@@ -220,30 +220,42 @@
     }
 
     function navigate() {
-        const fromLoc = document.getElementById("from").value;
-        const toLoc = document.getElementById("to").value;
+    const fromLoc = document.getElementById("from").value;
+    const toLoc = document.getElementById("to").value;
 
-        if (!fromLoc || !toLoc) {
-            alert("Please enter both locations");
-            return;
-        }
+    if (!fromLoc || !toLoc) {
+        alert("Please enter both locations");
+        return;
+    }
 
-        getCoords(fromLoc, (fromCoords) => {
-            getCoords(toLoc, (toCoords) => {
-                if (routeControl) {
-                    map.removeControl(routeControl);
-                }
-                routeControl = L.Routing.control({
-                    waypoints: [
-                        L.latLng(fromCoords[0], fromCoords[1]),
-                        L.latLng(toCoords[0], toCoords[1])
-                    ],
-                    routeWhileDragging: true,
-                    show: false
-                }).addTo(map);
+    getCoords(fromLoc, (fromCoords) => {
+        getCoords(toLoc, (toCoords) => {
+            if (routeControl) {
+                map.removeControl(routeControl);
+            }
+            routeControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(fromCoords[0], fromCoords[1]),
+                    L.latLng(toCoords[0], toCoords[1])
+                ],
+                routeWhileDragging: true,
+                show: false
+            }).addTo(map);
+
+            // Update travel info on route found
+            routeControl.on('routesfound', function(e) {
+                const route = e.routes[0];
+                const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+                const timeMins = Math.round(route.summary.totalTime / 60);
+
+                document.getElementById("travelInfo").innerHTML = `
+                    Distance: ${distanceKm} km<br>
+                    Time: ${timeMins} mins
+                `;
             });
         });
-    }
+    });
+}
 </script>
 </body>
 </html>
