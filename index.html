@@ -234,7 +234,8 @@
             .then(data => {
                 if (data.features && data.features.length > 0) {
                     // Set the 'from' input to place name or full place_text
-                    document.getElementById("from").value = data.features[0].place_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                    document.getElementById("from").value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+;
                 } else {
                     document.getElementById("from").value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                 }
