@@ -1,202 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Manipal University Jaipur Map</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
-    #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-    }
-    /* Top center search box */
-    .search-box {
-        position: absolute;
-        top: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0,0,0,0.6);
-        padding: 12px;
-        border-radius: 15px;
-        display: flex;
-        gap: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        z-index: 2;
-    }
-    input {
-        padding: 10px;
-        border-radius: 8px;
-        border: none;
-        font-size: 14px;
-        outline: none;
-        background: linear-gradient(135deg, #1f4037, #99f2c8);
-        color: white;
-    }
-    input::placeholder {
-        color: #f1f1f1;
-    }
-    button {
-        padding: 10px 15px;
-        border: none;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #ff512f, #dd2476);
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    button:hover {
-        opacity: 0.85;
-    }
-    /* Distance & time box bottom-left */
-    .info-box {
-        position: absolute;
-        bottom: 15px;
-        left: 15px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 13px;
-        max-width: 180px;
-        z-index: 2;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-</style>
+    <title>Manipal Navigation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+    <style>
+        #map { height: 100vh; }
+
+        /* Original box style */
+        .input-box {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            padding: 14px 18px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            width: 450px;
+        }
+
+        .input-box input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 15px;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(6px);
+            transition: all 0.3s ease;
+        }
+
+        .input-box input::placeholder {
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+        }
+
+        .input-box input:focus {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-box button {
+            padding: 10px 16px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            transition: all 0.3s ease;
+        }
+
+        .input-box button:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Routing box compact */
+        .leaflet-routing-container {
+            position: absolute !important;
+            bottom: 10px;
+            left: 10px;
+            width: 200px;
+            max-height: 150px;
+            font-size: 12px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+            .input-box {
+                width: 90%;
+                flex-direction: column;
+                gap: 6px;
+                padding: 10px;
+            }
+            .input-box input {
+                width: 100%;
+            }
+            .input-box button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div id="map"></div>
 
-<div class="search-box">
-    <input id="from" list="landmarks" placeholder="From location...">
-    <input id="to" list="landmarks" placeholder="To location...">
-    <button onclick="findRoute()">Go</button>
+<div class="input-box">
+    <input type="text" id="from" list="locations" placeholder="From">
+    <input type="text" id="to" list="locations" placeholder="To">
+    <button onclick="route()">Go</button>
 
-    <datalist id="landmarks">
-        <option value="Current Location">
-        <option value="AB1 Block">
-        <option value="AB2 Block">
-        <option value="BlueDove Mess">
-        <option value="Laundry">
-        <option value="Central Library">
-        <option value="Main Gate">
-        <option value="Gate 2">
-        <option value="BluSpring Mess">
-        <option value="AB3 Block">
-        <option value="Lecture Hall Complex">
-        <option value="Grand Stairs">
+    <datalist id="locations">
+        <option value="Current Location"></option>
+        <option value="AB1"></option>
+        <option value="AB2"></option>
+        <option value="Central Library"></option>
+        <option value="Mess"></option>
+        <option value="Laundry"></option>
     </datalist>
 </div>
 
-<div class="info-box" id="infoBox">Distance: - <br>Time: -</div>
-
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 <script>
-mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
+    var map = L.map('map').setView([26.8436, 75.5650], 16);
 
-// Landmarks coordinates
-const landmarks = {
-    "AB1 Block": [26.8451, 75.5655],
-    "AB2 Block": [26.8459, 75.5648],
-    "BlueDove Mess": [26.8465, 75.5653],
-    "Laundry": [26.8469, 75.5641],
-    "Central Library": [26.8446, 75.5657],
-    "Main Gate": [26.8436, 75.5650],
-    "Gate 2": [26.8432, 75.5662],
-    "BluSpring Mess": [26.8462, 75.5637],
-    "AB3 Block": [26.8467, 75.5646],
-    "Lecture Hall Complex": [26.8455, 75.5660],
-    "Grand Stairs": [26.8449, 75.5659]
-};
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-// Init map
-const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v12',
-    center: [75.5650, 26.8436],
-    zoom: 16
-});
+    var markers = {
+        "AB1": [26.8439, 75.5652],
+        "AB2": [26.8445, 75.5658],
+        "Central Library": [26.8435, 75.5665],
+        "Mess": [26.8429, 75.5659],
+        "Laundry": [26.8425, 75.5653]
+    };
 
-// Function to get coordinates from input
-function getCoords(location, callback) {
-    if (location.toLowerCase() === "current location") {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => callback([pos.coords.latitude, pos.coords.longitude]),
-                () => alert("Unable to fetch current location")
-            );
-        } else {
-            alert("Geolocation not supported by your browser");
-        }
-    } else if (landmarks[location]) {
-        callback(landmarks[location]);
-    } else {
-        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?proximity=75.5650,26.8436&limit=1&access_token=${mapboxgl.accessToken}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.features.length > 0) {
-                    callback([data.features[0].center[1], data.features[0].center[0]]);
-                } else {
-                    alert("Location not found");
-                }
+    var control;
+
+    function route() {
+        var fromVal = document.getElementById("from").value;
+        var toVal = document.getElementById("to").value;
+
+        var fromCoords, toCoords;
+
+        if (fromVal === "Current Location") {
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                fromCoords = [pos.coords.latitude, pos.coords.longitude];
+                toCoords = markers[toVal];
+                if (toCoords) showRoute(fromCoords, toCoords);
+            }, function(err) {
+                alert("Unable to fetch location");
             });
-    }
-}
-
-// Find route
-function findRoute() {
-    const fromLocation = document.getElementById('from').value;
-    const toLocation = document.getElementById('to').value;
-
-    if (!fromLocation || !toLocation) {
-        alert("Please enter both locations");
-        return;
+        } else {
+            fromCoords = markers[fromVal];
+            toCoords = markers[toVal];
+            if (fromCoords && toCoords) {
+                showRoute(fromCoords, toCoords);
+            }
+        }
     }
 
-    getCoords(fromLocation, (fromCoords) => {
-        getCoords(toLocation, (toCoords) => {
-            fetch(`https://api.mapbox.com/directions/v5/mapbox/walking/${fromCoords[1]},${fromCoords[0]};${toCoords[1]},${toCoords[0]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`)
-                .then(res => res.json())
-                .then(data => {
-                    const route = data.routes[0].geometry.coordinates;
-                    const distance = (data.routes[0].distance / 1000).toFixed(2);
-                    const duration = Math.round(data.routes[0].duration / 60);
-
-                    document.getElementById('infoBox').innerHTML = `Distance: ${distance} km<br>Time: ${duration} min`;
-
-                    if (map.getSource('route')) {
-                        map.removeLayer('route');
-                        map.removeSource('route');
-                    }
-
-                    map.addSource('route', {
-                        type: 'geojson',
-                        data: {
-                            type: 'Feature',
-                            geometry: { type: 'LineString', coordinates: route }
-                        }
-                    });
-
-                    map.addLayer({
-                        id: 'route',
-                        type: 'line',
-                        source: 'route',
-                        layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: { 'line-color': '#ff5733', 'line-width': 5 }
-                    });
-
-                    map.flyTo({ center: [(fromCoords[1] + toCoords[1]) / 2, (fromCoords[0] + toCoords[0]) / 2], zoom: 16 });
-                });
-        });
-    });
-}
+    function showRoute(start, end) {
+        if (control) {
+            map.removeControl(control);
+        }
+        control = L.Routing.control({
+            waypoints: [
+                L.latLng(start[0], start[1]),
+                L.latLng(end[0], end[1])
+            ],
+            routeWhileDragging: true,
+            show: true,
+            draggableWaypoints: false,
+            addWaypoints: false
+        }).addTo(map);
+    }
 </script>
 
 </body>
