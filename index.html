@@ -207,7 +207,7 @@
         if (landmarks[location]) {
             callback(landmarks[location]);
         } else {
-            fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?proximity=75.5650,26.8436&limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw')
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?proximity=75.5650,26.8436&limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.features.length > 0) {
@@ -220,43 +220,42 @@
     }
 
     function navigate() {
-    const fromLoc = document.getElementById("from").value;
-    const toLoc = document.getElementById("to").value;
+        const fromLoc = document.getElementById("from").value;
+        const toLoc = document.getElementById("to").value;
 
-    if (!fromLoc || !toLoc) {
-        alert("Please enter both locations");
-        return;
-    }
+        if (!fromLoc || !toLoc) {
+            alert("Please enter both locations");
+            return;
+        }
 
-    getCoords(fromLoc, (fromCoords) => {
-        getCoords(toLoc, (toCoords) => {
-            if (routeControl) {
-                map.removeControl(routeControl);
-            }
-            routeControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(fromCoords[0], fromCoords[1]),
-                    L.latLng(toCoords[0], toCoords[1])
-                ],
-                routeWhileDragging: true,
-                show: false
-            }).addTo(map);
+        getCoords(fromLoc, (fromCoords) => {
+            getCoords(toLoc, (toCoords) => {
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                }
+                routeControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(fromCoords[0], fromCoords[1]),
+                        L.latLng(toCoords[0], toCoords[1])
+                    ],
+                    routeWhileDragging: true,
+                    show: false
+                }).addTo(map);
 
-            // Update travel info on route found
-            routeControl.on('routesfound', function(e) {
-                const route = e.routes[0];
-                const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
-                const timeMins = Math.round(route.summary.totalTime / 60);
+                // Update travel info on route found
+                routeControl.on('routesfound', function(e) {
+                    const route = e.routes[0];
+                    const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+                    const timeMins = Math.round(route.summary.totalTime / 60);
 
-                document.getElementById("travelInfo").innerHTML = `
-                    Distance: ${distanceKm} km<br>
-                    Time: ${timeMins} mins
-                    `
-                ;
+                    document.getElementById("travelInfo").innerHTML = `
+                        Distance: ${distanceKm} km<br>
+                        Time: ${timeMins} mins
+                    `;
+                });
             });
         });
-    });
-}
+    }
 </script>
 </body>
 </html>
