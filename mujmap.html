@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MUJ Navigation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        #map { height: 100vh; }
+        .input-box {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 280px;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            padding: 8px;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005fcc;
+        }
+        datalist {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="input-box">
+    <input id="from" list="landmarks" placeholder="From location...">
+    <input id="to" list="landmarks" placeholder="To location...">
+    <datalist id="landmarks">
+        <option value="AB1 Block">
+        <option value="AB2 Block">
+        <option value="BlueDove Mess">
+        <option value="Laundry">
+        <option value="Central Library">
+        <option value="Main Gate">
+        <option value="Gate 2"></option>
+        <option value="BluSpring Mess"></option>
+        <option value="AB3 Block"></option>
+        <option value="Lecture Hall Complex"></option>
+        <option value="Grand Stairs"></option>
+        <option value=""></option>
+        <option value=""></option>
+
+            
+    </datalist>
+    <button onclick="navigate()">Go</button>
+</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+<script>
+    const map = L.map('map').setView([26.8436, 75.5650], 16); // MUJ coords
+
+    L.tileLayer(`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`, {
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1
+    }).addTo(map);
+
+    const landmarks = {
+        "AB1 Block": [26.842586, 75.564249],
+        "AB2 Block": [26.843117, 75.566100],
+        "BlueDove Mess": [26.840432, 75.561798],
+        "Laundry": [26.840202, 75.561454],
+        "Central Library": [26.841648, 75.565944],
+        "Main Gate": [26.840729, 75.566325],
+        "Gate 2": [26.841524, 75.563868],
+        "BluSpring Mess": [26.841255, 75.561567],
+        "AB3 Block": [26.844070, 75.564072],
+        "Lecture Hall Complex": [26.844338, 75.564705],
+        "Grand Stairs": [26.842811, 75.565360]
+        //add more landmarks
+    };
+
+    let routeControl;
+
+    function getCoords(location, callback) {
+        if (landmarks[location]) {
+            callback(landmarks[location]);
+        } else {
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?proximity=75.5650,26.8436&limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.features.length > 0) {
+                        callback([data.features[0].center[1], data.features[0].center[0]]);
+                    } else {
+                        alert("Location not found");
+                    }
+                });
+        }
+    }
+
+    function navigate() {
+        const fromLoc = document.getElementById("from").value;
+        const toLoc = document.getElementById("to").value;
+
+        if (!fromLoc || !toLoc) {
+            alert("Please enter both locations");
+            return;
+        }
+
+        getCoords(fromLoc, (fromCoords) => {
+            getCoords(toLoc, (toCoords) => {
+                if (routeControl) {
+                    map.removeControl(routeControl);
+                }
+                routeControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(fromCoords[0], fromCoords[1]),
+                        L.latLng(toCoords[0], toCoords[1])
+                    ],
+                    routeWhileDragging: true,
+                    show: false
+                }).addTo(map);
+            });
+        });
+    }
+</script>
+</body>
+</html>
