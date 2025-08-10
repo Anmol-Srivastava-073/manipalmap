@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>MUJ Navigation</title>
-    <link rel="icon" type="image/png" href="image/manipallogo.png">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -44,6 +43,19 @@
         datalist {
             font-size: 14px;
         }
+        .leaflet-routing-container {
+    position: absolute !important;
+    bottom: 10px;
+    right: 10px;
+    width: 200px;   /* smaller width */
+    max-height: 150px; /* smaller height */
+    font-size: 12px;   /* smaller text */
+    overflow-y: auto;  /* scroll if text is too long */
+    background: rgba(255, 255, 255, 0.9); /* semi-transparent */
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
     </style>
 </head>
 <body>
@@ -95,7 +107,6 @@
         "AB3 Block": [26.844070, 75.564072],
         "Lecture Hall Complex": [26.844338, 75.564705],
         "Grand Stairs": [26.842811, 75.565360]
-        //add more landmarks
     };
 
     let routeControl;
@@ -144,3 +155,4 @@
 </script>
 </body>
 </html>
+
