@@ -11,55 +11,71 @@
         #map { height: 100vh; }
         
         
-        .input-box {
+       .input-box {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 1001; /* keep above map & routing box */
-    background: rgba(255, 255, 255, 0.95);
-    padding: 10px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    bottom: 15px;
+    right: 15px;
+    z-index: 1001;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    width: 220px;
+    gap: 8px;
+    padding: 12px;
+    width: 240px;
+
+    /* Glassmorphism background */
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+    /* Border & shadow */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
 }
 
-/* Cool input style */
+/* Text input styling */
 .input-box input {
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 14px;
-    border: 2px solid transparent;
-    border-radius: 20px;
+    color: white;
+    border: none;
+    border-radius: 12px;
     outline: none;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 1px 5px rgba(0,0,0,0.15);
+
+    /* Semi-transparent input */
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
 }
 
+/* Glow on focus */
 .input-box input:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 150, 255, 0.7);
 }
 
+/* Placeholder style */
 .input-box input::placeholder {
-    color: #777;
+    color: rgba(255, 255, 255, 0.7);
     font-style: italic;
 }
 
-/* Button style */
+/* Button styling */
 .input-box button {
-    padding: 8px;
-    background: #0078ff;
+    padding: 10px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
     color: white;
+    font-weight: bold;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* Button hover animation */
 .input-box button:hover {
-    background: #005fcc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.6);
 }
         button {
             padding: 8px;
