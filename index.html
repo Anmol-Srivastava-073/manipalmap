@@ -46,7 +46,7 @@
     }).addTo(map);
 
     // Load roads.geojson (must be in same folder or update path)
-    fetch('roads.geojson')
+    fetch('export.geojson')
         .then(response => response.json())
         .then(data => {
             L.geoJSON(data, {
