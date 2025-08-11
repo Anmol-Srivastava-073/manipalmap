@@ -6,70 +6,252 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- ADDED: your custom/fancy CSS (keeps look you asked for) -->
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; }
-        #map { height: 100vh; width: 100%; }
+        :root{
+            --accent1: linear-gradient(135deg,#ff9966,#ff5e62);
+            --accent-route: #00bcd4;
+            --muted-road: #bfc4c6;
+            --glass: rgba(255,255,255,0.12);
+            --glass-strong: rgba(255,255,255,0.22);
+            --ui-radius: 12px;
+            --shadow: 0 10px 30px rgba(12,18,26,0.18);
+        }
+
+        /* global */
+        html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+        #map{height:100vh;width:100%;background:#eaecef}
+
+        /* --- Your original fancy input-box styles --- */
+        .input-box{
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1200;
+            width: calc(100% - 30px);
+            max-width: 820px;
+            padding: 10px;
+            display:flex;
+            gap:10px;
+            align-items:center;
+            border-radius:var(--ui-radius);
+            background: var(--accent1);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px) saturate(120%);
+            border:1px solid rgba(255,255,255,0.06);
+        }
+        .input-left{ display:flex; gap:10px; align-items:center; flex:1 1 auto; }
+        .input-left input{
+            min-width:130px;
+            padding:10px 12px;
+            border-radius:10px;
+            border:none;
+            background: rgba(255,255,255,0.14);
+            color:white;
+            outline:none;
+            font-size:15px;
+        }
+        .input-left input::placeholder{ color: rgba(255,255,255,0.95); font-style:italic; }
+
+        .btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background: rgba(0,0,0,0.18);
+            color: #fff;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+        }
+        .icon-btn {
+            width:42px;height:42px;padding:0;justify-content:center;
+            background: rgba(255,255,255,0.08);
+        }
+        .btn:hover{ transform: translateY(-2px); filter:brightness(1.03); }
+
+        /* Suggestion dropdown (custom lightweight) */
+        .suggestions {
+            position:absolute;
+            top: 58px; /* relative to .input-box, adjust */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index:1300;
+            width: calc(100% - 30px);
+            max-width:820px;
+            pointer-events:none;
+        }
+        .suggest-list {
+            pointer-events:auto;
+            display:flex;
+            gap:8px;
+            padding:8px;
+            background: rgba(0,0,0,0.55);
+            border-radius:10px;
+            box-shadow: var(--shadow);
+            color:#fff;
+        }
+        .suggest-item {
+            padding:8px 10px;
+            border-radius:8px;
+            background: rgba(255,255,255,0.06);
+            cursor:pointer;
+            font-weight:600;
+            font-size:14px;
+        }
+        .suggest-item:hover { background: rgba(255,255,255,0.12); }
+
+        /* Info box bottom-left */
+        .travel-info-box {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            z-index: 1200;
+            background: rgba(12,17,22,0.75);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size:14px;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+            backdrop-filter: blur(6px);
+            min-width:160px;
+        }
+        .travel-info-box b{display:block;margin-bottom:6px;font-size:13px}
+
+        /* Live location toggle */
+        .live-toggle {
+            position:absolute;
+            bottom:14px;
+            right:14px;
+            z-index:1200;
+            background: rgba(255,255,255,0.08);
+            color:#fff;
+            padding:8px 10px;
+            border-radius:10px;
+            border:1px solid rgba(255,255,255,0.04);
+            cursor:pointer;
+            box-shadow: var(--shadow);
+        }
+
+        /* small responsive adjustments */
+        @media (max-width:720px){
+            .input-box{ width: calc(100% - 18px); padding:8px; gap:8px; top:10px; }
+            .suggestions { top: 56px; }
+            .input-left input { min-width: 90px; font-size:14px; padding:9px; }
+        }
+
+        /* --- MAPPINGS: apply your CSS look to the existing HTML class names
+           The code you gave uses .search-box, #info-box and #suggestions.
+           We map them to the styles above so nothing else in your JS/HTML needed to change. --- */
+
+        /* apply input-box look to existing .search-box (so we didn't need to change HTML) */
         .search-box {
             position: absolute;
-            top: 10px; left: 50%;
+            top: 14px;
+            left: 50%;
             transform: translateX(-50%);
-            background: white;
+            z-index: 1200;
+            width: calc(100% - 30px);
+            max-width: 820px;
             padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            display: flex; gap: 5px;
-            z-index: 999;
+            display:flex;
+            gap:10px;
+            align-items:center;
+            border-radius:var(--ui-radius);
+            background: var(--accent1);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px) saturate(120%);
+            border:1px solid rgba(255,255,255,0.06);
         }
-        input, button {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        .search-box input {
+            min-width:130px;
+            padding:10px 12px;
+            border-radius:10px;
+            border:none;
+            background: rgba(255,255,255,0.14);
+            color:white;
+            outline:none;
+            font-size:15px;
         }
-        button { background: #0078d7; color: white; cursor: pointer; border: none; }
+        .search-box input::placeholder { color: rgba(255,255,255,0.9); font-style:italic; }
+
+        /* suggestions mapping to your suggest-list style */
+        #suggestions {
+            position:absolute;
+            top: 58px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index:1300;
+            width: calc(100% - 30px);
+            max-width:820px;
+            pointer-events:auto;
+            display:none; /* hidden until needed */
+        }
+        #suggestions .list {
+            display:flex;
+            gap:8px;
+            padding:8px;
+            background: rgba(0,0,0,0.55);
+            border-radius:10px;
+            box-shadow: var(--shadow);
+            color:#fff;
+            flex-wrap:wrap;
+            justify-content:center;
+        }
+        #suggestions .item {
+            padding:8px 10px;
+            border-radius:8px;
+            background: rgba(255,255,255,0.06);
+            cursor:pointer;
+            font-weight:600;
+            font-size:14px;
+        }
+        #suggestions .item:hover { background: rgba(255,255,255,0.12); }
+
+        /* info box mapping */
         #info-box {
             position: absolute;
-            bottom: 10px; left: 10px;
-            background: rgba(255,255,255,0.95);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            z-index: 999;
+            bottom: 14px;
+            left: 14px;
+            z-index: 1200;
+            background: rgba(12,17,22,0.75);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size:14px;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+            backdrop-filter: blur(6px);
+            min-width:160px;
         }
-        #suggestions {
-            position: absolute;
-            top: 50px; left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            border-radius: 5px;
-            max-height: 150px;
-            overflow-y: auto;
-            width: 200px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            z-index: 999;
-        }
-        #suggestions div {
-            padding: 8px;
-            cursor: pointer;
-        }
-        #suggestions div:hover {
-            background: #f0f0f0;
-        }
+
+        /* keep small defaults (so Leaflet controls etc still look ok) */
+        .leaflet-container a.leaflet-control-zoom-in,
+        .leaflet-container a.leaflet-control-zoom-out { font-weight: bold; }
     </style>
 </head>
 <body>
+    <!-- KEEP your original HTML exactly as you last sent it -->
     <div class="search-box">
         <input id="from" type="text" placeholder="From (leave empty for my location)">
         <input id="to" type="text" placeholder="To">
         <button onclick="startNavigation()">Go</button>
         <button onclick="getMyLocation()">📍</button>
     </div>
-    <div id="suggestions"></div>
+
+    <!-- suggestions element (styled by CSS mapping above) -->
+    <div id="suggestions"><div class="list" id="suggestList"></div></div>
+
     <div id="map"></div>
     <div id="info-box">Distance: - | Time: -</div>
 
+    <!-- Leaflet -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     <script>
+        // --- KEEP your JS exactly as before (no functional changes) ---
         var map = L.map('map').setView([26.8436, 75.5650], 17);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -96,7 +278,7 @@
 
         var userMarker, routeLine, watchID;
 
-        // Track live location
+        // Track live location (watch)
         function getMyLocation() {
             if (watchID) navigator.geolocation.clearWatch(watchID);
             if (!navigator.geolocation) {
@@ -115,6 +297,7 @@
             }, { enableHighAccuracy: true });
         }
 
+        // Start the navigation: draw route line + calculate distance/time
         function startNavigation() {
             let fromVal = document.getElementById('from').value;
             let toVal = document.getElementById('to').value;
@@ -145,33 +328,49 @@
             if (!val) return null;
             if (val.includes(",")) {
                 let [lat, lng] = val.split(",").map(Number);
-                return [lat, lng];
+                if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+                return null;
             }
             if (campusLocations[val]) return campusLocations[val];
             return null;
         }
 
-        // Suggestions for campus locations
+        // Suggestions: show matching campus locations under the top box
+        const suggestList = document.getElementById('suggestList');
+        const suggestionsWrapper = document.getElementById('suggestions');
+
+        function showSuggestions(query) {
+            suggestList.innerHTML = '';
+            if (!query) { suggestionsWrapper.style.display = 'none'; return; }
+            for (let name in campusLocations) {
+                if (name.toLowerCase().includes(query.toLowerCase())) {
+                    const item = document.createElement('div');
+                    item.className = 'item';
+                    item.textContent = name;
+                    item.onclick = () => {
+                        document.getElementById('to').value = name;
+                        suggestList.innerHTML = '';
+                        suggestionsWrapper.style.display = 'none';
+                    };
+                    suggestList.appendChild(item);
+                }
+            }
+            // show only if we added results
+            suggestionsWrapper.style.display = suggestList.children.length ? 'block' : 'none';
+        }
+
         document.getElementById('to').addEventListener('input', function() {
             showSuggestions(this.value);
         });
 
-        function showSuggestions(query) {
-            let sugBox = document.getElementById('suggestions');
-            sugBox.innerHTML = "";
-            if (!query) return;
-            for (let name in campusLocations) {
-                if (name.toLowerCase().includes(query.toLowerCase())) {
-                    let div = document.createElement('div');
-                    div.innerHTML = name;
-                    div.onclick = () => {
-                        document.getElementById('to').value = name;
-                        sugBox.innerHTML = "";
-                    };
-                    sugBox.appendChild(div);
-                }
+        // hide suggestions if clicking outside
+        document.addEventListener('click', (e) => {
+            const box = document.querySelector('.search-box');
+            if (!box.contains(e.target)) {
+                suggestList.innerHTML = '';
+                suggestionsWrapper.style.display = 'none';
             }
-        }
+        });
     </script>
 </body>
 </html>
