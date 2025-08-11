@@ -97,6 +97,29 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
+        /* Suggestions box styling */
+        #suggestions {
+            position: absolute;
+            background: #fff;
+            border-radius: 8px;
+            max-width: 820px;
+            width: calc(100% - 30px);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            z-index: 1300;
+            max-height: 180px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+        }
+
+        #suggestions > div {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        #suggestions > div:hover {
+            background: #e0e0e0;
+        }
+
         /* Info box bottom-left */
         .travel-info-box {
             position: absolute;
@@ -172,7 +195,7 @@
         <button class="btn" id="goBtn" onclick="navigate()" title="Navigate">Go ➜</button>
     </div>
 
-    <div id="suggestions" role="listbox" aria-label="Location suggestions" ></div>
+    <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
 
     <div class="travel-info-box" id="travelInfo" aria-live="polite">
         <b>Trip</b>
@@ -268,6 +291,11 @@
                 };
                 suggestWrapper.appendChild(el);
             });
+            // Position suggestions below the input that triggered it
+            const rect = input.getBoundingClientRect();
+            suggestWrapper.style.top = (rect.bottom + window.scrollY) + 'px';
+            suggestWrapper.style.left = (rect.left + window.scrollX) + 'px';
+            suggestWrapper.style.width = rect.width + 'px';
             suggestWrapper.style.display = 'flex';
         }
 
@@ -337,11 +365,11 @@
                             ]
                         },
                         router: L.Routing.osrmv1({
-    serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
-    pointToUrlParam: function(latLng) {
-        return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
-    }
-})
+                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
+                            pointToUrlParam: function(latLng) {
+                                return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
+                            }
+                        })
                     }).addTo(map);
 
                     routeControl.on('routesfound', function (e) {
@@ -438,5 +466,4 @@
         }
     </script>
 </body>
-</html>
 </html>
