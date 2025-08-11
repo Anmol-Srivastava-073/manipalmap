@@ -229,26 +229,44 @@
             return;
         }
         navigator.geolocation.getCurrentPosition(position => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
 
-            // Reverse geocode using Mapbox API
-            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.features && data.features.length > 0) {
-                        // Set the 'from' input to full place name
-                        document.getElementById("from").value = data.features[0].place_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                    } else {
-                        document.getElementById("from").value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                    }
-                })
-                .catch(() => {
-                    document.getElementById("from").value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                });
-        }, () => {
-            alert("Unable to retrieve your location");
+    // Reverse geocode using Mapbox API
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
+        .then(res => res.json())
+        .then(data => {
+            let locationName;
+            if (data.features && data.features.length > 0) {
+                locationName = data.features[0].place_name;
+            } else {
+                locationName = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+            }
+
+            // Fill the "from" input
+            document.getElementById("from").value = locationName;
+
+            // Add marker to your location
+            L.marker([lat, lon])
+                .addTo(map)
+                .bindPopup("📍 You are here<br>" + locationName)
+                .openPopup();
+
+            // Zoom to your location
+            map.setView([lat, lon], 17);
+        })
+        .catch(() => {
+            const fallback = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+            document.getElementById("from").value = fallback;
+            L.marker([lat, lon])
+                .addTo(map)
+                .bindPopup("📍 You are here<br>" + fallback)
+                .openPopup();
+            map.setView([lat, lon], 17);
         });
+}, () => {
+    alert("Unable to retrieve your location");
+});
     }
 
     function navigate() {
