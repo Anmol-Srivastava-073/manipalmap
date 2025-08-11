@@ -205,23 +205,18 @@
         "Grand Stairs": [26.842811, 75.565360]
     };
 
-    let routeControl;
-
-    function getCoords(location, callback) {
-        if (landmarks[location]) {
-            callback(landmarks[location]);
-        } else {
-            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?proximity=75.5650,26.8436&limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.features.length > 0) {
-                        callback([data.features[0].center[1], data.features[0].center[0]]);
-                    } else {
-                        alert("Location not found");
-                    }
-                });
-        }
-    }
+    routeControl = L.Routing.control({
+    waypoints: [
+        L.latLng(fromCoords[0], fromCoords[1]),
+        L.latLng(toCoords[0], toCoords[1])
+    ],
+    routeWhileDragging: true,
+    show: false,
+    router: L.Routing.mapbox(
+        'pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw',
+        { profile: 'mapbox/walking' } // ensures campus paths are used
+    )
+}).addTo(map);
 
     function setCurrentLocation() {
         if (!navigator.geolocation) {
