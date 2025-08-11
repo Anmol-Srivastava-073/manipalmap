@@ -209,13 +209,9 @@ fetch('export.geojson')
                 return { color: '#bfc4c6', weight: 2, opacity: 0.9 };
             }
         });
-        console.log('Roads geojson loaded');
     })
     .catch(err => console.warn('Could not load export.geojson', err));
 
-let routeControl = null;
-
-// Suggestions data for campus landmarks
 const LANDMARKS = {
     "AB1 Block": [26.842586, 75.564249],
     "AB2 Block": [26.843117, 75.566100],
@@ -230,7 +226,6 @@ const LANDMARKS = {
     "Grand Stairs": [26.842811, 75.565360]
 };
 
-// Suggestion UI handlers
 const suggestWrapper = document.getElementById('suggestions');
 const suggestList = document.getElementById('suggestList');
 
@@ -263,14 +258,13 @@ function hideSuggestions() {
 
 document.getElementById('from').addEventListener('focus', showSuggestions);
 document.getElementById('to').addEventListener('focus', showSuggestions);
-document.getElementById('from').addEventListener('input', () => { /* keep suggestions visible */ });
-document.getElementById('to').addEventListener('input', () => { /* keep suggestions visible */ });
+document.getElementById('from').addEventListener('input', () => {});
+document.getElementById('to').addEventListener('input', () => {});
 document.addEventListener('click', (e) => {
     const box = document.querySelector('.input-box');
     if (!box.contains(e.target)) hideSuggestions();
 });
 
-// Helper: get coordinates from input (landmark name or "lat, lon")
 function getCoords(location, callback) {
     location = location.trim();
     if (LANDMARKS[location]) {
@@ -287,7 +281,8 @@ function getCoords(location, callback) {
     alert('Please enter a valid campus location or coordinates as "lat, lon".');
 }
 
-// Navigation function with routing and markers
+let routeControl = null;
+
 function navigate() {
     const fromVal = document.getElementById('from').value.trim();
     const toVal = document.getElementById('to').value.trim();
@@ -316,7 +311,7 @@ function navigate() {
                 createMarker: function (i, wp) {
                     return L.marker(wp.latLng, {
                         icon: L.divIcon({
-                            html: `<div style="background:${getComputedStyle(document.documentElement).getPropertyValue('--accent-route') || '#00bcd4'}; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+                            html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
                             className: '',
                             iconSize: [20, 20],
                             iconAnchor: [10, 10]
@@ -354,7 +349,6 @@ function navigate() {
     });
 }
 
-// Live location & current location functions (unchanged)...
 let liveWatchId = null;
 let liveMarker = null;
 let liveAccuracyCircle = null;
@@ -400,12 +394,10 @@ function stopLiveLocation() {
         liveWatchId = null;
     }
     if (liveMarker) {
-        map.removeLayer(liveMarker);
-        liveMarker = null;
+        map.removeLayer(liveMarker); liveMarker = null;
     }
     if (liveAccuracyCircle) {
-        map.removeLayer(liveAccuracyCircle);
-        liveAccuracyCircle = null;
+        map.removeLayer(liveAccuracyCircle); liveAccuracyCircle = null;
     }
 }
 
