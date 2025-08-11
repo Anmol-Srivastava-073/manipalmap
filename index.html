@@ -25,11 +25,11 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-        button { background: #0078d7; color: white; cursor: pointer; }
+        button { background: #0078d7; color: white; cursor: pointer; border: none; }
         #info-box {
             position: absolute;
             bottom: 10px; left: 10px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 14px;
@@ -77,12 +77,13 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Load campus roads
+        // Load campus roads (grey, minimal)
         fetch('export.geojson')
             .then(res => res.json())
             .then(data => {
-                L.geoJSON(data, { style: { color: '#888', weight: 1 } }).addTo(map);
-            });
+                L.geoJSON(data, { style: { color: '#aaa', weight: 1 } }).addTo(map);
+            })
+            .catch(err => console.error("GeoJSON load error:", err));
 
         // Campus locations
         const campusLocations = {
@@ -93,17 +94,25 @@
             "Laundry": [26.8440, 75.5639]
         };
 
-        var userMarker, routeLine;
+        var userMarker, routeLine, watchID;
 
+        // Track live location
         function getMyLocation() {
-            navigator.geolocation.getCurrentPosition(pos => {
+            if (watchID) navigator.geolocation.clearWatch(watchID);
+            if (!navigator.geolocation) {
+                alert("Geolocation not supported by your browser.");
+                return;
+            }
+            watchID = navigator.geolocation.watchPosition(pos => {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-                if (userMarker) map.removeLayer(userMarker);
-                userMarker = L.marker([lat, lng]).addTo(map).bindPopup("You are here").openPopup();
+                if (userMarker) userMarker.setLatLng([lat, lng]);
+                else userMarker = L.marker([lat, lng]).addTo(map).bindPopup("You are here");
                 map.setView([lat, lng], 18);
                 document.getElementById('from').value = `${lat},${lng}`;
-            }, err => alert("Location access denied."));
+            }, err => {
+                alert("Location access denied.");
+            }, { enableHighAccuracy: true });
         }
 
         function startNavigation() {
@@ -120,13 +129,14 @@
 
             if (routeLine) map.removeLayer(routeLine);
 
+            // Draw route line
             routeLine = L.polyline([fromCoords, toCoords], { color: 'blue', weight: 4 }).addTo(map);
             map.fitBounds(routeLine.getBounds());
 
+            // Calculate distance/time
             let dist = map.distance(fromCoords, toCoords);
-            let walkingSpeed = 1.4; // m/s
+            let walkingSpeed = 1.4; // meters/sec
             let timeSec = dist / walkingSpeed;
-
             document.getElementById('info-box').innerHTML =
                 `Distance: ${(dist/1000).toFixed(2)} km | Time: ${(timeSec/60).toFixed(1)} min`;
         }
@@ -141,7 +151,7 @@
             return null;
         }
 
-        // Suggestions
+        // Suggestions for campus locations
         document.getElementById('to').addEventListener('input', function() {
             showSuggestions(this.value);
         });
