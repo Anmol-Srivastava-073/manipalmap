@@ -365,11 +365,11 @@
                             ]
                         },
                         router: L.Routing.osrmv1({
-                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
-                            pointToUrlParam: function(latLng) {
-                                return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
-                            }
-                        })
+    serviceUrl: 'https://routing.openstreetmap.de/routed-foot/route/v1',
+    pointToUrlParam: function(latLng) {
+        return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
+    }
+})
                     }).addTo(map);
 
                     routeControl.on('routesfound', function (e) {
