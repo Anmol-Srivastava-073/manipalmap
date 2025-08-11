@@ -348,6 +348,19 @@ function navigate() {
         });
     });
 }
+        createMarker: function (i, wp) {
+    const label = i === 0 ? 'From (A)' : 'To (B)';
+    const marker = L.marker(wp.latLng, {
+        icon: L.divIcon({
+            html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+            className: '',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        })
+    });
+    marker.bindPopup(label);
+    return marker;
+},
 
 let liveWatchId = null;
 let liveMarker = null;
