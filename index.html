@@ -215,24 +215,85 @@ fetch('export.geojson')
 
 let routeControl = null;
 
+// Suggestions data for campus landmarks
+const LANDMARKS = {
+    "AB1 Block": [26.842586, 75.564249],
+    "AB2 Block": [26.843117, 75.566100],
+    "AB3 Block": [26.844070, 75.564072],
+    "BlueDove Mess": [26.840432, 75.561798],
+    "BluSpring Mess": [26.841255, 75.561567],
+    "Laundry": [26.840202, 75.561454],
+    "Central Library": [26.841648, 75.565944],
+    "Lecture Hall Complex": [26.844338, 75.564705],
+    "Main Gate": [26.840729, 75.566325],
+    "Gate 2": [26.841524, 75.563868],
+    "Grand Stairs": [26.842811, 75.565360]
+};
+
+// Suggestion UI handlers
+const suggestWrapper = document.getElementById('suggestions');
+const suggestList = document.getElementById('suggestList');
+
+function showSuggestions() {
+    suggestList.innerHTML = '';
+    for (const name of Object.keys(LANDMARKS)) {
+        const el = document.createElement('div');
+        el.className = 'suggest-item';
+        el.textContent = name;
+        el.onclick = () => {
+            const active = document.activeElement;
+            if (active && (active.id === 'to' || active.id === 'from')) {
+                active.value = name;
+            }
+            suggestWrapper.style.display = 'none';
+            suggestWrapper.setAttribute('aria-hidden', 'true');
+        };
+        suggestList.appendChild(el);
+    }
+    suggestWrapper.style.display = 'block';
+    suggestWrapper.setAttribute('aria-hidden', 'false');
+    suggestList.style.display = 'flex';
+}
+
+function hideSuggestions() {
+    suggestWrapper.style.display = 'none';
+    suggestWrapper.setAttribute('aria-hidden', 'true');
+    suggestList.style.display = 'none';
+}
+
+document.getElementById('from').addEventListener('focus', showSuggestions);
+document.getElementById('to').addEventListener('focus', showSuggestions);
+document.getElementById('from').addEventListener('input', () => { /* keep suggestions visible */ });
+document.getElementById('to').addEventListener('input', () => { /* keep suggestions visible */ });
+document.addEventListener('click', (e) => {
+    const box = document.querySelector('.input-box');
+    if (!box.contains(e.target)) hideSuggestions();
+});
+
+// Helper: get coordinates from input (landmark name or "lat, lon")
 function getCoords(location, callback) {
     location = location.trim();
-    const latlonMatch = location.match(/^\s*([+-]?\d+\.\d+)\s*,\s*([+-]?\d+\.\d+)\s*$/);
+    if (LANDMARKS[location]) {
+        callback(LANDMARKS[location]);
+        return;
+    }
+    const latlonMatch = location.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
     if (latlonMatch) {
         const lat = parseFloat(latlonMatch[1]);
-        const lon = parseFloat(latlonMatch[2]);
+        const lon = parseFloat(latlonMatch[3]);
         callback([lat, lon]);
         return;
     }
-    alert('Please enter coordinates in "lat, lon" format.');
+    alert('Please enter a valid campus location or coordinates as "lat, lon".');
 }
 
+// Navigation function with routing and markers
 function navigate() {
     const fromVal = document.getElementById('from').value.trim();
     const toVal = document.getElementById('to').value.trim();
 
     if (!fromVal || !toVal) {
-        alert('Please fill both From and To fields with coordinates like "lat, lon".');
+        alert('Please fill both From and To fields.');
         return;
     }
 
@@ -247,56 +308,56 @@ function navigate() {
                 roadsLayer.addTo(map);
             }
 
-            // Wait a tick to ensure roadsLayer added
-            setTimeout(() => {
-                routeControl = L.Routing.control({
-                    waypoints: [
-                        L.latLng(fromCoords[0], fromCoords[1]),
-                        L.latLng(toCoords[0], toCoords[1])
-                    ],
-                    createMarker: function(i, wp) {
-                        return L.marker(wp.latLng, {
-                            icon: L.divIcon({
-                                html: `<div style="background:${getComputedStyle(document.documentElement).getPropertyValue('--accent-route') || '#00bcd4'}; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i===0?'A':'B'}</div>`,
-                                className: '',
-                                iconSize: [20, 20],
-                                iconAnchor: [10, 10]
-                            })
-                        });
-                    },
-                    routeWhileDragging: false,
-                    addWaypoints: false,
-                    show: false,
-                    lineOptions: {
-                        styles: [
-                            { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
-                            { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
-                        ]
-                    },
-                    router: L.Routing.osrmv1({
-                        serviceUrl: 'https://router.project-osrm.org/route/v1'
-                    })
-                }).addTo(map);
+            routeControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(fromCoords[0], fromCoords[1]),
+                    L.latLng(toCoords[0], toCoords[1])
+                ],
+                createMarker: function (i, wp) {
+                    return L.marker(wp.latLng, {
+                        icon: L.divIcon({
+                            html: `<div style="background:${getComputedStyle(document.documentElement).getPropertyValue('--accent-route') || '#00bcd4'}; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+                            className: '',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        })
+                    });
+                },
+                routeWhileDragging: false,
+                addWaypoints: false,
+                show: false,
+                lineOptions: {
+                    styles: [
+                        { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
+                        { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
+                    ]
+                },
+                router: L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1'
+                })
+            }).addTo(map);
 
-                routeControl.on('routesfound', function(e) {
-                    const r = e.routes[0];
-                    const distKm = (r.summary.totalDistance / 1000);
-                    const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
+            routeControl.on('routesfound', function (e) {
+                const r = e.routes[0];
+                const distKm = (r.summary.totalDistance / 1000);
+                const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
 
-                    document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
-                    map.fitBounds(r.bounds.pad(0.12));
-                });
+                document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
+                map.fitBounds(r.bounds.pad(0.12));
+            });
 
-                routeControl.on('routingerror', function(e) {
-                    console.error('Routing error:', e);
-                    alert('Could not calculate route. Check coordinates and try again.');
-                });
-            }, 100);
+            routeControl.on('routingerror', function (e) {
+                console.error('Routing error:', e);
+                alert('Could not calculate route. Please check inputs.');
+            });
         });
     });
 }
 
-// Live location & current location helpers (unchanged)...
+// Live location & current location functions (unchanged)...
+let liveWatchId = null;
+let liveMarker = null;
+let liveAccuracyCircle = null;
 
 function startLiveLocation() {
     if (!navigator.geolocation) {
