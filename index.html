@@ -318,76 +318,77 @@
         let routeControl = null;
 
         function navigate() {
-            const fromVal = document.getElementById('from').value.trim();
-            const toVal = document.getElementById('to').value.trim();
+    const fromVal = document.getElementById('from').value.trim();
+    const toVal = document.getElementById('to').value.trim();
 
-            if (!fromVal || !toVal) {
-                alert('Please fill both From and To fields.');
-                return;
+    if (!fromVal || !toVal) {
+        alert('Please fill both From and To fields.');
+        return;
+    }
+
+    getCoords(fromVal, (fromCoords) => {
+        getCoords(toVal, (toCoords) => {
+            if (routeControl) {
+                map.removeControl(routeControl);
+                routeControl = null;
             }
 
-            getCoords(fromVal, (fromCoords) => {
-                getCoords(toVal, (toCoords) => {
-                    if (routeControl) {
-                        map.removeControl(routeControl);
-                        routeControl = null;
-                    }
+            if (roadsLayer && !map.hasLayer(roadsLayer)) {
+                roadsLayer.addTo(map);
+            }
 
-                    if (roadsLayer && !map.hasLayer(roadsLayer)) {
-                        roadsLayer.addTo(map);
+            routeControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(fromCoords[0], fromCoords[1]),
+                    L.latLng(toCoords[0], toCoords[1])
+                ],
+                router: L.Routing.osrmv1({
+                    serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
+                    profile: 'foot',
+                    pointToUrlParam: function(latLng) {
+                        return latLng.lng + ',' + latLng.lat; // OSRM expects lon,lat
                     }
-
-                    routeControl = L.Routing.control({
-                        waypoints: [
-                            L.latLng(fromCoords[0], fromCoords[1]),
-                            L.latLng(toCoords[0], toCoords[1])
-                        ],
-                        createMarker: function (i, wp) {
-                            const label = i === 0 ? 'From (A)' : 'To (B)';
-                            const marker = L.marker(wp.latLng, {
-                                icon: L.divIcon({
-                                    html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
-                                    className: '',
-                                    iconSize: [20, 20],
-                                    iconAnchor: [10, 10]
-                                })
-                            });
-                            marker.bindPopup(label);
-                            return marker;
-                        },
-                        routeWhileDragging: false,
-                        addWaypoints: false,
-                        show: false,
-                        lineOptions: {
-                            styles: [
-                                { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
-                                { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
-                            ]
-                        },
-                        router: L.Routing.osrmv1({
-                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
-                            pointToUrlParam: function(latLng) {
-                                return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
-                            }
+                }),
+                createMarker: function (i, wp) {
+                    const label = i === 0 ? 'From (A)' : 'To (B)';
+                    const marker = L.marker(wp.latLng, {
+                        icon: L.divIcon({
+                            html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+                            className: '',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
                         })
-                    }).addTo(map);
-
-                    routeControl.on('routesfound', function (e) {
-                        const r = e.routes[0];
-                        const distKm = (r.summary.totalDistance / 1000);
-                        const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
-
-                        document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
-                        map.fitBounds(r.bounds.pad(0.12));
                     });
+                    marker.bindPopup(label);
+                    return marker;
+                },
+                routeWhileDragging: false,
+                addWaypoints: false,
+                show: true,  // changed from false to true so path is visible immediately
+                lineOptions: {
+                    styles: [
+                        { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
+                        { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
+                    ]
+                }
+            }).addTo(map);
 
-                    routeControl.on('routingerror', function (e) {
-                        console.error('Routing error:', e);
-                        alert('Could not calculate route. Please check inputs.');
-                    });
-                });
+            routeControl.on('routesfound', function (e) {
+                const r = e.routes[0];
+                const distKm = (r.summary.totalDistance / 1000);
+                const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
+
+                document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
+                map.fitBounds(r.bounds.pad(0.12));
             });
-        }
+
+            routeControl.on('routingerror', function (e) {
+                console.error('Routing error:', e);
+                alert('Could not calculate route. Please check inputs.');
+            });
+        });
+    });
+}
 
         let liveWatchId = null;
         let liveMarker = null;
