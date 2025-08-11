@@ -242,6 +242,62 @@
     // ... (reuse your landmark suggestion/autocomplete code here) ...
 
     // --- HELPERS FOR ROUTING ---
+        let displayedRoute = null;
+
+function navigate() {
+    const fromVal = document.getElementById('from').value.trim();
+    const toVal = document.getElementById('to').value.trim();
+    if (!fromVal || !toVal) {
+        alert('Please fill both From and To fields.');
+        return;
+    }
+    if (!pathFinder) {
+        alert('Campus map data not loaded yet.');
+        return;
+    }
+    getCoords(fromVal, fromCoords => {
+        getCoords(toVal, toCoords => {
+            // Remove previous route if exists
+            if (displayedRoute) {
+                map.removeLayer(displayedRoute);
+                displayedRoute = null;
+            }
+
+            // Snap points to network (GeoJSON coords are [lng, lat])
+            const fromPoint = { type: "Feature", geometry: { type: "Point", coordinates: [fromCoords[1], fromCoords[0]] }};
+            const toPoint   = { type: "Feature", geometry: { type: "Point", coordinates: [toCoords[1], toCoords[0]] }};
+
+            const path = pathFinder.findPath(fromPoint, toPoint);
+            if (!path) {
+                alert('No campus route found between those points.');
+                return;
+            }
+
+            // Convert path coords for Leaflet [lat,lng]
+            const pathLatLngs = path.path.map(([lng,lat]) => [lat,lng]);
+
+            // Draw route polyline
+            displayedRoute = L.polyline(pathLatLngs, {
+                color: '#00bcd4',
+                weight: 5,
+                opacity: 0.96
+            }).addTo(map);
+
+            // Add markers for start and end
+            L.marker(pathLatLngs[0], {title:'Start'}).addTo(map);
+            L.marker(pathLatLngs[pathLatLngs.length - 1], {title:'End'}).addTo(map);
+
+            // Update trip info
+            const distKm = path.weight / 1000; // meters to km
+            const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
+            document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time: ${walkMins} mins`;
+
+            // Fit map view
+            map.fitBounds(L.polyline(pathLatLngs).getBounds().pad(0.15));
+        });
+    });
+}
+
     function getCoords(location, callback) {
         location = location.trim();
         if (LANDMARKS[location]) {
