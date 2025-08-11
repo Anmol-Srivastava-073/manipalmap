@@ -164,17 +164,15 @@
 
     <div class="input-box" role="search" aria-label="Campus navigation">
         <div class="input-left">
-            <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off">
+            <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions">
             <button class="btn icon-btn" onclick="useCurrentAsFrom()" title="Use current location">📍</button>
-            <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off">
+            <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions">
         </div>
 
         <button class="btn" id="goBtn" onclick="navigate()" title="Navigate">Go ➜</button>
     </div>
 
-    <div id="suggestions" role="listbox" aria-label="Location suggestions" style="position:absolute; top:70px; left:50%; transform:translateX(-50%); background:#fff; border-radius:8px; max-width:820px; width:calc(100% - 30px); box-shadow: 0 3px 12px rgba(0,0,0,0.1); z-index:1300; display:none; flex-direction: column; max-height: 180px; overflow-y: auto;">
-      <!-- suggestions will be added here dynamically -->
-    </div>
+    <div id="suggestions" role="listbox" aria-label="Location suggestions" ></div>
 
     <div class="travel-info-box" id="travelInfo" aria-live="polite">
         <b>Trip</b>
@@ -231,13 +229,6 @@
         };
 
         const suggestWrapper = document.getElementById('suggestions');
-
-        function showSuggestions() {
-            // You can keep empty or remove if unused
-        }
-        function hideSuggestions() {
-            suggestWrapper.style.display = 'none';
-        }
 
         document.getElementById('from').addEventListener('focus', e => updateSuggestions(e.target));
         document.getElementById('to').addEventListener('focus', e => updateSuggestions(e.target));
@@ -346,7 +337,7 @@
                             ]
                         },
                         router: L.Routing.osrmv1({
-                            serviceUrl: 'https://router.project-osrm.org/route/foot'
+                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot'
                         })
                     }).addTo(map);
 
@@ -444,4 +435,5 @@
         }
     </script>
 </body>
+</html>
 </html>
