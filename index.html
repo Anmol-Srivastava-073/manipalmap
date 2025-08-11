@@ -6,7 +6,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Leaflet & plugins CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 
@@ -205,7 +204,6 @@
 
     <button class="live-toggle" id="liveToggle" onclick="toggleLive()" title="Toggle live location">Start live location</button>
 
-    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
@@ -276,14 +274,16 @@
                 suggestWrapper.style.display = 'none';
                 return;
             }
+            const rect = input.getBoundingClientRect();
+            suggestWrapper.style.top = (rect.bottom + window.scrollY) + 'px';
+            suggestWrapper.style.left = (rect.left + window.scrollX) + 'px';
+            suggestWrapper.style.width = rect.width + 'px';
+            suggestWrapper.style.display = 'flex';
+
             filtered.forEach(name => {
                 const el = document.createElement('div');
                 el.textContent = name;
                 el.setAttribute('role', 'option');
-                el.style.padding = '8px 12px';
-                el.style.cursor = 'pointer';
-                el.onmouseover = () => el.style.background = '#e0e0e0';
-                el.onmouseout = () => el.style.background = 'transparent';
                 el.onclick = () => {
                     input.value = name;
                     suggestWrapper.style.display = 'none';
@@ -291,12 +291,6 @@
                 };
                 suggestWrapper.appendChild(el);
             });
-            // Position suggestions below the input that triggered it
-            const rect = input.getBoundingClientRect();
-            suggestWrapper.style.top = (rect.bottom + window.scrollY) + 'px';
-            suggestWrapper.style.left = (rect.left + window.scrollX) + 'px';
-            suggestWrapper.style.width = rect.width + 'px';
-            suggestWrapper.style.display = 'flex';
         }
 
         function getCoords(location, callback) {
@@ -318,77 +312,74 @@
         let routeControl = null;
 
         function navigate() {
-    const fromVal = document.getElementById('from').value.trim();
-    const toVal = document.getElementById('to').value.trim();
+            const fromVal = document.getElementById('from').value.trim();
+            const toVal = document.getElementById('to').value.trim();
 
-    if (!fromVal || !toVal) {
-        alert('Please fill both From and To fields.');
-        return;
-    }
-
-    getCoords(fromVal, (fromCoords) => {
-        getCoords(toVal, (toCoords) => {
-            if (routeControl) {
-                map.removeControl(routeControl);
-                routeControl = null;
+            if (!fromVal || !toVal) {
+                alert('Please fill both From and To fields.');
+                return;
             }
 
-            if (roadsLayer && !map.hasLayer(roadsLayer)) {
-                roadsLayer.addTo(map);
-            }
-
-            routeControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(fromCoords[0], fromCoords[1]),
-                    L.latLng(toCoords[0], toCoords[1])
-                ],
-                router: L.Routing.osrmv1({
-                    serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
-                    profile: 'foot',
-                    pointToUrlParam: function(latLng) {
-                        return latLng.lng + ',' + latLng.lat; // OSRM expects lon,lat
+            getCoords(fromVal, (fromCoords) => {
+                getCoords(toVal, (toCoords) => {
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
                     }
-                }),
-                createMarker: function (i, wp) {
-                    const label = i === 0 ? 'From (A)' : 'To (B)';
-                    const marker = L.marker(wp.latLng, {
-                        icon: L.divIcon({
-                            html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
-                            className: '',
-                            iconSize: [20, 20],
-                            iconAnchor: [10, 10]
-                        })
+
+                    if (roadsLayer && !map.hasLayer(roadsLayer)) {
+                        roadsLayer.addTo(map);
+                    }
+
+                    routeControl = L.Routing.control({
+                        waypoints: [
+                            L.latLng(fromCoords[0], fromCoords[1]),
+                            L.latLng(toCoords[0], toCoords[1])
+                        ],
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
+                            profile: 'foot'
+                        }),
+                        createMarker: function (i, wp) {
+                            const label = i === 0 ? 'From (A)' : 'To (B)';
+                            const marker = L.marker(wp.latLng, {
+                                icon: L.divIcon({
+                                    html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+                                    className: '',
+                                    iconSize: [20, 20],
+                                    iconAnchor: [10, 10]
+                                })
+                            });
+                            marker.bindPopup(label);
+                            return marker;
+                        },
+                        routeWhileDragging: false,
+                        addWaypoints: false,
+                        show: true,
+                        lineOptions: {
+                            styles: [
+                                { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
+                                { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
+                            ]
+                        }
+                    }).addTo(map);
+
+                    routeControl.on('routesfound', function (e) {
+                        const r = e.routes[0];
+                        const distKm = (r.summary.totalDistance / 1000);
+                        const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
+
+                        document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
+                        map.fitBounds(r.bounds.pad(0.12));
                     });
-                    marker.bindPopup(label);
-                    return marker;
-                },
-                routeWhileDragging: false,
-                addWaypoints: false,
-                show: true,  // changed from false to true so path is visible immediately
-                lineOptions: {
-                    styles: [
-                        { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
-                        { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
-                    ]
-                }
-            }).addTo(map);
 
-            routeControl.on('routesfound', function (e) {
-                const r = e.routes[0];
-                const distKm = (r.summary.totalDistance / 1000);
-                const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
-
-                document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
-                map.fitBounds(r.bounds.pad(0.12));
+                    routeControl.on('routingerror', function (e) {
+                        console.error('Routing error:', e);
+                        alert('Could not calculate route. Please check inputs.');
+                    });
+                });
             });
-
-            routeControl.on('routingerror', function (e) {
-                console.error('Routing error:', e);
-                alert('Could not calculate route. Please check inputs.');
-            });
-        });
-    });
-}
+        }
 
         let liveWatchId = null;
         let liveMarker = null;
@@ -423,6 +414,7 @@
                     liveAccuracyCircle.setLatLng([lat, lon]);
                     liveAccuracyCircle.setRadius(acc);
                 }
+                map.panTo([lat, lon]); // Pan the map to the new location
             }, err => {
                 console.error('Live position error', err);
                 alert('Unable to get live position.');
@@ -468,3 +460,4 @@
     </script>
 </body>
 </html>
+       
