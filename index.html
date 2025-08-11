@@ -338,39 +338,39 @@
                     }
 
                     routeControl = L.Routing.control({
-                        waypoints: [
-                            L.latLng(fromCoords[0], fromCoords[1]),
-                            L.latLng(toCoords[0], toCoords[1])
-                        ],
-                        createMarker: function (i, wp) {
-                            const label = i === 0 ? 'From (A)' : 'To (B)';
-                            const marker = L.marker(wp.latLng, {
-                                icon: L.divIcon({
-                                    html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
-                                    className: '',
-                                    iconSize: [20, 20],
-                                    iconAnchor: [10, 10]
-                                })
-                            });
-                            marker.bindPopup(label);
-                            return marker;
-                        },
-                        routeWhileDragging: false,
-                        addWaypoints: false,
-                        show: false,
-                        lineOptions: {
-                            styles: [
-                                { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
-                                { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
-                            ]
-                        },
-                        router: L.Routing.osrmv1({
-    serviceUrl: 'https://routing.openstreetmap.de/routed-foot/route/v1',
-    pointToUrlParam: function(latLng) {
-        return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
-    }
-})
-                    }).addTo(map);
+    waypoints: [
+        L.latLng(fromCoords[0], fromCoords[1]),
+        L.latLng(toCoords[0], toCoords[1])
+    ],
+    createMarker: function (i, wp) {
+        const label = i === 0 ? 'From (A)' : 'To (B)';
+        const marker = L.marker(wp.latLng, {
+            icon: L.divIcon({
+                html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+                className: '',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            })
+        });
+        marker.bindPopup(label);
+        return marker;
+    },
+    routeWhileDragging: false,
+    addWaypoints: false,
+    show: false,
+    lineOptions: {
+        styles: [
+            { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
+            { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
+        ]
+    },
+    router: L.Routing.osrmv1({
+        serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
+        pointToUrlParam: function(latLng) {
+            return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
+        }
+    })
+}).addTo(map);
 
                     routeControl.on('routesfound', function (e) {
                         const r = e.routes[0];
