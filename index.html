@@ -1,6 +1,4 @@
-
-    
-       <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>MUJ Navigator</title>
@@ -340,46 +338,46 @@
                     }
 
                     routeControl = L.Routing.control({
-    waypoints: [
-        L.latLng(fromCoords[0], fromCoords[1]),
-        L.latLng(toCoords[0], toCoords[1])
-    ],
-    createMarker: function (i, wp) {
-        const label = i === 0 ? 'From (A)' : 'To (B)';
-        const marker = L.marker(wp.latLng, {
-            icon: L.divIcon({
-                html: <div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>,
-                className: '',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-            })
-        });
-        marker.bindPopup(label);
-        return marker;
-    },
-    routeWhileDragging: false,
-    addWaypoints: false,
-    show: false,
-    lineOptions: {
-        styles: [
-            { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
-            { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
-        ]
-    },
-    router: L.Routing.osrmv1({
-        serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
-        pointToUrlParam: function(latLng) {
-            return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
-        }
-    })
-}).addTo(map);
+                        waypoints: [
+                            L.latLng(fromCoords[0], fromCoords[1]),
+                            L.latLng(toCoords[0], toCoords[1])
+                        ],
+                        createMarker: function (i, wp) {
+                            const label = i === 0 ? 'From (A)' : 'To (B)';
+                            const marker = L.marker(wp.latLng, {
+                                icon: L.divIcon({
+                                    html: `<div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>`,
+                                    className: '',
+                                    iconSize: [20, 20],
+                                    iconAnchor: [10, 10]
+                                })
+                            });
+                            marker.bindPopup(label);
+                            return marker;
+                        },
+                        routeWhileDragging: false,
+                        addWaypoints: false,
+                        show: false,
+                        lineOptions: {
+                            styles: [
+                                { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
+                                { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
+                            ]
+                        },
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
+                            pointToUrlParam: function(latLng) {
+                                return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
+                            }
+                        })
+                    }).addTo(map);
 
                     routeControl.on('routesfound', function (e) {
                         const r = e.routes[0];
                         const distKm = (r.summary.totalDistance / 1000);
                         const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
 
-                        document.getElementById('travelInfo').innerHTML = <b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins;
+                        document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins`;
                         map.fitBounds(r.bounds.pad(0.12));
                     });
 
@@ -462,7 +460,7 @@
             navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                document.getElementById('from').value = ${lat.toFixed(5)}, ${lon.toFixed(5)};
+                document.getElementById('from').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                 map.setView([lat, lon], 17);
             }, () => alert('Unable to get current location.'));
         }
