@@ -337,9 +337,9 @@
                             L.latLng(toCoords[0], toCoords[1])
                         ],
                         router: L.Routing.osrmv1({
-                            serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
-                            profile: 'foot'
-                        }),
+  serviceUrl: 'https://cors-anywhere.herokuapp.com/https://router.project-osrm.org/route/v1/foot',
+  profile: 'foot'
+}),
                         createMarker: function (i, wp) {
                             const label = i === 0 ? 'From (A)' : 'To (B)';
                             const marker = L.marker(wp.latLng, {
