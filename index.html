@@ -6,38 +6,62 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
     <style>
-        #map { height: 100vh; }
-        .search-box {
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 90vh;
+            width: 100%;
+        }
+        .search-container {
             position: absolute;
             top: 10px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1000;
             background: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
         }
-        .search-box input {
-            padding: 5px;
-            margin: 0 5px;
+        .search-container input {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 150px;
+            margin-right: 5px;
+        }
+        .search-container button {
+            padding: 6px 12px;
+            background: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-container button:hover {
+            background: #005fa3;
         }
     </style>
 </head>
 <body>
 
-<div id="map"></div>
-<div class="search-box">
-    <input type="text" id="start" placeholder="From">
-    <input type="text" id="end" placeholder="To">
-    <button onclick="alert('Navigation feature coming soon!')">Go</button>
+<div class="search-container">
+    <input type="text" id="from" placeholder="From">
+    <input type="text" id="to" placeholder="To">
+    <button onclick="findRoute()">Go</button>
 </div>
+
+<div id="map"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
     // Create map
-    var map = L.map('map').setView([26.8436, 75.5650], 17); // MUJ coords
+    var map = L.map('map').setView([26.8436, 75.5650], 17);
 
     // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -45,22 +69,44 @@
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Load roads.geojson (must be in same folder or update path)
+    // Load MUJ roads GeoJSON
     fetch('export.geojson')
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             L.geoJSON(data, {
                 style: {
                     color: 'red',
-                    weight: 2
+                    weight: 3
                 }
             }).addTo(map);
         })
-        .catch(err => console.error("Error loading GeoJSON:", err));
+        .catch(err => console.error("Error loading roads:", err));
 
     // Example landmarks
-    L.marker([26.8436, 75.5650]).addTo(map)
-        .bindPopup("Manipal University Jaipur");
+    var landmarks = {
+        "AB1": [26.8439, 75.5655],
+        "AB2": [26.8445, 75.5660],
+        "Central Library": [26.8440, 75.5658],
+        "Mess": [26.8434, 75.5648],
+        "Laundry": [26.8430, 75.5644]
+    };
+
+    for (var name in landmarks) {
+        L.marker(landmarks[name]).addTo(map).bindPopup(name);
+    }
+
+    // Find route between landmarks
+    function findRoute() {
+        var fromPlace = document.getElementById('from').value.trim();
+        var toPlace = document.getElementById('to').value.trim();
+
+        if (landmarks[fromPlace] && landmarks[toPlace]) {
+            L.polyline([landmarks[fromPlace], landmarks[toPlace]], {color: 'blue'}).addTo(map);
+            map.fitBounds([landmarks[fromPlace], landmarks[toPlace]]);
+        } else {
+            alert("Invalid landmark name");
+        }
+    }
 </script>
 
 </body>
