@@ -205,18 +205,7 @@
         "Grand Stairs": [26.842811, 75.565360]
     };
 
-    routeControl = L.Routing.control({
-    waypoints: [
-        L.latLng(fromCoords[0], fromCoords[1]),
-        L.latLng(toCoords[0], toCoords[1])
-    ],
-    routeWhileDragging: true,
-    show: false,
-    router: L.Routing.mapbox(
-        'pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw',
-        { profile: 'mapbox/walking' } // ensures campus paths are used
-    )
-}).addTo(map);
+    let routeControl;
 
     function setCurrentLocation() {
         if (!navigator.geolocation) {
@@ -224,44 +213,56 @@
             return;
         }
         navigator.geolocation.getCurrentPosition(position => {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
 
-    // Reverse geocode using Mapbox API
-    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
-        .then(res => res.json())
-        .then(data => {
-            let locationName;
-            if (data.features && data.features.length > 0) {
-                locationName = data.features[0].place_name;
-            } else {
-                locationName = ${lat.toFixed(5)}, ${lon.toFixed(5)};
-            }
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
+                .then(res => res.json())
+                .then(data => {
+                    let locationName;
+                    if (data.features && data.features.length > 0) {
+                        locationName = data.features[0].place_name;
+                    } else {
+                        locationName = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                    }
 
-            // Fill the "from" input
-            document.getElementById("from").value = locationName;
+                    document.getElementById("from").value = locationName;
 
-            // Add marker to your location
-            L.marker([lat, lon])
-                .addTo(map)
-                .bindPopup("📍 You are here<br>" + locationName)
-                .openPopup();
+                    L.marker([lat, lon])
+                        .addTo(map)
+                        .bindPopup(`📍 You are here<br>${locationName}`)
+                        .openPopup();
 
-            // Zoom to your location
-            map.setView([lat, lon], 17);
-        })
-        .catch(() => {
-            const fallback = ${lat.toFixed(5)}, ${lon.toFixed(5)};
-            document.getElementById("from").value = fallback;
-            L.marker([lat, lon])
-                .addTo(map)
-                .bindPopup("📍 You are here<br>" + fallback)
-                .openPopup();
-            map.setView([lat, lon], 17);
+                    map.setView([lat, lon], 17);
+                })
+                .catch(() => {
+                    const fallback = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                    document.getElementById("from").value = fallback;
+                    L.marker([lat, lon])
+                        .addTo(map)
+                        .bindPopup(`📍 You are here<br>${fallback}`)
+                        .openPopup();
+                    map.setView([lat, lon], 17);
+                });
+        }, () => {
+            alert("Unable to retrieve your location");
         });
-}, () => {
-    alert("Unable to retrieve your location");
-});
+    }
+
+    function getCoords(location, callback) {
+        if (landmarks[location]) {
+            callback(landmarks[location]);
+        } else {
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.features && data.features.length > 0) {
+                        callback(data.features[0].center.reverse());
+                    } else {
+                        alert(`Could not find location: ${location}`);
+                    }
+                });
+        }
     }
 
     function navigate() {
@@ -287,16 +288,12 @@
                     show: false
                 }).addTo(map);
 
-                // Update travel info on route found
                 routeControl.on('routesfound', function(e) {
                     const route = e.routes[0];
                     const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
                     const timeMins = Math.round(route.summary.totalTime / 60);
-
-                    document.getElementById("travelInfo").innerHTML = 
-                        Distance: ${distanceKm} km<br>
-                        Time: ${timeMins} mins
-                    ;
+                    document.getElementById("travelInfo").innerHTML =
+                        `Distance: ${distanceKm} km<br>Time: ${timeMins} mins`;
                 });
             });
         });
