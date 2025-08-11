@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+  <!DOCTYPE html>
 <html>
 <head>
     <title>MUJ Navigator</title>
@@ -12,152 +13,399 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 
     <style>
-        #map { height: 100vh; }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            background: #f4f4f4;
-            animation: fadeIn 0.6s ease;
+        /* --- Base --- */
+        :root{
+            --accent1: linear-gradient(135deg,#ff9966,#ff5e62);
+            --glass-bg: rgba(255,255,255,0.12);
+            --glass-strong: rgba(255,255,255,0.22);
+            --muted-road: #9ea3a6;
+            --accent-route: #00bcd4;
+            --ui-shadow: 0 8px 28px rgba(15,23,42,0.18);
+            --ui-radius: 14px;
+            --text-light: #ffffff;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+        #map{height:100vh;width:100%;display:block;background:#eaeaea;}
 
-        /* Top Input Box */
-        .input-box {
+        /* --- Top input box (glass + gradient) --- */
+        .input-box{
             position: absolute;
-            top: 15px;
+            top: 16px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1001;
-            background: linear-gradient(135deg, #ff9966, #ff5e62);
-            padding: 12px 14px;
-            border-radius: 16px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            width: 90%;
-            max-width: 520px;
-            animation: gradientShift 8s ease infinite;
-            background-size: 200% 200%;
+            z-index: 1100;
+            width: calc(100% - 40px);
+            max-width: 740px;
+            padding: 12px;
+            display:flex;
+            gap:10px;
+            align-items:center;
+            border-radius:var(--ui-radius);
+            background: var(--accent1);
+            box-shadow: var(--ui-shadow);
+            padding-left: 14px;
+            padding-right:14px;
+            backdrop-filter: blur(8px) saturate(120%);
+            border: 1px solid rgba(255,255,255,0.06);
         }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+
+        .input-left {
+            display:flex;
+            gap:10px;
+            align-items:center;
+            flex:1 1 auto;
         }
-        .input-box input {
-            flex: 1 1 auto;
-            min-width: 120px;
-            padding: 10px 14px;
-            font-size: 15px;
-            color: #fff;
+
+        .input-box input[type="text"]{
+            flex:1 1 auto;
+            min-width:120px;
+            padding:10px 12px;
+            border-radius:10px;
             border: none;
-            border-radius: 10px;
             outline: none;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            transition: background 0.3s ease;
+            font-size:15px;
+            color:var(--text-light);
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(6px);
         }
-        .input-box input::placeholder { color: rgba(255, 255, 255, 0.85); font-style: italic; }
-        .input-box input:focus { background: rgba(255, 255, 255, 0.35); }
+        .input-box input::placeholder{ color: rgba(255,255,255,0.9); opacity:0.95; font-style:italic; }
 
-        .input-box button {
-            padding: 10px 16px;
-            font-size: 15px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            transition: background 0.3s ease, transform 0.2s ease;
+        .btn {
+            padding: 10px 14px;
+            border-radius:10px;
+            border:none;
+            cursor:pointer;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            font-weight:600;
+            color:var(--text-light);
+            background: rgba(0,0,0,0.18);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            transition: transform .14s ease, background .14s ease;
         }
-        .input-box button:hover {
-            background: rgba(255, 255, 255, 0.35);
-            transform: scale(1.05);
+        .btn:hover{ transform: translateY(-2px); background: rgba(0,0,0,0.22); }
+
+        .icon {
+            font-size:16px;
+            line-height:0;
         }
 
-        /* Distance/Time Box */
-        .info-box {
+        /* small icon-only button */
+        .icon-btn{
+            width:42px;
+            height:42px;
+            padding:0;
+            justify-content:center;
+            background: rgba(255,255,255,0.08);
+        }
+
+        /* --- info box (bottom-left) --- */
+        .travel-info-box {
             position: absolute;
-            bottom: 15px;
-            left: 15px;
-            z-index: 1001;
-            background: rgba(0, 0, 0, 0.65);
-            color: white;
+            bottom: 18px;
+            left: 18px;
+            z-index: 1100;
+            background: rgba(20, 24, 28, 0.75);
+            color: #fff;
             padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            font-size: 13px;
+            box-shadow: 0 6px 18px rgba(7,10,15,0.35);
+            backdrop-filter: blur(6px);
+            min-width: 150px;
+            text-align:left;
         }
+
+        .travel-info-box b{ display:block; font-weight:700; font-size:13px; margin-bottom:4px; }
+
+        /* --- custom small pin marker styles --- */
+        .custom-pin {
+            display:inline-block;
+            background:var(--accent-route);
+            color:#fff;
+            border-radius:50%;
+            width:18px;
+            height:18px;
+            text-align:center;
+            line-height:18px;
+            font-size:12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        /* --- road overlay style in legend (if needed) --- */
+        .legend {
+            position:absolute;
+            bottom:18px;
+            right:18px;
+            z-index:1100;
+            background: rgba(255,255,255,0.06);
+            padding:8px 10px;
+            border-radius:10px;
+            color:#fff;
+            font-size:13px;
+            backdrop-filter: blur(6px);
+            border:1px solid rgba(255,255,255,0.04);
+        }
+
+        /* responsive tweaks */
+        @media (max-width:720px){
+            .input-box{ width: calc(100% - 20px); max-width: 520px; gap:8px; padding:10px; }
+            .btn{ padding:8px 10px; font-size:14px; }
+            .travel-info-box { font-size:13px; min-width:120px; padding:8px 10px; }
+        }
+
     </style>
 </head>
 <body>
     <div id="map"></div>
 
-    <div class="input-box">
-        <input type="text" id="from" placeholder="From..." />
-        <input type="text" id="to" placeholder="To..." />
-        <button onclick="route()">Go</button>
+    <div class="input-box" role="search" aria-label="Navigation">
+        <div class="input-left">
+            <input id="from" list="landmarks" type="text" placeholder="From location..." />
+            <button class="btn icon-btn" onclick="setCurrentLocation()" title="Use current location">📍</button>
+            <input id="to" list="landmarks" type="text" placeholder="To location..." />
+        </div>
+
+        <datalist id="landmarks">
+            <option value="AB1 Block">
+            <option value="AB2 Block">
+            <option value="AB3 Block">
+            <option value="BlueDove Mess">
+            <option value="BluSpring Mess">
+            <option value="Laundry">
+            <option value="Central Library">
+            <option value="Lecture Hall Complex">
+            <option value="Main Gate">
+            <option value="Gate 2">
+            <option value="Grand Stairs">
+        </datalist>
+
+        <button class="btn" onclick="navigate()" title="Navigate">
+            <span class="icon">➔</span> Go
+        </button>
     </div>
 
-    <div class="info-box" id="infoBox">Distance: -- | Time: --</div>
+    <div class="travel-info-box" id="travelInfo">
+        <b>Trip</b>
+        Distance: -- km<br>
+        Time: -- mins
+    </div>
 
-    <!-- Scripts -->
+    <!-- Leaflet + plugins -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
     <script>
-        // MUJ center
-        var map = L.map('map').setView([26.8436, 75.5650], 16);
+        // Map center
+        const map = L.map('map').setView([26.8436, 75.5650], 16);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+        // Use Mapbox tiles (keeps look consistent); you can change to OSM tiles if needed
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw', {
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            attribution: '© Mapbox © OpenStreetMap'
         }).addTo(map);
 
-        var geocoder = L.Control.Geocoder.nominatim();
+        // Load export.geojson (the roads). subtle muted style so map doesn't feel "untidy".
+        fetch('export.geojson')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: function(feature){
+                        return {
+                            color: getRoadColor(feature),
+                            weight: 2,
+                            opacity: 0.65,
+                            lineCap: 'round'
+                        };
+                    }
+                }).addTo(map);
+            })
+            .catch(err => {
+                // If file not found or CORS issue, fail gracefully
+                console.warn("Could not load export.geojson (check path or run a local server):", err);
+            });
 
-        var control = L.Routing.control({
-            waypoints: [],
-            createMarker: function() { return null; }, // no markers by default
-            addWaypoints: false,
-            routeWhileDragging: false,
-            show: false,
-            lineOptions: {
-                styles: [{ color: 'transparent', opacity: 0, weight: 0 }] // hide red path
+        function getRoadColor(feature){
+            // keep roads muted; if OSM tags are present you can vary by type
+            if (feature && feature.properties && feature.properties.highway){
+                const t = feature.properties.highway;
+                if (t === 'footway' || t === 'path') return '#c7cbd0'; // lighter for footpaths
+                if (t === 'residential' || t === 'service') return '#bfc4c6';
+                if (t === 'primary' || t === 'secondary') return '#9ea3a6';
             }
-        }).addTo(map);
+            return '#bfc4c6';
+        }
 
-        function route() {
-            var fromVal = document.getElementById("from").value;
-            var toVal = document.getElementById("to").value;
+        // Landmarks (used by getCoords fallback)
+        const landmarks = {
+            "AB1 Block": [26.842586, 75.564249],
+            "AB2 Block": [26.843117, 75.566100],
+            "BlueDove Mess": [26.840432, 75.561798],
+            "Laundry": [26.840202, 75.561454],
+            "Central Library": [26.841648, 75.565944],
+            "Main Gate": [26.840729, 75.566325],
+            "Gate 2": [26.841524, 75.563868],
+            "BluSpring Mess": [26.841255, 75.561567],
+            "AB3 Block": [26.844070, 75.564072],
+            "Lecture Hall Complex": [26.844338, 75.564705],
+            "Grand Stairs": [26.842811, 75.565360]
+        };
 
-            geocoder.geocode(fromVal + " Manipal University Jaipur", function(resultsFrom) {
-                if (resultsFrom.length > 0) {
-                    var fromLatLng = resultsFrom[0].center;
+        // Add markers for landmarks (soft pins)
+        Object.entries(landmarks).forEach(([name, coords])=>{
+            L.marker(coords).addTo(map).bindPopup(`<strong>${name}</strong>`);
+        });
 
-                    geocoder.geocode(toVal + " Manipal University Jaipur", function(resultsTo) {
-                        if (resultsTo.length > 0) {
-                            var toLatLng = resultsTo[0].center;
+        // Routing control (created when used)
+        let routeControl = null;
 
-                            control.setWaypoints([
-                                L.latLng(fromLatLng.lat, fromLatLng.lng),
-                                L.latLng(toLatLng.lat, toLatLng.lng)
-                            ]);
+        // Geocoder (Mapbox via Leaflet Control Geocoder uses Nominatim by default; we will still use Mapbox geocoding in helpers below)
+        const geocoder = L.Control.Geocoder.nominatim();
 
-                            // Show distance & time
-                            control.on('routesfound', function(e) {
-                                var summary = e.routes[0].summary;
-                                document.getElementById("infoBox").innerHTML =
-                                    `Distance: ${(summary.totalDistance / 1000).toFixed(2)} km | Time: ${(summary.totalTime / 60).toFixed(0)} min`;
-                            });
+        // Mapbox token for geocoding (same token used in earlier code)
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw';
+
+        // setCurrentLocation: populate "from" with user's GPS + reverse geocode
+        function setCurrentLocation() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=${MAPBOX_TOKEN}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let locationName;
+                        if (data.features && data.features.length > 0) {
+                            locationName = data.features[0].place_name;
+                        } else {
+                            locationName = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                         }
+
+                        document.getElementById("from").value = locationName;
+
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup(`📍 You are here<br>${locationName}`)
+                            .openPopup();
+
+                        map.setView([lat, lon], 17);
+                    })
+                    .catch(() => {
+                        const fallback = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        document.getElementById("from").value = fallback;
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup(`📍 You are here<br>${fallback}`)
+                            .openPopup();
+                        map.setView([lat, lon], 17);
                     });
-                }
+            }, () => {
+                alert("Unable to retrieve your location");
             });
         }
+
+        // getCoords: look up from landmarks or Mapbox forward geocode -> returns [lat, lon] via callback
+        function getCoords(location, callback) {
+            // if matches a predefined landmark (exact string match)
+            if (landmarks[location]) {
+                callback(landmarks[location]);
+                return;
+            }
+            // otherwise use Mapbox geocoding
+            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?limit=1&access_token=${MAPBOX_TOKEN}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.features && data.features.length > 0) {
+                        const c = data.features[0].center; // [lon, lat]
+                        callback([c[1], c[0]]);
+                    } else {
+                        alert(`Could not find location: ${location}`);
+                    }
+                })
+                .catch(err => {
+                    console.error("Geocoding error:", err);
+                    alert("Error looking up location.");
+                });
+        }
+
+        // navigate: compute route, show clean accent route and update travel info box
+        function navigate() {
+            const fromLoc = document.getElementById("from").value.trim();
+            const toLoc = document.getElementById("to").value.trim();
+
+            if (!fromLoc || !toLoc) {
+                alert("Please enter both locations");
+                return;
+            }
+
+            // Resolve coordinates for both
+            getCoords(fromLoc, (fromCoords) => {
+                getCoords(toLoc, (toCoords) => {
+
+                    // remove previous control if present
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
+                    }
+
+                    // add routing control with a sleek accent line (not red)
+                    routeControl = L.Routing.control({
+                        waypoints: [
+                            L.latLng(fromCoords[0], fromCoords[1]),
+                            L.latLng(toCoords[0], toCoords[1])
+                        ],
+                        routeWhileDragging: true,
+                        show: false,
+                        addWaypoints: false,
+                        createMarker: function(i, wp){
+                            // custom small numbered pins
+                            return L.marker(wp.latLng, {
+                                icon: L.divIcon({
+                                    className: '',
+                                    html: `<div class="custom-pin">${i===0?'A':'B'}</div>`,
+                                    iconSize: [18,18],
+                                    iconAnchor: [9,9]
+                                })
+                            });
+                        },
+                        lineOptions: {
+                            styles: [
+                                { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.95 },
+                                { color: 'rgba(255,255,255,0.08)', weight: 10, opacity: 0.1 }
+                            ]
+                        },
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1'
+                        })
+                    }).addTo(map);
+
+                    // when routes found, update the info box
+                    routeControl.on('routesfound', function(e) {
+                        const route = e.routes[0];
+                        const distanceKm = (route.summary.totalDistance / 1000).toFixed(2);
+                        const timeMins = Math.round(route.summary.totalTime / 60);
+
+                        document.getElementById("travelInfo").innerHTML =
+                            `<b>Trip</b>Distance: ${distanceKm} km<br>Time: ${timeMins} mins`;
+                    });
+
+                    // center/fit to route
+                    routeControl.on('routeselected', function(e){
+                        const bbox = e.route.bounds;
+                        map.fitBounds(bbox.pad(0.2));
+                    });
+                });
+            });
+        }
+
+        // Optional: attempt to suggest local landmark names as user types (minimal, local)
+        // (Kept intentionally lightweight — not using heavy plugins)
     </script>
 </body>
 </html>
