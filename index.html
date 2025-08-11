@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+    
+       <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>MUJ Navigator</title>
@@ -183,190 +185,287 @@
     </style>
 </head>
 <body>
-    <div id="map"></div>
-    <!-- INPUTS, SUGGESTIONS, INFO --><!-- unchanged markup from your prior code -->
+    <div id="map" aria-hidden="false"></div>
 
+    <div class="input-box" role="search" aria-label="Campus navigation">
+        <div class="input-left">
+            <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions">
+            <button class="btn icon-btn" onclick="useCurrentAsFrom()" title="Use current location">📍</button>
+            <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions">
+        </div>
 
-    <!-- SCRIPTS -->
+        <button class="btn" id="goBtn" onclick="navigate()" title="Navigate">Go ➜</button>
+    </div>
+
+    <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
+
+    <div class="travel-info-box" id="travelInfo" aria-live="polite">
+        <b>Trip</b>
+        Distance: -- km<br>
+        Time: -- mins
+    </div>
+
+    <button class="live-toggle" id="liveToggle" onclick="toggleLive()" title="Toggle live location">Start live location</button>
+
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- geojson-path-finder from CDN, or host locally -->
-    <script src="https://unpkg.com/geojson-path-finder@1.6.0/umd/geojson-path-finder.min.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
     <script>
-    // >>>>>>> CONFIG START
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw';
+        const WALKING_SPEED_KMPH = 5;
 
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw';
-    const WALKING_SPEED_KMPH = 5;
-    const LANDMARKS = {
-        "AB1 Block": [26.842586, 75.564249],
-        "AB2 Block": [26.843117, 75.566100],
-        "AB3 Block": [26.844070, 75.564072],
-        "BlueDove Mess": [26.840432, 75.561798],
-        "BluSpring Mess": [26.841255, 75.561567],
-        "Laundry": [26.840202, 75.561454],
-        "Central Library": [26.841648, 75.565944],
-        "Lecture Hall Complex": [26.844338, 75.564705],
-        "Main Gate": [26.840729, 75.566325],
-        "Gate 2": [26.841524, 75.563868],
-        "Grand Stairs": [26.842811, 75.565360]
-    };
-    // <<<<<<<< CONFIG END
+        const map = L.map('map').setView([26.8436, 75.5650], 16);
 
-    // --- MAP INIT ---
-    const map = L.map('map').setView([26.8436, 75.5650], 16);
-    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
-        id: 'mapbox/streets-v11',
-        tileSize: 512,
-        zoomOffset: -1,
-        attribution: '© Mapbox © OpenStreetMap'
-    }).addTo(map);
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + MAPBOX_TOKEN, {
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1,
+            attribution: '© Mapbox © OpenStreetMap'
+        }).addTo(map);
 
-    // --- LOAD ROADS GEOJSON AND INIT PATHFINDER ---
-    let graphGeojson, pathFinder;
-    let roadsLayer = null;
-    fetch('export.geojson')
-        .then(r => r.json())
-        .then(data => {
-            graphGeojson = data;
-            pathFinder = new PathFinder(graphGeojson, { precision: 1e-5 });
-            roadsLayer = L.geoJSON(graphGeojson, {
-                style: feature => {
-                    const c = feature?.properties?.highway || '';
-                    if (c === 'footway' || c === 'path') return { color: '#d6d8da', weight: 2, opacity: 0.9 };
-                    if (c === 'residential' || c === 'service') return { color: '#c5c9cc', weight: 2, opacity: 0.9 };
-                    return { color: '#bfc4c6', weight: 2, opacity: 0.9 };
-                }
-            }).addTo(map);
+        let roadsLayer = null;
+        fetch('export.geojson')
+            .then(r => r.json())
+            .then(data => {
+                roadsLayer = L.geoJSON(data, {
+                    style: feature => {
+                        const c = feature?.properties?.highway || '';
+                        if (c === 'footway' || c === 'path') return { color: '#d6d8da', weight: 2, opacity: 0.9 };
+                        if (c === 'residential' || c === 'service') return { color: '#c5c9cc', weight: 2, opacity: 0.9 };
+                        return { color: '#bfc4c6', weight: 2, opacity: 0.9 };
+                    }
+                });
+            })
+            .catch(err => console.warn('Could not load export.geojson', err));
+
+        const LANDMARKS = {
+            "AB1 Block": [26.842586, 75.564249],
+            "AB2 Block": [26.843117, 75.566100],
+            "AB3 Block": [26.844070, 75.564072],
+            "BlueDove Mess": [26.840432, 75.561798],
+            "BluSpring Mess": [26.841255, 75.561567],
+            "Laundry": [26.840202, 75.561454],
+            "Central Library": [26.841648, 75.565944],
+            "Lecture Hall Complex": [26.844338, 75.564705],
+            "Main Gate": [26.840729, 75.566325],
+            "Gate 2": [26.841524, 75.563868],
+            "Grand Stairs": [26.842811, 75.565360]
+        };
+
+        const suggestWrapper = document.getElementById('suggestions');
+
+        document.getElementById('from').addEventListener('focus', e => updateSuggestions(e.target));
+        document.getElementById('to').addEventListener('focus', e => updateSuggestions(e.target));
+        document.getElementById('from').addEventListener('input', e => updateSuggestions(e.target));
+        document.getElementById('to').addEventListener('input', e => updateSuggestions(e.target));
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#suggestions') && !e.target.closest('#from') && !e.target.closest('#to')) {
+                suggestWrapper.style.display = 'none';
+            }
         });
 
-    // --- LANDMARK SEARCH ---
-    // ... (reuse your landmark suggestion/autocomplete code here) ...
-
-    // --- HELPERS FOR ROUTING ---
-        let displayedRoute = null;
-
-function navigate() {
-    const fromVal = document.getElementById('from').value.trim();
-    const toVal = document.getElementById('to').value.trim();
-    if (!fromVal || !toVal) {
-        alert('Please fill both From and To fields.');
-        return;
-    }
-    if (!pathFinder) {
-        alert('Campus map data not loaded yet.');
-        return;
-    }
-    getCoords(fromVal, fromCoords => {
-        getCoords(toVal, toCoords => {
-            // Remove previous route if exists
-            if (displayedRoute) {
-                map.removeLayer(displayedRoute);
-                displayedRoute = null;
+        function updateSuggestions(input) {
+            const val = input.value.toLowerCase();
+            suggestWrapper.innerHTML = '';
+            if (!val) {
+                suggestWrapper.style.display = 'none';
+                return;
             }
+            const filtered = Object.keys(LANDMARKS).filter(name => name.toLowerCase().includes(val));
+            if (filtered.length === 0) {
+                suggestWrapper.style.display = 'none';
+                return;
+            }
+            filtered.forEach(name => {
+                const el = document.createElement('div');
+                el.textContent = name;
+                el.setAttribute('role', 'option');
+                el.style.padding = '8px 12px';
+                el.style.cursor = 'pointer';
+                el.onmouseover = () => el.style.background = '#e0e0e0';
+                el.onmouseout = () => el.style.background = 'transparent';
+                el.onclick = () => {
+                    input.value = name;
+                    suggestWrapper.style.display = 'none';
+                    input.focus();
+                };
+                suggestWrapper.appendChild(el);
+            });
+            // Position suggestions below the input that triggered it
+            const rect = input.getBoundingClientRect();
+            suggestWrapper.style.top = (rect.bottom + window.scrollY) + 'px';
+            suggestWrapper.style.left = (rect.left + window.scrollX) + 'px';
+            suggestWrapper.style.width = rect.width + 'px';
+            suggestWrapper.style.display = 'flex';
+        }
 
-            // Snap points to network (GeoJSON coords are [lng, lat])
-            const fromPoint = { type: "Feature", geometry: { type: "Point", coordinates: [fromCoords[1], fromCoords[0]] }};
-            const toPoint   = { type: "Feature", geometry: { type: "Point", coordinates: [toCoords[1], toCoords[0]] }};
+        function getCoords(location, callback) {
+            location = location.trim();
+            if (LANDMARKS[location]) {
+                callback(LANDMARKS[location]);
+                return;
+            }
+            const latlonMatch = location.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
+            if (latlonMatch) {
+                const lat = parseFloat(latlonMatch[1]);
+                const lon = parseFloat(latlonMatch[3]);
+                callback([lat, lon]);
+                return;
+            }
+            alert('Please enter a valid campus location or coordinates as "lat, lon".');
+        }
 
-            const path = pathFinder.findPath(fromPoint, toPoint);
-            if (!path) {
-                alert('No campus route found between those points.');
+        let routeControl = null;
+
+        function navigate() {
+            const fromVal = document.getElementById('from').value.trim();
+            const toVal = document.getElementById('to').value.trim();
+
+            if (!fromVal || !toVal) {
+                alert('Please fill both From and To fields.');
                 return;
             }
 
-            // Convert path coords for Leaflet [lat,lng]
-            const pathLatLngs = path.path.map(([lng,lat]) => [lat,lng]);
+            getCoords(fromVal, (fromCoords) => {
+                getCoords(toVal, (toCoords) => {
+                    if (routeControl) {
+                        map.removeControl(routeControl);
+                        routeControl = null;
+                    }
 
-            // Draw route polyline
-            displayedRoute = L.polyline(pathLatLngs, {
-                color: '#00bcd4',
-                weight: 5,
-                opacity: 0.96
-            }).addTo(map);
+                    if (roadsLayer && !map.hasLayer(roadsLayer)) {
+                        roadsLayer.addTo(map);
+                    }
 
-            // Add markers for start and end
-            L.marker(pathLatLngs[0], {title:'Start'}).addTo(map);
-            L.marker(pathLatLngs[pathLatLngs.length - 1], {title:'End'}).addTo(map);
-
-            // Update trip info
-            const distKm = path.weight / 1000; // meters to km
-            const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
-            document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time: ${walkMins} mins`;
-
-            // Fit map view
-            map.fitBounds(L.polyline(pathLatLngs).getBounds().pad(0.15));
+                    routeControl = L.Routing.control({
+    waypoints: [
+        L.latLng(fromCoords[0], fromCoords[1]),
+        L.latLng(toCoords[0], toCoords[1])
+    ],
+    createMarker: function (i, wp) {
+        const label = i === 0 ? 'From (A)' : 'To (B)';
+        const marker = L.marker(wp.latLng, {
+            icon: L.divIcon({
+                html: <div style="background:#00bcd4; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-weight:700;">${i === 0 ? 'A' : 'B'}</div>,
+                className: '',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            })
         });
-    });
-}
-
-    function getCoords(location, callback) {
-        location = location.trim();
-        if (LANDMARKS[location]) {
-            callback(LANDMARKS[location]);
-            return;
+        marker.bindPopup(label);
+        return marker;
+    },
+    routeWhileDragging: false,
+    addWaypoints: false,
+    show: false,
+    lineOptions: {
+        styles: [
+            { color: 'rgba(0,188,212,0.96)', weight: 5, opacity: 0.96 },
+            { color: 'rgba(255,255,255,0.06)', weight: 10, opacity: 0.06 }
+        ]
+    },
+    router: L.Routing.osrmv1({
+        serviceUrl: 'https://router.project-osrm.org/route/v1/foot',
+        pointToUrlParam: function(latLng) {
+            return latLng.lng + ',' + latLng.lat; // lon,lat order required by OSRM
         }
-        const latlonMatch = location.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
-        if (latlonMatch) {
-            callback([parseFloat(latlonMatch[1]), parseFloat(latlonMatch[3])]);
-            return;
-        }
-        alert('Please enter a valid campus location or coordinates as "lat, lon".');
-    }
+    })
+}).addTo(map);
 
-    let displayedRoute = null;
-    function navigate() {
-        const fromVal = document.getElementById('from').value.trim();
-        const toVal = document.getElementById('to').value.trim();
-        if (!fromVal || !toVal) {
-            alert('Please fill both From and To fields.');
-            return;
-        }
-        if (!pathFinder) {
-            alert('Campus map data not loaded yet.');
-            return;
-        }
-        getCoords(fromVal, fromCoords => {
-            getCoords(toVal, toCoords => {
-                // Remove previous route
-                if (displayedRoute) {
-                    map.removeLayer(displayedRoute);
-                    displayedRoute = null;
-                }
+                    routeControl.on('routesfound', function (e) {
+                        const r = e.routes[0];
+                        const distKm = (r.summary.totalDistance / 1000);
+                        const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
 
-                // Snap inputs to nearest network points
-                const fromPoint = { type: "Feature", geometry: { type: "Point", coordinates: [fromCoords[1], fromCoords[0]] }};
-                const toPoint   = { type: "Feature", geometry: { type: "Point", coordinates: [toCoords[1], toCoords[0]] }};
-                const path = pathFinder.findPath(fromPoint, toPoint);
-                if (!path) {
-                    alert('No campus route found between those points.');
-                    return;
-                }
-                // Draw the route (reformat [lng,lat] to [lat,lng] for Leaflet)
-                const pathLatLngs = path.path.map(([lng,lat]) => [lat,lng]);
-                displayedRoute = L.polyline(pathLatLngs, {
-                    color: '#00bcd4',
-                    weight: 5,
-                    opacity: 0.96
-                }).addTo(map);
+                        document.getElementById('travelInfo').innerHTML = <b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time (walk): ${walkMins} mins;
+                        map.fitBounds(r.bounds.pad(0.12));
+                    });
 
-                // Markers
-                L.marker(pathLatLngs[0], {title:'Start'}).addTo(map);
-                L.marker(pathLatLngs[pathLatLngs.length-1], {title:'End'}).addTo(map);
-
-                // Show trip info
-                const distKm = path.weight / 1000; // path.weight is in meters
-                const walkMins = Math.max(1, Math.round((distKm / WALKING_SPEED_KMPH) * 60));
-                document.getElementById('travelInfo').innerHTML = `<b>Trip</b>Distance: ${distKm.toFixed(2)} km<br>Time: ${walkMins} mins`;
-
-                // Fit to route
-                map.fitBounds(L.polyline(pathLatLngs).getBounds().pad(0.15));
+                    routeControl.on('routingerror', function (e) {
+                        console.error('Routing error:', e);
+                        alert('Could not calculate route. Please check inputs.');
+                    });
+                });
             });
-        });
-    }
+        }
 
-    // --- FROM/TO: CURRENT LOCATION BUTTON, ETC. ---
+        let liveWatchId = null;
+        let liveMarker = null;
+        let liveAccuracyCircle = null;
 
-    // Your live location, suggestion, and other UI code can remain almost unchanged.
+        function startLiveLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation not supported by your browser.');
+                return;
+            }
+            liveWatchId = navigator.geolocation.watchPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const acc = pos.coords.accuracy || 20;
 
+                if (!liveMarker) {
+                    liveMarker = L.circleMarker([lat, lon], {
+                        radius: 8,
+                        fillColor: '#1e90ff',
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    }).addTo(map).bindPopup('You (live)');
+                } else {
+                    liveMarker.setLatLng([lat, lon]);
+                }
+
+                if (!liveAccuracyCircle) {
+                    liveAccuracyCircle = L.circle([lat, lon], { radius: acc, color: '#1e90ff', fillOpacity: 0.06 }).addTo(map);
+                } else {
+                    liveAccuracyCircle.setLatLng([lat, lon]);
+                    liveAccuracyCircle.setRadius(acc);
+                }
+            }, err => {
+                console.error('Live position error', err);
+                alert('Unable to get live position.');
+            }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 });
+        }
+
+        function stopLiveLocation() {
+            if (liveWatchId !== null) {
+                navigator.geolocation.clearWatch(liveWatchId);
+                liveWatchId = null;
+            }
+            if (liveMarker) {
+                map.removeLayer(liveMarker); liveMarker = null;
+            }
+            if (liveAccuracyCircle) {
+                map.removeLayer(liveAccuracyCircle); liveAccuracyCircle = null;
+            }
+        }
+
+        function toggleLive() {
+            const btn = document.getElementById('liveToggle');
+            if (liveWatchId === null) {
+                startLiveLocation();
+                btn.textContent = 'Stop live location';
+            } else {
+                stopLiveLocation();
+                btn.textContent = 'Start live location';
+            }
+        }
+
+        function useCurrentAsFrom() {
+            if (!navigator.geolocation) {
+                alert('Geolocation not supported.');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                document.getElementById('from').value = ${lat.toFixed(5)}, ${lon.toFixed(5)};
+                map.setView([lat, lon], 17);
+            }, () => alert('Unable to get current location.'));
+        }
     </script>
 </body>
 </html>
