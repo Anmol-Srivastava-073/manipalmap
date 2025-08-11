@@ -228,7 +228,7 @@
     const lon = position.coords.longitude;
 
     // Reverse geocode using Mapbox API
-    fetch(https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw)
+    fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?limit=1&access_token=pk.eyJ1IjoiYW5tb2xzcml2MDczIiwiYSI6ImNtZTYybGdqeDExNHgybG9sb25mZm8xdDkifQ.9-KhGDc-7Ip4KYTIUOe8tw`)
         .then(res => res.json())
         .then(data => {
             let locationName;
