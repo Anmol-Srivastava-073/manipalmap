@@ -118,41 +118,6 @@
             font-size: 13px;
         }
 
-        /* Suggestion dropdown */
-        .suggestions {
-            position: absolute;
-            top: 58px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1300;
-            width: calc(100% - 30px);
-            max-width: 820px;
-            pointer-events: none;
-        }
-        .suggest-list {
-            pointer-events: auto;
-            display: flex;
-            gap: 8px;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.55);
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            color: #fff;
-            flex-wrap: wrap;
-        }
-        .suggest-item {
-            padding: 8px 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.06);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        .suggest-item:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
-
         /* Live location toggle */
         .live-toggle {
             position: absolute;
@@ -182,9 +147,6 @@
                 gap: 8px;
                 top: 10px;
             }
-            .suggestions {
-                top: 56px;
-            }
             .input-left input {
                 min-width: 90px;
                 font-size: 14px;
@@ -202,33 +164,15 @@
 
     <div class="input-box" role="search" aria-label="Campus navigation">
         <div class="input-left">
-            <input id="from" list="landmarks" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off">
+            <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off">
             <button class="btn icon-btn" onclick="useCurrentAsFrom()" title="Use current location">📍</button>
-            <input id="to" list="landmarks" type="text" placeholder="To" aria-label="To location" autocomplete="off">
+            <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off">
         </div>
-
-        <datalist id="landmarks">
-            <option value="AB1 Block">
-            <option value="AB2 Block">
-            <option value="AB3 Block">
-            <option value="BlueDove Mess">
-            <option value="BluSpring Mess">
-            <option value="Laundry">
-            <option value="Central Library">
-            <option value="Lecture Hall Complex">
-            <option value="Main Gate">
-            <option value="Gate 2">
-            <option value="Grand Stairs">
-        </datalist>
 
         <button class="btn" id="goBtn" onclick="navigate()" title="Navigate">Go ➜</button>
     </div>
 
-    <div class="suggestions" id="suggestions" aria-hidden="true">
-        <div class="suggest-list" id="suggestList" style="display:none;"></div>
-    </div>
-
-    <div class="travel-info-box" id="travelInfo">
+    <div class="travel-info-box" id="travelInfo" aria-live="polite">
         <b>Trip</b>
         Distance: -- km<br>
         Time: -- mins
@@ -265,26 +209,9 @@
                         return { color: '#bfc4c6', weight: 2, opacity: 0.9 };
                     }
                 });
+                // do NOT add here — add only on navigate()
             })
             .catch(err => console.warn('Could not load export.geojson', err));
-
-        const LANDMARKS = {
-            "AB1 Block": [26.842586, 75.564249],
-            "AB2 Block": [26.843117, 75.566100],
-            "AB3 Block": [26.844070, 75.564072],
-            "BlueDove Mess": [26.840432, 75.561798],
-            "BluSpring Mess": [26.841255, 75.561567],
-            "Laundry": [26.840202, 75.561454],
-            "Central Library": [26.841648, 75.565944],
-            "Lecture Hall Complex": [26.844338, 75.564705],
-            "Main Gate": [26.840729, 75.566325],
-            "Gate 2": [26.841524, 75.563868],
-            "Grand Stairs": [26.842811, 75.565360]
-        };
-
-        for (const [name, coord] of Object.entries(LANDMARKS)) {
-            L.marker(coord).addTo(map).bindPopup(`<strong>${name}</strong>`);
-        }
 
         let liveWatchId = null;
         let liveMarker = null;
@@ -360,20 +287,13 @@
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 document.getElementById('from').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                if (liveMarker) liveMarker.openPopup();
-                else {
-                    L.marker([lat, lon]).addTo(map).bindPopup('Current location').openPopup();
-                }
                 map.setView([lat, lon], 17);
             }, () => alert('Unable to get current location.'));
         }
 
+        // Accepts "lat, lon" or manual text (but now no landmarks)
         function getCoords(location, callback) {
             location = location.trim();
-            if (LANDMARKS[location]) {
-                callback(LANDMARKS[location]);
-                return;
-            }
             const latlonMatch = location.match(/^\s*([+-]?\d+\.\d+)\s*,\s*([+-]?\d+\.\d+)\s*$/);
             if (latlonMatch) {
                 const lat = parseFloat(latlonMatch[1]);
@@ -381,46 +301,8 @@
                 callback([lat, lon]);
                 return;
             }
-            alert('Please use one of the campus suggestions or paste coordinates as "lat, lon".');
+            alert('Please enter coordinates in "lat, lon" format.');
         }
-
-        const suggestWrapper = document.getElementById('suggestions');
-        const suggestList = document.getElementById('suggestList');
-
-        function showSuggestions(){
-            suggestList.innerHTML = '';
-            for (const name of Object.keys(LANDMARKS)) {
-                const el = document.createElement('div');
-                el.className = 'suggest-item';
-                el.textContent = name;
-                el.onclick = () => {
-                    const active = document.activeElement;
-                    if (active && active.id === 'to') document.getElementById('to').value = name;
-                    else document.getElementById('from').value = name;
-                    suggestWrapper.style.display = 'none';
-                    suggestWrapper.setAttribute('aria-hidden','true');
-                };
-                suggestList.appendChild(el);
-            }
-            suggestWrapper.style.display = 'block';
-            suggestWrapper.setAttribute('aria-hidden','false');
-            suggestList.style.display = 'flex';
-        }
-
-        function hideSuggestions(){
-            suggestWrapper.style.display = 'none';
-            suggestWrapper.setAttribute('aria-hidden','true');
-            suggestList.style.display = 'none';
-        }
-
-        document.getElementById('from').addEventListener('focus', showSuggestions);
-        document.getElementById('to').addEventListener('focus', showSuggestions);
-        document.getElementById('from').addEventListener('input', ()=>{/* keep suggestions visible */});
-        document.getElementById('to').addEventListener('input', ()=>{/* keep suggestions visible */});
-        document.addEventListener('click', (e)=>{ 
-            const box = document.querySelector('.input-box');
-            if (!box.contains(e.target)) hideSuggestions();
-        });
 
         let routeControl = null;
 
@@ -429,7 +311,7 @@
             const toVal = document.getElementById('to').value.trim();
 
             if (!fromVal || !toVal) {
-                alert('Please fill both From and To (use suggestions).');
+                alert('Please fill both From and To fields with coordinates like "lat, lon".');
                 return;
             }
 
