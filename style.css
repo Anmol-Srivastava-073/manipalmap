@@ -1,5 +1,5 @@
 .header-gradient {
-    background: linear-gradient(180deg, #fd8f00, black, #fd7e00, black, #fd7600);
+    background: linear-gradient(180deg, #4f3007, black, #8e4a07, black, #843f02);
     background-size: 100% 400%; /* big enough for smooth motion */
     animation: gradientScroll 5s linear infinite alternate;
 }
@@ -221,3 +221,4 @@
     box-shadow: 0 0 25px rgba(255, 105, 180, 1), 
                 0 0 50px rgba(0, 191, 255, 1);
 }
+
