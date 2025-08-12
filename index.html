@@ -284,12 +284,7 @@
     // Add campus polygons with labels
     
 
-    L.marker([HOSTEL_POLYGON[0][0]+0.001, HOSTEL_POLYGON[0][1]+0.004], { 
-      interactive: false,
-    }).bindTooltip('<div class="campus-label">Hostel Campus</div>', { permanent: true, direction: 'center', className: '' }).addTo(map);
-
-    L.marker([COLLEGE_POLYGON[0][0]+0.001, COLLEGE_POLYGON[0][1]+0.004], { interactive: false })
-      .bindTooltip('<div class="campus-label">College Campus</div>', { permanent: true, direction: 'center' }).addTo(map);
+    
 
     // Add landmark markers (small)
     Object.keys(LANDMARKS).forEach((name) => {
