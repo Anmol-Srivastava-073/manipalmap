@@ -282,8 +282,7 @@
     }).addTo(map);
 
     // Add campus polygons with labels
-    const hostelLayer = L.polygon(HOSTEL_POLYGON, { color: '#2ecc71', fillColor: '#2ecc7133', weight: 2 }).addTo(map);
-    const collegeLayer = L.polygon(COLLEGE_POLYGON, { color: '#3498db', fillColor: '#3498db33', weight: 2 }).addTo(map);
+    
 
     L.marker([HOSTEL_POLYGON[0][0]+0.001, HOSTEL_POLYGON[0][1]+0.004], { 
       interactive: false,
