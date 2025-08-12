@@ -262,6 +262,7 @@
       "Chiller Panel Room": [26.841275, 75.560800],
       "GHS Library": [26.840317, 75.561444],
       "Jogger's Park": [26.840092, 75.563310],
+      "Subway Entrance": [26.841900, 75.565100],
       
       
       //Add more locations here
@@ -344,12 +345,15 @@
 
     async function fetchRoute(start, end) {
       const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
+      const subwayCoords = LANDMARKS["Subway Entrance"];
+
       const body = {
-        coordinates: [
-          [start[1], start[0]],
-          [end[1], end[0]],
-        ],
-      };
+         coordinates: [
+         [start[1], start[0]],
+         [subwayCoords[1], subwayCoords[0]], // Force pass through subway
+         [end[1], end[0]],
+       ],
+     };
 
       const res = await fetch(url, {
         method: 'POST',
