@@ -11,100 +11,100 @@
     href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
 
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+ <style>
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    #map {
-      height: 100vh;
-      width: 100%;
-      background: #dfe6e9;
-    }
+#map {
+  height: 100vh;
+  width: 100%;
+  background: #dfe6e9;
+}
 
-    .input-box {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1500;
-      background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      padding: 10px 14px; /* smaller */
-      display: flex;
-      gap: 10px; /* slightly smaller gap */
-      max-width: 800px;
-      width: 90vw;
-      align-items: center;
-      color: white;
-      font-size: 15px; /* slightly smaller */
-    }
+.input-box {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
+  background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 10px 14px; /* smaller */
+  display: flex;
+  gap: 10px; /* slightly smaller gap */
+  max-width: 800px;
+  width: 90vw;
+  align-items: center;
+  color: white;
+  font-size: 15px; /* slightly smaller */
+}
 
-    .input-box input {
-      flex-grow: 1;
-      padding: 8px 12px; /* smaller */
-      border-radius: 8px;
-      border: none;
-      font-size: 14px; /* smaller */
-      outline: none;
-      color: #333;
-    }
+.input-box input {
+  flex-grow: 1;
+  padding: 8px 12px; /* smaller */
+  border-radius: 8px;
+  border: none;
+  font-size: 14px; /* smaller */
+  outline: none;
+  color: #333;
+}
 
-    .input-box input::placeholder {
-      color: #666;
-      font-style: italic;
-    }
+.input-box input::placeholder {
+  color: #666;
+  font-style: italic;
+}
 
-    .btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      border-radius: 8px;
-      padding: 6px 14px; /* smaller */
-      font-weight: 700;
-      cursor: pointer;
-      color: #ff7e5f;
-      transition: background-color 0.2s ease;
-      white-space: nowrap;
-      font-size: 13px; /* smaller */
-    }
+.btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px; /* smaller */
+  font-weight: 700;
+  cursor: pointer;
+  color: #ff7e5f;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  font-size: 13px; /* smaller */
+}
 
-    .btn:hover {
-      background-color: #fff4f1;
-    }
+.btn:hover {
+  background-color: #fff4f1;
+}
 
-    #suggestions {
-      position: absolute;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: 800px;
-      width: 90vw;
-      background: white;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      border-radius: 10px;
-      max-height: 180px;
-      overflow-y: auto;
-      display: none;
-      z-index: 1600;
-      font-size: 15px;
-    }
+#suggestions {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  width: 90vw;
+  background: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1600;
+  font-size: 15px;
+}
 
-    #suggestions div {
-      padding: 12px 15px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-      color: #333;
-    }
+#suggestions div {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
 
-    #suggestions div:hover {
-      background: #f7d7ca;
-      color: #ff7e5f;
-    }
+#suggestions div:hover {
+  background: #f7d7ca;
+  color: #ff7e5f;
+}
 
-    .travel-info-box {
+.travel-info-box {
   position: absolute;
   bottom: 70px; /* desktop offset */
   left: 18px;
@@ -120,15 +120,7 @@
   line-height: 1.4;
 }
 
-@media (max-width: 600px) {
-  .travel-info-box {
-    bottom: 150px; /* extra space to fit stacked buttons */
-    left: 14px;
-    right: 14px; /* optional: let it scale full width on mobile */
-    min-width: auto;
-  }
-}
-    .live-toggle {
+.live-toggle {
   position: absolute;
   bottom: 18px;
   right: 18px;
@@ -172,19 +164,9 @@
   background: #ff7675;
 }
 
+/* Mobile adjustments */
 @media (max-width: 600px) {
-  .live-toggle,
-  .cancel-trip {
-    position: static;
-    width: 100%;
-    margin: 5px 0;
-    border-radius: 10px;
-    padding: 10px 0;
-    font-size: 13px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  /* Container for stacking buttons at bottom on mobile */
+  /* Stack buttons at bottom */
   .mobile-button-container {
     position: absolute;
     bottom: 14px;
@@ -195,45 +177,54 @@
     gap: 8px;
     z-index: 1500;
   }
+
+  .live-toggle,
+  .cancel-trip {
+    position: static;
+    width: 100%;
+    margin: 0;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Move info box above stacked buttons */
+  .travel-info-box {
+    bottom: calc(14px + 2 * (40px + 8px) + 14px);
+    left: 14px;
+    right: 14px;
+    min-width: auto;
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+
+  .input-box {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px; /* smaller */
+    font-size: 13px;
+  }
+
+  .input-box input {
+    font-size: 13px;
+    padding: 8px 10px; /* smaller */
+  }
+
+  .btn, .live-toggle {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 13px; /* smaller */
+  }
+
+  #suggestions {
+    max-height: 140px;
+    font-size: 14px;
+  }
 }
-    
+</style>
 
-    @media (max-width: 600px) {
-      .input-box {
-        flex-direction: column;
-        gap: 10px;
-        padding: 12px 14px; /* smaller */
-        font-size: 13px;
-      }
-
-      .input-box input {
-        font-size: 13px;
-        padding: 8px 10px; /* smaller */
-      }
-
-      .btn, .live-toggle {
-        width: 100%;
-        text-align: center;
-        padding: 10px 0;
-        font-size: 13px; /* smaller */
-      }
-
-      #suggestions {
-        max-height: 140px;
-        font-size: 14px;
-      }
-
-      .travel-info-box {
-        font-size: 13px;
-        padding: 12px 14px;
-        min-width: 140px;
-        bottom: 70px; /* moved up on mobile too */
-        left: 14px;
-      }
-
-      
-    }
-  </style>
 </head>
 
 <body>
