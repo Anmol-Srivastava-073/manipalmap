@@ -10,169 +10,185 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
+
+  <style>
     html, body {
-  height: 100%;
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-#map {
-  height: 100vh;
-  width: 100%;
-  background: #dfe6e9;
-}
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-.input-box {
-  position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1500;
-  background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 12px 16px;
-  display: flex;
-  gap: 12px;
-  max-width: 800px;
-  width: 90vw;
-  align-items: center;
-  color: white;
-  font-size: 16px;
-}
+    #map {
+      height: 100vh;
+      width: 100%;
+      background: #dfe6e9;
+    }
 
-.input-box input {
-  flex-grow: 1;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  font-size: 15px;
-  outline: none;
-  color: #333;
-}
-.input-box input::placeholder {
-  color: #666;
-  font-style: italic;
-}
+    .input-box {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1500;
+      background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      padding: 12px 16px;
+      display: flex;
+      gap: 12px;
+      max-width: 800px;
+      width: 90vw;
+      align-items: center;
+      color: white;
+      font-size: 16px;
+    }
 
-.btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 700;
-  cursor: pointer;
-  color: #ff7e5f;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-  font-size: 15px;
-}
-.btn:hover {
-  background-color: #fff4f1;
-}
+    .input-box input {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+      outline: none;
+      color: #333;
+    }
 
-#suggestions {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 800px;
-  width: 90vw;
-  background: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  border-radius: 10px;
-  max-height: 180px;
-  overflow-y: auto;
-  display: none;
-  z-index: 1600;
-  font-size: 15px;
-}
-#suggestions div {
-  padding: 12px 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-  color: #333;
-}
-#suggestions div:hover {
-  background: #f7d7ca;
-  color: #ff7e5f;
-}
+    .input-box input::placeholder {
+      color: #666;
+      font-style: italic;
+    }
 
-.travel-info-box {
-  position: absolute;
-  bottom: 18px;
-  left: 18px;
-  z-index: 1500;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 14px 18px;
-  border-radius: 10px;
-  color: #333;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  font-weight: 600;
-  min-width: 180px;
-  font-size: 14px;
-  line-height: 1.4;
-}
+    .btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #ff7e5f;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      font-size: 15px;
+    }
 
-.live-toggle {
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-  z-index: 1500;
-  background: #ff7e5f;
-  border: none;
-  color: white;
-  font-weight: 700;
-  padding: 12px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
-  transition: background-color 0.25s ease;
-  font-size: 15px;
-  white-space: nowrap;
-}
-.live-toggle:hover {
-  background: #feb47b;
-}
+    .btn:hover {
+      background-color: #fff4f1;
+    }
 
-@media (max-width: 600px) {
-  .input-box {
-    flex-direction: column;
-    gap: 10px;
-    padding: 14px 16px;
-    font-size: 14px;
-  }
-  .input-box input {
-    font-size: 14px;
-    padding: 10px 12px;
-  }
-  .btn, .live-toggle {
-    width: 100%;
-    text-align: center;
-    padding: 12px 0;
-    font-size: 14px;
-  }
-  #suggestions {
-    max-height: 140px;
-    font-size: 14px;
-  }
-  .travel-info-box {
-    font-size: 13px;
-    padding: 12px 14px;
-    min-width: 140px;
-  }
-  .live-toggle {
-    padding: 10px 0;
-    font-size: 14px;
-    bottom: 14px;
-    right: 14px;
-    border-radius: 10px;
-  }
-  .travel-info-box {
-    bottom: 14px;
-    left: 14px;
-  }
-}
+    #suggestions {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 800px;
+      width: 90vw;
+      background: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1600;
+      font-size: 15px;
+    }
+
+    #suggestions div {
+      padding: 12px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      color: #333;
+    }
+
+    #suggestions div:hover {
+      background: #f7d7ca;
+      color: #ff7e5f;
+    }
+
+    .travel-info-box {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      z-index: 1500;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 14px 18px;
+      border-radius: 10px;
+      color: #333;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      font-weight: 600;
+      min-width: 180px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .live-toggle {
+      position: absolute;
+      bottom: 18px;
+      right: 18px;
+      z-index: 1500;
+      background: #ff7e5f;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+      transition: background-color 0.25s ease;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    .live-toggle:hover {
+      background: #feb47b;
+    }
+
+    @media (max-width: 600px) {
+      .input-box {
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 16px;
+        font-size: 14px;
+      }
+
+      .input-box input {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
+
+      .btn, .live-toggle {
+        width: 100%;
+        text-align: center;
+        padding: 12px 0;
+        font-size: 14px;
+      }
+
+      #suggestions {
+        max-height: 140px;
+        font-size: 14px;
+      }
+
+      .travel-info-box {
+        font-size: 13px;
+        padding: 12px 14px;
+        min-width: 140px;
+      }
+
+      .live-toggle {
+        padding: 10px 0;
+        font-size: 14px;
+        bottom: 14px;
+        right: 14px;
+        border-radius: 10px;
+      }
+
+      .travel-info-box {
+        bottom: 14px;
+        left: 14px;
+      }
+    }
+  </style>
 </head>
+
 <body>
   <div id="map" aria-hidden="false"></div>
 
