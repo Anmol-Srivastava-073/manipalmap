@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUJ UNIWAY</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
+
+</head>
+<body class="header-gradient backdrop-blur-md shadow-md">
+
+    <nav class="sticky top-0 z-50 w-full bg-gradient-to-r from-black via-orange-600 to-[#FF780A] bg-opacity-95 backdrop-blur-md shadow-md">
+  <div class="max-w-10xl mx-auto px-8">
+    <div class="flex justify-between items-center h-20">
+      
+      <!-- Logo -->
+      <a href="#hero" class="logo-shine navbar-font text-black text-3xl font-bold tracking-tight">
+        Manipal UniNav
+      </a>
+
+      <!-- Hamburger Menu Button (Mobile) -->
+      <button id="menu-toggle" class="sm:hidden text-white text-3xl focus:outline-none">
+        ☰
+      </button>
+
+      <!-- Navigation Links -->
+      <div id="nav-links" class="hidden sm:flex space-x-8 flex-col sm:flex-row sm:items-center sm:space-x-8 absolute sm:static top-20 right-0 sm:top-auto sm:right-auto bg-gradient-to-r from-black via-orange-600 to-[#FF780A] sm:bg-transparent p-4 sm:p-0 rounded-lg sm:rounded-none shadow-lg sm:shadow-none">
+        <a href="#home" class="toggle-button navbar-font text-white hover:text-yellow-300 transition duration-300">Home</a>
+        <a href="#about" class="toggle-button navbar-font text-white hover:text-yellow-300 transition duration-300">About</a>
+        <a href="#maps" class="toggle-button navbar-font text-white hover:text-yellow-300 transition duration-300">Maps</a>
+        <a href="#pois" class="toggle-button navbar-font text-white hover:text-yellow-300 transition duration-300">Points of Interest</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+    <main class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+        <section id="hero" class="navbar-font w-full max-w-4xl text-center my-12 md:my-20 ">
+            <h2 class="text-4xl sm:text-6xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
+                Welcome To 
+                <br> 
+            </h2>
+            <h1 class="fade-in text-4xl sm:text-8xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed ">
+                Manipal UniNav 
+            </h1>
+            <p class="mt-4 text-lg text-[#FF780A] max-w-2xl mx-auto">
+                <br><span id= "typewriter">
+                 </span> 
+            </p>
+        </section>
+
+       <section id="about" class="scroll-mt-28 w-full max-w-4xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-12">
+            <h2 class="refade-in navbar-font text-4xl font-bold text-[#963646] mb-4 text-center">About Our Campus</h2>
+            <p class="navbar-font text-[#000000] leading-relaxed text-center sm:text-center">
+ Finding your way around a large university campus can be confusing, especially for new students or visitors. <b> Manipal UniNav </b> is our interactive navigation platform designed to make this easier. It helps students quickly locate classrooms, labs, libraries, cafeterias, hostels, sports facilities, and other key spots around the campus.
+
+With a simple search or click, users can view the shortest route, estimated walking time, and important landmarks along the way—so no more wandering aimlessly or arriving late.
+</p>
+        </section>
+
+        <div class="flex justify-center my-6">
+    <a href="https://mujnavigator.netlify.app/" target="_blank" 
+       class="glow-btn px-10 py-5 text-2xl font-bold text-white rounded-full shadow-lg">
+        Open Full Campus Map
+    </a>
+</div>
+
+<section id="maps" class="w-full max-w-4xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-12 text-center">
+  <h2 class="navbar-font text-4xl font-bold text-[#963646] mb-6">Campus Map</h2>
+  
+  <!-- Clickable Map Preview -->
+  <a href="https://mujnavigator.netlify.app/" target="_blank" class="block rounded-2xl overflow-hidden shadow-lg transform transition duration-300 hover:scale-105">
+    <iframe 
+      src="https://mujnavigator.netlify.app/" 
+      class="w-full h-96 pointer-events-none" 
+      style="border:0;" 
+      loading="lazy">
+    </iframe>
+  </a>
+
+  <p class="mt-4 text-[#000000] navbar-font">
+    Click the map above to explore the full interactive MUJ Navigator.
+  </p>
+</section>
+
+        <section id="pois" class=" navbar-font w-full max-w-4xl my-12">
+            <h1 class="rerefade-in text-4xl font-bold text-[#F4E452] mb-6 text-center">Points of Interest</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="poi-card bg-white rounded-3xl shadow-md p-6 cursor-pointer" data-location="Library">
+                    <img src="https://jaipur.manipal.edu/img/library/layout-2.png" alt="Campus Library" class="w-full h-40 object-cover rounded-2xl mb-4">
+                    <h3 class="text-xl font-semibold text-blue-600">The Library</h3>
+                    <p class="text-gray-600 text-sm mt-2">
+                        A modern and quiet space for study, research, and collaboration, with an extensive collection of books.
+                    </p>
+                </div>
+                
+                <div class="poi-card bg-white rounded-3xl shadow-md p-6 cursor-pointer" data-location="Cafeteria">
+                    <img src="https://miro.medium.com/v2/resize:fit:1400/1*hxnsPii6HGeId17K39CY0w.jpeg" alt="Campus Cafeteria" class="w-full h-40 object-cover rounded-2xl mb-4">
+                    <h3 class="text-xl font-semibold text-blue-600">The Cafeteria</h3>
+                    <p class="text-gray-600 text-sm mt-2">
+                        The perfect place to grab a meal, a coffee, or just hang out with friends between classes.
+                    </p>
+                </div>
+               
+                <div class="poi-card bg-white rounded-3xl shadow-md p-6 cursor-pointer" data-location="Sports Complex">
+                    <img src="https://jaipur.manipal.edu/fomca/img-foa/facilities/physical-education/b7.jpg" alt="Sports Complex" class="w-full h-40 object-cover rounded-2xl mb-4">
+                    <h3 class="text-xl font-semibold text-blue-600">Sports Complex</h3>
+                    <p class="text-gray-600 text-sm mt-2">
+                        Home to various indoor and outdoor sports facilities, including a gym, courts, and a swimming pool.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="w-full text-center text-[#F4E452] py-6 mt-12 border-t border-gray-200">
+            © 2025 Manipal UniNav. All rights reserved.
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
