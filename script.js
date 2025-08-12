@@ -76,3 +76,20 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("menu-toggle").addEventListener("click", function () {
   document.getElementById("nav-links").classList.toggle("hidden");
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const map = document.querySelector(".glow-map");
+
+    map.addEventListener("click", (e) => {
+        const ripple = document.createElement("span");
+        ripple.classList.add("ripple");
+        ripple.style.left = `${e.clientX - map.getBoundingClientRect().left}px`;
+        ripple.style.top = `${e.clientY - map.getBoundingClientRect().top}px`;
+        map.parentElement.appendChild(ripple);
+
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    });
+});
