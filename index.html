@@ -251,7 +251,7 @@
       "Block G3": [26.840518, 75.562956],
       "Block G4": [26.840587, 75.562146],
       "G4 Badminton Court": [26.840350, 75.562369],
-      
+      "Gym": [26.841210, 75.561594],
       "Block B1": [26.841782, 75.562967],
       "Block B3": [26.841413, 75.562431],
       "Block B5": [26.841729, 75.561921],
@@ -263,10 +263,25 @@
       "GHS Library": [26.840317, 75.561444],
       "Jogger's Park": [26.840092, 75.563310],
       "Subway Entrance": [26.842031, 75.563313],
-      
-      
+      "Saras Juice Corner": [26.840758, 75.563485],
       //Add more locations here
     };
+
+    const CAMPUS_BOUNDS = {
+      minLat: 26.8395,
+      maxLat: 26.8455,
+      minLon: 75.5595,
+      maxLon: 75.5675
+    };
+
+    function isInsideCampus([lat, lon]) {
+      return (
+        lat >= CAMPUS_BOUNDS.minLat &&
+        lat <= CAMPUS_BOUNDS.maxLat &&
+        lon >= CAMPUS_BOUNDS.minLon &&
+        lon <= CAMPUS_BOUNDS.maxLon
+      );
+    }
 
     // Initialize map centered on MUJ campus
     const map = L.map('map').setView([26.8436, 75.565], 16);
@@ -277,8 +292,6 @@
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
-
-    
 
     const suggestBox = document.getElementById('suggestions');
 
@@ -347,13 +360,13 @@
       const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
       const subwayCoords = LANDMARKS["Subway Entrance"];
 
-      const body = {
-         coordinates: [
-         [start[1], start[0]],
-         [subwayCoords[1], subwayCoords[0]], // Force pass through subway
-         [end[1], end[0]],
-       ],
-     };
+      const bothInside = isInsideCampus(start) && isInsideCampus(end);
+
+      const coordinates = bothInside
+        ? [ [start[1], start[0]], [end[1], end[0]] ]
+        : [ [start[1], start[0]], [subwayCoords[1], subwayCoords[0]], [end[1], end[0]] ];
+
+      const body = { coordinates };
 
       const res = await fetch(url, {
         method: 'POST',
@@ -402,7 +415,6 @@
         const bounds = routeLayer.getBounds();
         map.fitBounds(bounds.pad(0.15));
 
-        // Calculate distance and duration (in seconds) from route properties
         const summary = routeGeojson.features[0].properties.summary;
         const distKm = summary.distance / 1000;
         const durationMins = Math.round(summary.duration / 60);
@@ -413,7 +425,6 @@
           2
         )} km<br>Estimated time: ${durationMins} mins`;
 
-        // Add markers for start and end
         L.marker(fromCoords, {
           title: 'Start (From)',
           icon: L.divIcon({
@@ -438,7 +449,6 @@
       }
     }
 
-    // Live location handling
     let watchId = null;
     let liveMarker = null;
     let liveAccuracyCircle = null;
@@ -517,7 +527,6 @@
       }
     }
 
-    // Use current location for "from" input
     function useCurrentLocationAsFrom() {
       if (!navigator.geolocation) {
         alert('Geolocation not supported.');
@@ -537,6 +546,6 @@
     document.getElementById('goBtn').addEventListener('click', navigate);
     document.getElementById('liveToggle').addEventListener('click', toggleLive);
     document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
-  </script>
+</script>
 </body>
 </html>
