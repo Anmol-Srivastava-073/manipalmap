@@ -141,6 +141,19 @@
     .live-toggle:hover {
       background: #feb47b;
     }
+    .cancel-trip {
+  background: #d63031;
+  right: auto;
+  left: 18px;
+}
+
+@media (max-width: 600px) {
+  .cancel-trip {
+    width: 100%;
+    position: static;
+    margin-top: 8px;
+  }
+}
 
     @media (max-width: 600px) {
       .input-box {
@@ -205,7 +218,7 @@
   </div>
 
   <button class="live-toggle" id="liveToggle" aria-pressed="false">Start live location</button>
-  <button class="live-toggle" id="cancelTripBtn" style="right: 160px; background:#d63031;">Cancel Trip</button>
+  <button class="live-toggle cancel-trip" id="cancelTripBtn">Cancel Trip</button>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
