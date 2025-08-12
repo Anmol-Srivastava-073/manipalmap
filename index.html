@@ -205,6 +205,7 @@
   </div>
 
   <button class="live-toggle" id="liveToggle" aria-pressed="false">Start live location</button>
+  <button class="live-toggle" id="cancelTripBtn" style="right: 150px; background:#d63031;">Cancel Trip</button>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -318,6 +319,25 @@
 
     const suggestBox = document.getElementById('suggestions');
 
+    function cancelTrip() {
+      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+      // Remove A/B markers
+      map.eachLayer(function(layer) {
+        if (layer.options && layer.options.icon && (layer.options.icon.options.className === 'start-marker' || layer.options.icon.options.className === 'end-marker')) {
+          map.removeLayer(layer);
+        }
+      });
+      // Remove subway marker if present
+      map.eachLayer(function(layer) {
+        if (layer.getPopup && layer.getPopup() && layer.getPopup().getContent().includes('Subway (required transfer)')) {
+          map.removeLayer(layer);
+        }
+      });
+      document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
+    }
+
+    document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
+    
     function showSuggestions(input) {
       const val = input.value.trim().toLowerCase();
       suggestBox.innerHTML = '';
