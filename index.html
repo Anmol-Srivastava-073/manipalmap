@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Manipal Uninav</title>
+  <link rel="icon" type="image/png" href="image/weblogo.png" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+ <style>
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#map {
+  height: 100vh;
+  width: 100%;
+  background: #dfe6e9;
+}
+
+.input-box {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
+  background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 10px 14px; /* smaller */
+  display: flex;
+  gap: 10px; /* slightly smaller gap */
+  max-width: 800px;
+  width: 90vw;
+  align-items: center;
+  color: white;
+  font-size: 15px; /* slightly smaller */
+}
+
+.input-box input {
+  flex-grow: 1;
+  padding: 8px 12px; /* smaller */
+  border-radius: 8px;
+  border: none;
+  font-size: 14px; /* smaller */
+  outline: none;
+  color: #333;
+}
+
+.input-box input::placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+.btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px; /* smaller */
+  font-weight: 700;
+  cursor: pointer;
+  color: #ff7e5f;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  font-size: 13px; /* smaller */
+}
+
+.btn:hover {
+  background-color: #fff4f1;
+}
+
+#suggestions {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  width: 90vw;
+  background: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1600;
+  font-size: 15px;
+}
+
+#suggestions div {
+  padding: 12px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+#suggestions div:hover {
+  background: #f7d7ca;
+  color: #ff7e5f;
+}
+
+.travel-info-box {
+  position: absolute;
+  bottom: 70px; /* desktop offset */
+  left: 18px;
+  z-index: 1500;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 14px 18px;
+  border-radius: 10px;
+  color: #333;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  font-weight: 600;
+  min-width: 180px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.live-toggle {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  z-index: 1500;
+  background: #ff7e5f;
+  border: none;
+  color: white;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+  transition: background-color 0.25s ease;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.live-toggle:hover {
+  background: #feb47b;
+}
+
+.cancel-trip {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  z-index: 1500;
+  background: #d63031;
+  border: none;
+  color: white;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
+  transition: background-color 0.25s ease;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cancel-trip:hover {
+  background: #ff7675;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  /* Stack buttons at bottom */
+  .mobile-button-container {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1500;
+  }
+
+  .live-toggle,
+  .cancel-trip {
+    position: static;
+    width: 100%;
+    margin: 0;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Move info box above stacked buttons */
+  .travel-info-box {
+    bottom: calc(14px + 2 * (40px + 8px) + 14px);
+    left: 14px;
+    right: 14px;
+    min-width: auto;
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+
+  .input-box {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px; /* smaller */
+    font-size: 13px;
+  }
+
+  .input-box input {
+    font-size: 13px;
+    padding: 8px 10px; /* smaller */
+  }
+
+  .btn, .live-toggle {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 13px; /* smaller */
+  }
+
+  #suggestions {
+    max-height: 140px;
+    font-size: 14px;
+  }
+}
+</style>
+
+</head>
+
+<body>
+  <div id="map" aria-hidden="false"></div>
+
+  <div class="input-box" role="search" aria-label="Campus navigation">
+    <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
+    <button class="btn" title="Use current location" id="useCurrentBtn">📍</button>
+    <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
+    <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
+  </div>
+
+  <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
+
+  <div class="travel-info-box" id="travelInfo" aria-live="polite">
+    <b>Trip Info</b><br />
+    Distance: -- km<br />
+    Estimated time: -- mins
+  </div>
+
+  <div class="mobile-button-container">
+  <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
+  <button class="live-toggle" id="liveToggle" aria-pressed="false">Start live location</button>
+</div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // OpenRouteService API Key - free signup needed at https://openrouteservice.org
+    const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjNlYjllODc4MzcwNDQxOGNiNzg1YTg1ZDFjNDdmNmE5IiwiaCI6Im11cm11cjY0In0=';
+
+    const WALKING_SPEED_KMPH = 5;
+
+    // Landmarks and coordinates
+    const LANDMARKS = {
+      "AB1 Block": [26.842586, 75.564249],
+      "AB2 Block": [26.843117, 75.5661],
+      "AB3 Block": [26.84407, 75.564072],
+      "BlueDove Mess": [26.840432, 75.561798],
+      "BluSpring(INDYA) Mess": [26.841255, 75.561567],
+      "Laundry": [26.840202, 75.561454],
+      "Old Mess": [26.843112, 75.565209],
+      "Central Library": [26.841648, 75.565944],
+      "Lecture Hall Complex": [26.844338, 75.564705],
+      "Main Gate": [26.840729, 75.566325],
+      "Gate 2": [26.841524, 75.563868],
+      "Grand Stairs": [26.842507, 75.565467],
+      "Block G1": [26.840815, 75.563450],
+      "Block G2": [26.840642, 75.562629],
+      "Block G3": [26.840518, 75.562956],
+      "Block G4": [26.840587, 75.562146],
+      "G4 Badminton Court": [26.840350, 75.562369],
+      "Gym": [26.841210, 75.561594],
+      "Block B1": [26.841782, 75.562967],
+      "Block B3": [26.841413, 75.562431],
+      "Block B5": [26.841729, 75.561921],
+      "Block B2": [26.842045, 75.562189],
+      "Block B6": [26.842165, 75.561690],
+      "Block B7": [26.841859, 75.560896],
+      "Transformer": [26.841538, 75.560730],
+      "Chiller Panel Room": [26.841275, 75.560800],
+      "GHS Library": [26.840317, 75.561444],
+      "Jogger's Park": [26.840092, 75.563310],
+      "Subway Entrance": [26.842031, 75.563313],
+      "Saras Juice Corner": [26.840758, 75.563485],
+      "Subway Wraps": [26.841445, 75.563090],
+      "Taste Of India": [26.841445, 75.563090],
+      "Chatkara": [26.841445, 75.563090],
+      "Waffle Shop": [26.841399, 75.562809],
+      "Cook House": [26.840952, 75.563493],
+    };
+
+    // Define two campus polygons (approximate) - hostel and college
+    // These are simple rectangles / polygons approximating areas — tweak coordinates as needed
+    const HOSTEL_POLYGON = [
+      [26.84337, 75.56231],
+      [26.83925, 75.56459],
+      [26.83862, 75.56178],
+      [26.84262, 75.56036]
+    ];
+
+    const COLLEGE_POLYGON = [
+      [26.84622, 75.56238],
+      [26.83902, 75.56532],
+      [26.84450, 75.56806],
+      [26.84647, 75.56523]
+    ];
+
+    function campusOf([lat, lon]) {
+      if (!lat || !lon) return null;
+      const point = turfPoint([lon, lat]);
+      if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c=>[c[1], c[0]])]))) return 'hostel';
+      if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c=>[c[1], c[0]])]))) return 'college';
+      return null;
+    }
+
+    // Initialize map centered on MUJ campus
+    const map = L.map('map').setView([26.8436, 75.565], 16);
+
+    // OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    // Add campus polygons with labels
+    
+
+    
+
+    // Add landmark markers (small)
+    //Object.keys(LANDMARKS).forEach((name) => {
+    //  const [lat, lon] = LANDMARKS[name];
+    //  L.circleMarker([lat, lon], { radius: 5, fillOpacity: 0.9 }).bindTooltip(name, { permanent: false }).addTo(map);
+    //});
+
+    // Bring in turf helpers without network requests by embedding minimal functions
+    // Minimal turf-like helpers: booleanPointInPolygon and point/polygon constructors (very small)
+    // NOTE: This is a lightweight approximation and works for our simple polygons only.
+    function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
+    function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
+    function turfBooleanPointInPolygon(pt, poly) {
+      // Ray-casting algorithm for point in polygon on lon-lat coordinates
+      const x = pt.geometry.coordinates[0], y = pt.geometry.coordinates[1];
+      const vs = poly.geometry.coordinates[0];
+      let inside = false;
+      for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        const xi = vs[i][0], yi = vs[i][1];
+        const xj = vs[j][0], yj = vs[j][1];
+        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi + 0.0) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    const suggestBox = document.getElementById('suggestions');
+
+    function cancelTrip() {
+      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+      // Remove A/B markers
+      map.eachLayer(function(layer) {
+        if (layer.options && layer.options.icon && (layer.options.icon.options.className === 'start-marker' || layer.options.icon.options.className === 'end-marker')) {
+          map.removeLayer(layer);
+        }
+      });
+      // Remove subway marker if present
+      map.eachLayer(function(layer) {
+        if (layer.getPopup && layer.getPopup() && layer.getPopup().getContent().includes('Subway (required transfer)')) {
+          map.removeLayer(layer);
+        }
+      });
+      document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
+    }
+
+    document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
+    
+    function showSuggestions(input) {
+      const val = input.value.trim().toLowerCase();
+      suggestBox.innerHTML = '';
+      if (!val) { suggestBox.style.display = 'none'; return; }
+      const matches = Object.keys(LANDMARKS).filter((name) => name.toLowerCase().includes(val));
+      if (matches.length === 0) { suggestBox.style.display = 'none'; return; }
+      const rect = input.getBoundingClientRect();
+      suggestBox.style.width = rect.width + 'px';
+      suggestBox.style.top = rect.bottom + window.scrollY + 'px';
+      suggestBox.style.left = rect.left + window.scrollX + 'px';
+      suggestBox.style.display = 'block';
+      matches.forEach((name) => {
+        const div = document.createElement('div');
+        div.textContent = name;
+        div.setAttribute('role', 'option');
+        div.addEventListener('click', () => { input.value = name; suggestBox.style.display = 'none'; input.focus(); });
+        suggestBox.appendChild(div);
+      });
+    }
+
+    ['from', 'to'].forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => showSuggestions(el));
+      el.addEventListener('focus', () => showSuggestions(el));
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#suggestions') && !e.target.closest('#from') && !e.target.closest('#to')) { suggestBox.style.display = 'none'; }
+    });
+
+    function parseCoords(loc) {
+      loc = loc.trim();
+      if (LANDMARKS[loc]) return LANDMARKS[loc];
+      const match = loc.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
+      if (match) return [parseFloat(match[1]), parseFloat(match[3])];
+      return null;
+    }
+
+    let routeLayer = null;
+
+    async function fetchRoute(start, end, useSubway = false) {
+      const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
+      const subwayCoords = LANDMARKS['Subway Entrance'];
+
+      // build coordinates array in [lon, lat] for ORS
+      const coords = [];
+      coords.push([start[1], start[0]]);
+      if (useSubway) coords.push([subwayCoords[1], subwayCoords[0]]);
+      coords.push([end[1], end[0]]);
+
+      const body = { coordinates: coords };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Authorization': ORS_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error('Routing request failed: ' + res.statusText);
+      return res.json();
+    }
+
+    async function navigate() {
+      const fromInput = document.getElementById('from').value;
+      const toInput = document.getElementById('to').value;
+
+      if (!fromInput || !toInput) { alert('Please enter both From and To locations.'); return; }
+
+      const fromCoords = parseCoords(fromInput);
+      const toCoords = parseCoords(toInput);
+
+      if (!fromCoords || !toCoords) { alert('Please enter valid locations or coordinates.'); return; }
+
+      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+
+      const fromCampus = campusOf(fromCoords);
+      const toCampus = campusOf(toCoords);
+
+      // Decide whether subway is required: if both are inside campus areas but different campuses -> MUST use subway
+      const mustUseSubway = fromCampus && toCampus && fromCampus !== toCampus;
+
+      // If either point is outside both campuses, allow direct routing (no forced subway)
+      const useSubway = mustUseSubway;
+
+      try {
+        const routeGeojson = await fetchRoute(fromCoords, toCoords, useSubway);
+
+        routeLayer = L.geoJSON(routeGeojson, {
+          style: { color: '#ff7e5f', weight: 6, opacity: 0.85 },
+        }).addTo(map);
+
+        const bounds = routeLayer.getBounds();
+        map.fitBounds(bounds.pad(0.15));
+
+        const summary = routeGeojson.features[0].properties.summary;
+        const distKm = summary.distance / 1000;
+        const durationMins = Math.round(summary.duration / 60);
+
+        const travelInfoEl = document.getElementById('travelInfo');
+        travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${distKm.toFixed(2)} km<br>Estimated time: ${durationMins} mins`;
+
+        // Add start/end markers
+        L.marker(fromCoords, { title: 'Start (From)', icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+
+        L.marker(toCoords, { title: 'End (To)', icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+
+        // If subway was used, mark it clearly
+        if (useSubway) {
+          const sc = LANDMARKS['Subway Entrance'];
+          L.circleMarker(sc, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
+          travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Note: Transfer via Subway is required between campuses.</small>`;
+        }
+
+      } catch (e) {
+        alert('Could not calculate route: ' + e.message);
+      }
+    }
+
+    let watchId = null;
+    let liveMarker = null;
+    let liveAccuracyCircle = null;
+
+    function startLiveLocation() {
+      if (!navigator.geolocation) { alert('Geolocation not supported by your browser.'); return; }
+
+      watchId = navigator.geolocation.watchPosition((pos) => {
+        const lat = pos.coords.latitude; const lon = pos.coords.longitude; const acc = pos.coords.accuracy || 20;
+        if (!liveMarker) {
+          liveMarker = L.circleMarker([lat, lon], { radius: 10, fillColor: '#ff7e5f', color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(map).bindPopup('You (Live)');
+        } else { liveMarker.setLatLng([lat, lon]); }
+        if (!liveAccuracyCircle) {
+          liveAccuracyCircle = L.circle([lat, lon], { radius: acc, color: '#ff7e5f', fillOpacity: 0.1 }).addTo(map);
+        } else { liveAccuracyCircle.setLatLng([lat, lon]); liveAccuracyCircle.setRadius(acc); }
+        map.panTo([lat, lon]);
+      }, (err) => { alert('Unable to get live position.'); console.error(err); }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+    }
+
+    function stopLiveLocation() {
+      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+      if (liveMarker) { map.removeLayer(liveMarker); liveMarker = null; }
+      if (liveAccuracyCircle) { map.removeLayer(liveAccuracyCircle); liveAccuracyCircle = null; }
+    }
+
+    function toggleLive() {
+      const btn = document.getElementById('liveToggle');
+      if (!watchId) { startLiveLocation(); btn.textContent = 'Stop live location'; btn.setAttribute('aria-pressed','true'); }
+      else { stopLiveLocation(); btn.textContent = 'Start live location'; btn.setAttribute('aria-pressed','false'); }
+    }
+
+    function useCurrentLocationAsFrom() {
+      if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude; const lon = pos.coords.longitude;
+        document.getElementById('from').value = lat.toFixed(5) + ', ' + lon.toFixed(5);
+        map.setView([lat, lon], 17);
+      }, () => alert('Unable to get current location.'));
+    }
+
+    document.getElementById('goBtn').addEventListener('click', navigate);
+    document.getElementById('liveToggle').addEventListener('click', toggleLive);
+    document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
+
+  </script>
+</body>
+</html>
