@@ -287,10 +287,10 @@
     
 
     // Add landmark markers (small)
-    Object.keys(LANDMARKS).forEach((name) => {
-      const [lat, lon] = LANDMARKS[name];
-      L.circleMarker([lat, lon], { radius: 5, fillOpacity: 0.9 }).bindTooltip(name, { permanent: false }).addTo(map);
-    });
+    //Object.keys(LANDMARKS).forEach((name) => {
+    //  const [lat, lon] = LANDMARKS[name];
+    //  L.circleMarker([lat, lon], { radius: 5, fillOpacity: 0.9 }).bindTooltip(name, { permanent: false }).addTo(map);
+    //});
 
     // Bring in turf helpers without network requests by embedding minimal functions
     // Minimal turf-like helpers: booleanPointInPolygon and point/polygon constructors (very small)
