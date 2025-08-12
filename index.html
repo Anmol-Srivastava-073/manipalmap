@@ -121,39 +121,74 @@
     }
 
     .live-toggle {
-      position: absolute;
-      bottom: 18px;
-      right: 18px;
-      z-index: 1500;
-      background: #ff7e5f;
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 8px 16px; /* smaller */
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
-      transition: background-color 0.25s ease;
-      font-size: 13px; /* smaller */
-      white-space: nowrap;
-    }
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  z-index: 1500;
+  background: #ff7e5f;
+  border: none;
+  color: white;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+  transition: background-color 0.25s ease;
+  font-size: 13px;
+  white-space: nowrap;
+}
 
-    .live-toggle:hover {
-      background: #feb47b;
-    }
-    .cancel-trip {
-  background: #d63031;
-  right: auto;
+.live-toggle:hover {
+  background: #feb47b;
+}
+
+.cancel-trip {
+  position: absolute;
+  bottom: 18px;
   left: 18px;
+  z-index: 1500;
+  background: #d63031;
+  border: none;
+  color: white;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
+  transition: background-color 0.25s ease;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cancel-trip:hover {
+  background: #ff7675;
 }
 
 @media (max-width: 600px) {
+  .live-toggle,
   .cancel-trip {
-    width: 100%;
     position: static;
-    margin-top: 8px;
+    width: 100%;
+    margin: 5px 0;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Container for stacking buttons at bottom on mobile */
+  .mobile-button-container {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1500;
   }
 }
+    
 
     @media (max-width: 600px) {
       .input-box {
@@ -188,13 +223,7 @@
         left: 14px;
       }
 
-      .live-toggle {
-        padding: 8px 0;
-        font-size: 13px;
-        bottom: 14px;
-        right: 14px;
-        border-radius: 10px;
-      }
+      
     }
   </style>
 </head>
