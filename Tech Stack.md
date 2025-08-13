@@ -14,9 +14,6 @@ Manipal UniNav is a smart university navigation app designed to help students, f
 - **Frontend Framework**: 
   - HTML5/CSS3/JavaScript (Vanilla or with framework)
   - Possibly React.js or Vue.js for component-based architecture
-- **Build Tools**: 
-  - Webpack/Vite for bundling
-  - Babel for JavaScript transpilation
 - **Styling**: CSS3 with responsive design principles
 
 #### 2. Introductory Website (Landing Page)
