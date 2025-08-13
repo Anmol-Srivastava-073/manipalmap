@@ -13,7 +13,6 @@ Manipal UniNav is a smart university navigation app designed to help students, f
 - **Map Library**: Likely Leaflet.js or Mapbox GL JS for interactive map rendering
 - **Frontend Framework**: 
   - HTML5/CSS3/JavaScript (Vanilla or with framework)
-  - Possibly React.js or Vue.js for component-based architecture
 - **Styling**: CSS3 with responsive design principles
 
 #### 2. Introductory Website (Landing Page)
@@ -37,12 +36,6 @@ Manipal UniNav is a smart university navigation app designed to help students, f
 - Efficient caching of route calculations
 - Minimized API calls to OpenRouteService
 - Local storage for frequently accessed data
-
-### Security Considerations
-- HTTPS deployment
-- API key management
-- Input validation for location searches
-- Cross-origin resource sharing (CORS) configuration
 
 ### Future Enhancement Possibilities
 - Progressive Web App (PWA) capabilities
