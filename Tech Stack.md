@@ -25,9 +25,7 @@ Manipal UniNav is a smart university navigation app designed to help students, f
 #### APIs and External Services
 - **OpenRouteService API**: For routing and directions
 - **OpenStreetMap Data**: For map tiles and geographical data
-- **Custom Backend** (if applicable):
-  - Node.js with Express.js
-  - RESTful API architecture
+- **Custom Backend**:
   - JSON data format for campus locations
 
 - Code splitting for faster load times
