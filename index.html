@@ -505,57 +505,70 @@ html, body {
 let liveMarker, liveAccuracyCircle;
 let firstUpdate = true;
 
-watchId = navigator.geolocation.watchPosition(
-  (pos) => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    const acc = pos.coords.accuracy || 20;
+// Make sure this runs AFTER you create your Leaflet map
+// Example: const map = L.map('map').setView([0,0], 2);
 
-    console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
-
-    // Live marker
-    if (!liveMarker) {
-      liveMarker = L.circleMarker([lat, lon], {
-        radius: 10,
-        fillColor: '#ff7e5f',
-        color: '#fff',
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.9
-      }).addTo(map).bindPopup('You (Live)', { autoClose: false, closeOnClick: false }).openPopup();
-    } else {
-      liveMarker.setLatLng([lat, lon]);
-    }
-
-    // Accuracy circle
-    if (!liveAccuracyCircle) {
-      liveAccuracyCircle = L.circle([lat, lon], {
-        radius: acc,
-        color: '#ff7e5f',
-        fillOpacity: 0.1,
-        weight: 1
-      }).addTo(map);
-    } else {
-      liveAccuracyCircle.setLatLng([lat, lon]);
-      liveAccuracyCircle.setRadius(acc);
-    }
-
-    // Center map only on first update
-    if (firstUpdate) {
-      map.setView([lat, lon], 16); 
-      firstUpdate = false;
-    }
-  },
-  (err) => {
-    alert('Unable to get live position.');
-    console.error(err);
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 15000,
-    maximumAge: 0
+function startLiveTracking() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser");
+    return;
   }
-);
+
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const acc = pos.coords.accuracy || 20;
+
+      console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
+
+      // Live marker
+      if (!liveMarker) {
+        liveMarker = L.circleMarker([lat, lon], {
+          radius: 10,
+          fillColor: '#ff7e5f',
+          color: '#fff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9
+        }).addTo(map).bindPopup('You (Live)', { autoClose: false, closeOnClick: false }).openPopup();
+      } else {
+        liveMarker.setLatLng([lat, lon]);
+      }
+
+      // Accuracy circle
+      if (!liveAccuracyCircle) {
+        liveAccuracyCircle = L.circle([lat, lon], {
+          radius: acc,
+          color: '#ff7e5f',
+          fillOpacity: 0.1,
+          weight: 1
+        }).addTo(map);
+      } else {
+        liveAccuracyCircle.setLatLng([lat, lon]);
+        liveAccuracyCircle.setRadius(acc);
+      }
+
+      // Center map only once
+      if (firstUpdate) {
+        map.setView([lat, lon], 16);
+        firstUpdate = false;
+      }
+    },
+    (err) => {
+      alert('Unable to get live position.');
+      console.error(err);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+  );
+}
+
+// Call AFTER your map is initialized
+startLiveTracking();
 
 
     function stopLiveLocation() {
