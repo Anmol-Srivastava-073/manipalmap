@@ -246,8 +246,8 @@ html, body {
   </div>
 
   <div class="mobile-button-container">
-  <button class="cancel-trip" id="stopTracking">Cancel Trip</button>
-  <button class="live-toggle" id="startTracking" aria-pressed="false">Start live location</button>
+  <button onclick="startLiveTracking()">Start Live Location</button>
+<button onclick="stopLiveTracking()" disabled>Stop Live Location</button>
 </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -501,19 +501,18 @@ html, body {
 
     
 
-    let watchId;
-let liveMarker, liveAccuracyCircle;
-let firstUpdate = true;
-
 function startLiveTracking() {
   if (!navigator.geolocation) {
     console.error("Geolocation not supported by your browser");
     return;
   }
 
-  // Reset state if tracking was restarted
-  stopLiveTracking(); 
+  stopLiveTracking();
   firstUpdate = true;
+
+  // disable Start, enable Stop
+  document.querySelector("button[onclick='startLiveTracking()']").disabled = true;
+  document.querySelector("button[onclick='stopLiveTracking()']").disabled = false;
 
   watchId = navigator.geolocation.watchPosition(
     (pos) => {
@@ -523,12 +522,8 @@ function startLiveTracking() {
 
       console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
 
-      if (!map) {
-        console.error("Leaflet map is not initialized yet.");
-        return;
-      }
+      if (!map) return;
 
-      // Live marker
       if (!liveMarker) {
         liveMarker = L.circleMarker([lat, lon], {
           radius: 10,
@@ -545,7 +540,6 @@ function startLiveTracking() {
         liveMarker.setLatLng([lat, lon]);
       }
 
-      // Accuracy circle
       if (!liveAccuracyCircle) {
         liveAccuracyCircle = L.circle([lat, lon], {
           radius: acc,
@@ -558,7 +552,6 @@ function startLiveTracking() {
         liveAccuracyCircle.setRadius(acc);
       }
 
-      // Center map only once
       if (firstUpdate) {
         map.setView([lat, lon], 16);
         firstUpdate = false;
@@ -592,8 +585,11 @@ function stopLiveTracking() {
   liveAccuracyCircle = null;
 
   firstUpdate = true;
-}
 
+  // re-enable Start, disable Stop
+  document.querySelector("button[onclick='startLiveTracking()']").disabled = false;
+  document.querySelector("button[onclick='stopLiveTracking()']").disabled = true;
+}
 
 // Attach button actions
 document.getElementById("startTracking").addEventListener("click", startLiveTracking);
