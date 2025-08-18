@@ -245,9 +245,12 @@ html, body {
     Estimated time: -- mins
   </div>
 
-  <div class="mobile-button-container">
+  <div style="margin:10px;">
   <button onclick="startLiveTracking()">Start Live Location</button>
-<button onclick="stopLiveTracking()" disabled>Stop Live Location</button>
+  <button onclick="stopLiveTracking()" disabled>Stop Live Location</button>
+  <p id="trackingStatus" style="margin-top:5px; font-weight:bold; color:#555;">
+    Tracking stopped
+  </p>
 </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
