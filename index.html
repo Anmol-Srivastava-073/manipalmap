@@ -5,226 +5,219 @@
   <link rel="icon" type="image/png" href="image/weblogo.png" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
- <style>
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    #map {
+      height: 100vh;
+      width: 100%;
+      background: #dfe6e9;
+    }
 
-#map {
-  height: 100vh;
-  width: 100%;
-  background: #dfe6e9;
-}
+    .input-box {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1500;
+      background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+      max-width: 800px;
+      width: 90vw;
+      align-items: center;
+      color: white;
+      font-size: 15px;
+    }
 
-.input-box {
-  position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1500;
-  background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 10px 14px; /* smaller */
-  display: flex;
-  gap: 10px; /* slightly smaller gap */
-  max-width: 800px;
-  width: 90vw;
-  align-items: center;
-  color: white;
-  font-size: 15px; /* slightly smaller */
-}
+    .input-box input {
+      flex-grow: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      outline: none;
+      color: #333;
+    }
 
-.input-box input {
-  flex-grow: 1;
-  padding: 8px 12px; /* smaller */
-  border-radius: 8px;
-  border: none;
-  font-size: 14px; /* smaller */
-  outline: none;
-  color: #333;
-}
+    .input-box input::placeholder {
+      color: #666;
+      font-style: italic;
+    }
 
-.input-box input::placeholder {
-  color: #666;
-  font-style: italic;
-}
+    .btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #ff7e5f;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      font-size: 13px;
+    }
 
-.btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 8px;
-  padding: 6px 14px; /* smaller */
-  font-weight: 700;
-  cursor: pointer;
-  color: #ff7e5f;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
-  font-size: 13px; /* smaller */
-}
+    .btn:hover {
+      background-color: #fff4f1;
+    }
 
-.btn:hover {
-  background-color: #fff4f1;
-}
+    #suggestions {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 800px;
+      width: 90vw;
+      background: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1600;
+      font-size: 15px;
+    }
 
-#suggestions {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 800px;
-  width: 90vw;
-  background: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  border-radius: 10px;
-  max-height: 180px;
-  overflow-y: auto;
-  display: none;
-  z-index: 1600;
-  font-size: 15px;
-}
+    #suggestions div {
+      padding: 12px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      color: #333;
+    }
 
-#suggestions div {
-  padding: 12px 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-  color: #333;
-}
+    #suggestions div:hover {
+      background: #f7d7ca;
+      color: #ff7e5f;
+    }
 
-#suggestions div:hover {
-  background: #f7d7ca;
-  color: #ff7e5f;
-}
+    .travel-info-box {
+      position: absolute;
+      bottom: 70px;
+      left: 18px;
+      z-index: 1500;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 14px 18px;
+      border-radius: 10px;
+      color: #333;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      font-weight: 600;
+      min-width: 180px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
 
-.travel-info-box {
-  position: absolute;
-  bottom: 70px; /* desktop offset */
-  left: 18px;
-  z-index: 1500;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 14px 18px;
-  border-radius: 10px;
-  color: #333;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  font-weight: 600;
-  min-width: 180px;
-  font-size: 14px;
-  line-height: 1.4;
-}
+    .live-toggle {
+      position: absolute;
+      bottom: 18px;
+      right: 18px;
+      z-index: 1500;
+      background: #ff7e5f;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+      transition: background-color 0.25s ease;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
-.live-toggle {
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-  z-index: 1500;
-  background: #ff7e5f;
-  border: none;
-  color: white;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
-  transition: background-color 0.25s ease;
-  font-size: 13px;
-  white-space: nowrap;
-}
+    .live-toggle:hover {
+      background: #feb47b;
+    }
 
-.live-toggle:hover {
-  background: #feb47b;
-}
+    .cancel-trip {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      z-index: 1500;
+      background: #d63031;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
+      transition: background-color 0.25s ease;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
-.cancel-trip {
-  position: absolute;
-  bottom: 18px;
-  left: 18px;
-  z-index: 1500;
-  background: #d63031;
-  border: none;
-  color: white;
-  font-weight: 700;
-  padding: 8px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
-  transition: background-color 0.25s ease;
-  font-size: 13px;
-  white-space: nowrap;
-}
+    .cancel-trip:hover {
+      background: #ff7675;
+    }
 
-.cancel-trip:hover {
-  background: #ff7675;
-}
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .mobile-button-container {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        right: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 1500;
+      }
 
-/* Mobile adjustments */
-@media (max-width: 600px) {
-  /* Stack buttons at bottom */
-  .mobile-button-container {
-    position: absolute;
-    bottom: 14px;
-    left: 14px;
-    right: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 1500;
-  }
+      .live-toggle,
+      .cancel-trip {
+        position: static;
+        width: 100%;
+        margin: 0;
+        border-radius: 10px;
+        padding: 10px 0;
+        font-size: 13px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
 
-  .live-toggle,
-  .cancel-trip {
-    position: static;
-    width: 100%;
-    margin: 0;
-    border-radius: 10px;
-    padding: 10px 0;
-    font-size: 13px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
+      .travel-info-box {
+        bottom: calc(14px + 2 * (40px + 8px) + 14px);
+        left: 14px;
+        right: 14px;
+        min-width: auto;
+        font-size: 13px;
+        padding: 12px 14px;
+      }
 
-  /* Move info box above stacked buttons */
-  .travel-info-box {
-    bottom: calc(14px + 2 * (40px + 8px) + 14px);
-    left: 14px;
-    right: 14px;
-    min-width: auto;
-    font-size: 13px;
-    padding: 12px 14px;
-  }
+      .input-box {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 14px;
+        font-size: 13px;
+      }
 
-  .input-box {
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px 14px; /* smaller */
-    font-size: 13px;
-  }
+      .input-box input {
+        font-size: 13px;
+        padding: 8px 10px;
+      }
 
-  .input-box input {
-    font-size: 13px;
-    padding: 8px 10px; /* smaller */
-  }
+      .btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 13px;
+      }
 
-  .btn, .live-toggle {
-    width: 100%;
-    text-align: center;
-    padding: 10px 0;
-    font-size: 13px; /* smaller */
-  }
-
-  #suggestions {
-    max-height: 140px;
-    font-size: 14px;
-  }
-}
-</style>
-
+      #suggestions {
+        max-height: 140px;
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -245,20 +238,20 @@ html, body {
     Estimated time: -- mins
   </div>
 
-  <div style="margin:10px;">
-  <button onclick="startLiveTracking()">Start Live Location</button>
-  <button onclick="stopLiveTracking()" disabled>Stop Live Location</button>
-  <p id="trackingStatus" style="margin-top:5px; font-weight:bold; color:#555;">
-    Tracking stopped
-  </p>
-</div>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <div class="mobile-button-container">
+    <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
+    <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
+  </div>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     // OpenRouteService API Key - free signup needed at https://openrouteservice.org
-    const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjNlYjllODc4MzcwNDQxOGNiNzg1YTg1ZDFjNDdmNmE5IiwiaCI6Im11cm11cjY0In0=';
+    const ORS_API_KEY = 'YOUR_ORS_API_KEY'; // Replace with a valid API key
 
-    const WALKING_SPEED_KMPH = 5;
+    // NOTE: The ORS_API_KEY provided in the original code is not a valid API key.
+    // To make this application work, you must sign up for a free API key at
+    // https://openrouteservice.org and replace 'YOUR_ORS_API_KEY' with your own key.
+    // Example: const ORS_API_KEY = '5b3c...';
 
     // Landmarks and coordinates
     const LANDMARKS = {
@@ -302,7 +295,8 @@ html, body {
     };
 
     // Define two campus polygons (approximate) - hostel and college
-    // These are simple rectangles / polygons approximating areas — tweak coordinates as needed
+    // NOTE: These polygons are in [lat, lon] format for clarity, but the turf function
+    // expects [lon, lat], so they are correctly flipped below.
     const HOSTEL_POLYGON = [
       [26.84337, 75.56231],
       [26.83925, 75.56459],
@@ -317,125 +311,10 @@ html, body {
       [26.84647, 75.56523]
     ];
 
-    function campusOf([lat, lon]) {
-      if (!lat || !lon) return null;
-      const point = turfPoint([lon, lat]);
-      if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c=>[c[1], c[0]])]))) return 'hostel';
-      if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c=>[c[1], c[0]])]))) return 'college';
-      return null;
-    }
-
-    // Initialize map centered on MUJ campus
-    const map = L.map('map').setView([26.8436, 75.565], 16);
-
-    // OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
-
-    // Add campus polygons with labels
-    const map = L.map('map').setView([20.5937, 78.9629], 5); // default India view
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  let watchId;
-  let liveMarker, liveAccuracyCircle;
-  let firstUpdate = true;
-
-  function startLiveTracking() {
-    if (!navigator.geolocation) {
-      console.error("Geolocation not supported by your browser");
-      return;
-    }
-
-    watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const acc = pos.coords.accuracy || 20;
-
-        console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
-
-        // Live marker
-        if (!liveMarker) {
-          liveMarker = L.circleMarker([lat, lon], {
-            radius: 10,
-            fillColor: '#ff7e5f',
-            color: '#fff',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-          }).addTo(map).bindPopup('You (Live)', { autoClose: false, closeOnClick: false }).openPopup();
-        } else {
-          liveMarker.setLatLng([lat, lon]);
-        }
-
-        // Accuracy circle
-        if (!liveAccuracyCircle) {
-          liveAccuracyCircle = L.circle([lat, lon], {
-            radius: acc,
-            color: '#ff7e5f',
-            fillOpacity: 0.1,
-            weight: 1
-          }).addTo(map);
-        } else {
-          liveAccuracyCircle.setLatLng([lat, lon]);
-          liveAccuracyCircle.setRadius(acc);
-        }
-
-        // Center map only once
-        if (firstUpdate) {
-          map.setView([lat, lon], 16);
-          firstUpdate = false;
-        }
-      },
-      (err) => {
-        console.error("Geolocation error:", err);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
-      }
-    );
-  }
-
-  function stopLiveTracking() {
-    if (watchId) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-    if (liveMarker) {
-      map.removeLayer(liveMarker);
-      liveMarker = null;
-    }
-    if (liveAccuracyCircle) {
-      map.removeLayer(liveAccuracyCircle);
-      liveAccuracyCircle = null;
-    }
-    firstUpdate = true;
-    console.log("Live tracking stopped.");
-  }
-
-    
-
-    // Add landmark markers (small)
-    //Object.keys(LANDMARKS).forEach((name) => {
-    //  const [lat, lon] = LANDMARKS[name];
-    //  L.circleMarker([lat, lon], { radius: 5, fillOpacity: 0.9 }).bindTooltip(name, { permanent: false }).addTo(map);
-    //});
-
-    // Bring in turf helpers without network requests by embedding minimal functions
-    // Minimal turf-like helpers: booleanPointInPolygon and point/polygon constructors (very small)
-    // NOTE: This is a lightweight approximation and works for our simple polygons only.
+    // Minimal turf-like helpers
     function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
     function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
     function turfBooleanPointInPolygon(pt, poly) {
-      // Ray-casting algorithm for point in polygon on lon-lat coordinates
       const x = pt.geometry.coordinates[0], y = pt.geometry.coordinates[1];
       const vs = poly.geometry.coordinates[0];
       let inside = false;
@@ -448,58 +327,32 @@ html, body {
       return inside;
     }
 
-    const suggestBox = document.getElementById('suggestions');
-
-    function cancelTrip() {
-      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
-      // Remove A/B markers
-      map.eachLayer(function(layer) {
-        if (layer.options && layer.options.icon && (layer.options.icon.options.className === 'start-marker' || layer.options.icon.options.className === 'end-marker')) {
-          map.removeLayer(layer);
-        }
-      });
-      // Remove subway marker if present
-      map.eachLayer(function(layer) {
-        if (layer.getPopup && layer.getPopup() && layer.getPopup().getContent().includes('Subway (required transfer)')) {
-          map.removeLayer(layer);
-        }
-      });
-      document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
+    function campusOf([lat, lon]) {
+      if (!lat || !lon) return null;
+      // Flip coords to [lon, lat] for turf helpers
+      const point = turfPoint([lon, lat]);
+      // Flip polygon coords as well
+      if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c => [c[1], c[0]])]))) return 'hostel';
+      if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c => [c[1], c[0]])]))) return 'college';
+      return null;
     }
 
-    // Safely bind only if the element exists
-    const cancelTripBtnEl = document.getElementById('cancelTripBtn');
-    if (cancelTripBtnEl) cancelTripBtnEl.addEventListener('click', cancelTrip);
-    
-    function showSuggestions(input) {
-      const val = input.value.trim().toLowerCase();
-      suggestBox.innerHTML = '';
-      if (!val) { suggestBox.style.display = 'none'; return; }
-      const matches = Object.keys(LANDMARKS).filter((name) => name.toLowerCase().includes(val));
-      if (matches.length === 0) { suggestBox.style.display = 'none'; return; }
-      const rect = input.getBoundingClientRect();
-      suggestBox.style.width = rect.width + 'px';
-      suggestBox.style.top = rect.bottom + window.scrollY + 'px';
-      suggestBox.style.left = rect.left + window.scrollX + 'px';
-      suggestBox.style.display = 'block';
-      matches.forEach((name) => {
-        const div = document.createElement('div');
-        div.textContent = name;
-        div.setAttribute('role', 'option');
-        div.addEventListener('click', () => { input.value = name; suggestBox.style.display = 'none'; input.focus(); });
-        suggestBox.appendChild(div);
-      });
-    }
+    // Initialize map centered on MUJ campus
+    const map = L.map('map').setView([26.8436, 75.565], 16);
 
-    ['from', 'to'].forEach((id) => {
-      const el = document.getElementById(id);
-      el.addEventListener('input', () => showSuggestions(el));
-      el.addEventListener('focus', () => showSuggestions(el));
-    });
+    // OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
 
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('#suggestions') && !e.target.closest('#from') && !e.target.closest('#to')) { suggestBox.style.display = 'none'; }
-    });
+    let routeLayer = null;
+    let fromMarker = null;
+    let toMarker = null;
+    let subwayMarker = null;
+    let watchId = null;
+    let liveMarker = null;
+    let liveAccuracyCircle = null;
 
     function parseCoords(loc) {
       loc = loc.trim();
@@ -509,13 +362,18 @@ html, body {
       return null;
     }
 
-    let routeLayer = null;
+    function cancelTrip() {
+      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+      if (fromMarker) { map.removeLayer(fromMarker); fromMarker = null; }
+      if (toMarker) { map.removeLayer(toMarker); toMarker = null; }
+      if (subwayMarker) { map.removeLayer(subwayMarker); subwayMarker = null; }
+      document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
+    }
 
     async function fetchRoute(start, end, useSubway = false) {
       const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
       const subwayCoords = LANDMARKS['Subway Entrance'];
 
-      // build coordinates array in [lon, lat] for ORS
       const coords = [];
       coords.push([start[1], start[0]]);
       if (useSubway) coords.push([subwayCoords[1], subwayCoords[0]]);
@@ -533,6 +391,7 @@ html, body {
     }
 
     async function navigate() {
+      cancelTrip(); // Clear previous trip before navigating
       const fromInput = document.getElementById('from').value;
       const toInput = document.getElementById('to').value;
 
@@ -543,15 +402,10 @@ html, body {
 
       if (!fromCoords || !toCoords) { alert('Please enter valid locations or coordinates.'); return; }
 
-      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
-
       const fromCampus = campusOf(fromCoords);
       const toCampus = campusOf(toCoords);
 
-      // Decide whether subway is required: if both are inside campus areas but different campuses -> MUST use subway
       const mustUseSubway = fromCampus && toCampus && fromCampus !== toCampus;
-
-      // If either point is outside both campuses, allow direct routing (no forced subway)
       const useSubway = mustUseSubway;
 
       try {
@@ -571,15 +425,13 @@ html, body {
         const travelInfoEl = document.getElementById('travelInfo');
         travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${distKm.toFixed(2)} km<br>Estimated time: ${durationMins} mins`;
 
-        // Add start/end markers
-        L.marker(fromCoords, { title: 'Start (From)', icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+        fromMarker = L.marker(fromCoords, { title: 'Start (From)', icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
 
-        L.marker(toCoords, { title: 'End (To)', icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+        toMarker = L.marker(toCoords, { title: 'End (To)', icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
 
-        // If subway was used, mark it clearly
         if (useSubway) {
           const sc = LANDMARKS['Subway Entrance'];
-          L.circleMarker(sc, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
+          subwayMarker = L.circleMarker(sc, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
           travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Note: Transfer via Subway is required between campuses.</small>`;
         }
 
@@ -588,145 +440,133 @@ html, body {
       }
     }
 
-    
-
-
-let watchId;
-  let liveMarker, liveAccuracyCircle;
-  let firstUpdate = true;
-
-  function updateStatus(msg, color = "#555") {
-    document.getElementById("trackingStatus").textContent = msg;
-    document.getElementById("trackingStatus").style.color = color;
-  }
-
-  function startLiveTracking() {
-    if (!navigator.geolocation) {
-      console.error("Geolocation not supported by your browser");
-      updateStatus("Geolocation not supported", "red");
-      return;
+    function showSuggestions(input) {
+      const val = input.value.trim().toLowerCase();
+      const suggestBox = document.getElementById('suggestions');
+      suggestBox.innerHTML = '';
+      if (!val) {
+        suggestBox.style.display = 'none';
+        return;
+      }
+      const matches = Object.keys(LANDMARKS).filter((name) => name.toLowerCase().includes(val));
+      if (matches.length === 0) {
+        suggestBox.style.display = 'none';
+        return;
+      }
+      suggestBox.style.display = 'block';
+      matches.forEach((name) => {
+        const div = document.createElement('div');
+        div.textContent = name;
+        div.setAttribute('role', 'option');
+        div.addEventListener('click', () => {
+          input.value = name;
+          suggestBox.style.display = 'none';
+          input.focus();
+        });
+        suggestBox.appendChild(div);
+      });
     }
 
-    stopLiveTracking(); // clear if already running
-    firstUpdate = true;
+    ['from', 'to'].forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => showSuggestions(el));
+      el.addEventListener('focus', () => showSuggestions(el));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          navigate();
+        }
+      });
+    });
 
-    // disable Start, enable Stop
-    document.querySelector("button[onclick='startLiveTracking()']").disabled = true;
-    document.querySelector("button[onclick='stopLiveTracking()']").disabled = false;
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#suggestions') && !e.target.closest('#from') && !e.target.closest('#to')) {
+        document.getElementById('suggestions').style.display = 'none';
+      }
+    });
 
-    updateStatus("Tracking active...", "green");
-
-    watchId = navigator.geolocation.watchPosition(
-      (pos) => {
+    function useCurrentLocationAsFrom() {
+      if (!navigator.geolocation) {
+        alert('Geolocation not supported by your browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition((pos) => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
-        const acc = pos.coords.accuracy || 20;
-
-        console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
-
-        if (!map) return;
-
-        if (!liveMarker) {
-          liveMarker = L.circleMarker([lat, lon], {
-            radius: 10,
-            fillColor: '#ff7e5f',
-            color: '#fff',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-          })
-            .addTo(map)
-            .bindPopup("You (Live)", { autoClose: false, closeOnClick: false })
-            .openPopup();
-        } else {
-          liveMarker.setLatLng([lat, lon]);
-        }
-
-        if (!liveAccuracyCircle) {
-          liveAccuracyCircle = L.circle([lat, lon], {
-            radius: acc,
-            color: "#ff7e5f",
-            fillOpacity: 0.1,
-            weight: 1
-          }).addTo(map);
-        } else {
-          liveAccuracyCircle.setLatLng([lat, lon]);
-          liveAccuracyCircle.setRadius(acc);
-        }
-
-        if (firstUpdate) {
-          map.setView([lat, lon], 16);
-          firstUpdate = false;
-        }
-      },
-      (err) => {
-        console.error("Geolocation error:", err);
-        updateStatus("Error getting location", "red");
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
-      }
-    );
-  }
-
-  function stopLiveTracking() {
-    if (watchId) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-
-    if (liveMarker && map.hasLayer(liveMarker)) {
-      map.removeLayer(liveMarker);
-    }
-    liveMarker = null;
-
-    if (liveAccuracyCircle && map.hasLayer(liveAccuracyCircle)) {
-      map.removeLayer(liveAccuracyCircle);
-    }
-    liveAccuracyCircle = null;
-
-    firstUpdate = true;
-
-    // re-enable Start, disable Stop
-    document.querySelector("button[onclick='startLiveTracking()']").disabled = false;
-    document.querySelector("button[onclick='stopLiveTracking()']").disabled = true;
-
-    updateStatus("Tracking stopped", "#555");
-  }
-// Attach button actions (only if these elements exist)
-const startBtnEl = document.getElementById("startTracking");
-if (startBtnEl) startBtnEl.addEventListener("click", startLiveTracking);
-const stopBtnEl = document.getElementById("stopTracking");
-if (stopBtnEl) stopBtnEl.addEventListener("click", stopLiveTracking);
-
-    function stopLiveLocation() {
-      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-      if (liveMarker) { map.removeLayer(liveMarker); liveMarker = null; }
-      if (liveAccuracyCircle) { map.removeLayer(liveAccuracyCircle); liveAccuracyCircle = null; }
+        document.getElementById('from').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        map.setView([lat, lon], 17);
+      }, () => alert('Unable to get your current location.'));
     }
 
     function toggleLive() {
       const btn = document.getElementById('liveToggle');
-      if (!watchId) { startLiveLocation(); btn.textContent = 'Stop live location'; btn.setAttribute('aria-pressed','true'); }
-      else { stopLiveLocation(); btn.textContent = 'Start live location'; btn.setAttribute('aria-pressed','false'); }
+      if (watchId) {
+        // Stop tracking
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        if (liveMarker) map.removeLayer(liveMarker);
+        if (liveAccuracyCircle) map.removeLayer(liveAccuracyCircle);
+        liveMarker = null;
+        liveAccuracyCircle = null;
+        btn.textContent = 'Start Live Location';
+        btn.setAttribute('aria-pressed', 'false');
+      } else {
+        // Start tracking
+        if (!navigator.geolocation) {
+          alert('Geolocation not supported by your browser.');
+          return;
+        }
+        btn.textContent = '...Tracking';
+        btn.setAttribute('aria-pressed', 'true');
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const acc = pos.coords.accuracy || 20;
+
+            if (!liveMarker) {
+              liveMarker = L.circleMarker([lat, lon], {
+                radius: 10,
+                fillColor: '#ff7e5f',
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9
+              }).addTo(map).bindPopup("You (Live)").openPopup();
+            } else {
+              liveMarker.setLatLng([lat, lon]);
+            }
+
+            if (!liveAccuracyCircle) {
+              liveAccuracyCircle = L.circle([lat, lon], {
+                radius: acc,
+                color: "#ff7e5f",
+                fillOpacity: 0.1,
+                weight: 1
+              }).addTo(map);
+            } else {
+              liveAccuracyCircle.setLatLng([lat, lon]);
+              liveAccuracyCircle.setRadius(acc);
+            }
+
+            map.setView([lat, lon], 17);
+            btn.textContent = 'Stop Live Location';
+          },
+          (err) => {
+            console.error("Geolocation error:", err);
+            alert("Error getting location. Tracking stopped.");
+            toggleLive(); // Call to stop tracking
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+      }
     }
 
-    function useCurrentLocationAsFrom() {
-      if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
-      navigator.geolocation.getCurrentPosition((pos) => {
-        const lat = pos.coords.latitude; const lon = pos.coords.longitude;
-        document.getElementById('from').value = lat.toFixed(5) + ', ' + lon.toFixed(5);
-        map.setView([lat, lon], 17);
-      }, () => alert('Unable to get current location.'));
-    }
-
+    // Attach event listeners to buttons
     document.getElementById('goBtn').addEventListener('click', navigate);
-    const liveToggleEl = document.getElementById('liveToggle');
-    if (liveToggleEl) liveToggleEl.addEventListener('click', toggleLive);
     document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
-
+    document.getElementById('liveToggle').addEventListener('click', toggleLive);
+    document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
   </script>
 </body>
 </html>
