@@ -501,96 +501,111 @@ html, body {
 
     
 
-function startLiveTracking() {
-  if (!navigator.geolocation) {
-    console.error("Geolocation not supported by your browser");
-    return;
+
+let watchId;
+  let liveMarker, liveAccuracyCircle;
+  let firstUpdate = true;
+
+  function updateStatus(msg, color = "#555") {
+    document.getElementById("trackingStatus").textContent = msg;
+    document.getElementById("trackingStatus").style.color = color;
   }
 
-  stopLiveTracking();
-  firstUpdate = true;
-
-  // disable Start, enable Stop
-  document.querySelector("button[onclick='startLiveTracking()']").disabled = true;
-  document.querySelector("button[onclick='stopLiveTracking()']").disabled = false;
-
-  watchId = navigator.geolocation.watchPosition(
-    (pos) => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      const acc = pos.coords.accuracy || 20;
-
-      console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
-
-      if (!map) return;
-
-      if (!liveMarker) {
-        liveMarker = L.circleMarker([lat, lon], {
-          radius: 10,
-          fillColor: '#ff7e5f',
-          color: '#fff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.9
-        })
-          .addTo(map)
-          .bindPopup("You (Live)", { autoClose: false, closeOnClick: false })
-          .openPopup();
-      } else {
-        liveMarker.setLatLng([lat, lon]);
-      }
-
-      if (!liveAccuracyCircle) {
-        liveAccuracyCircle = L.circle([lat, lon], {
-          radius: acc,
-          color: "#ff7e5f",
-          fillOpacity: 0.1,
-          weight: 1
-        }).addTo(map);
-      } else {
-        liveAccuracyCircle.setLatLng([lat, lon]);
-        liveAccuracyCircle.setRadius(acc);
-      }
-
-      if (firstUpdate) {
-        map.setView([lat, lon], 16);
-        firstUpdate = false;
-      }
-    },
-    (err) => {
-      console.error("Geolocation error:", err);
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
+  function startLiveTracking() {
+    if (!navigator.geolocation) {
+      console.error("Geolocation not supported by your browser");
+      updateStatus("Geolocation not supported", "red");
+      return;
     }
-  );
-}
 
-function stopLiveTracking() {
-  if (watchId) {
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
+    stopLiveTracking(); // clear if already running
+    firstUpdate = true;
+
+    // disable Start, enable Stop
+    document.querySelector("button[onclick='startLiveTracking()']").disabled = true;
+    document.querySelector("button[onclick='stopLiveTracking()']").disabled = false;
+
+    updateStatus("Tracking active...", "green");
+
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const acc = pos.coords.accuracy || 20;
+
+        console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
+
+        if (!map) return;
+
+        if (!liveMarker) {
+          liveMarker = L.circleMarker([lat, lon], {
+            radius: 10,
+            fillColor: '#ff7e5f',
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+          })
+            .addTo(map)
+            .bindPopup("You (Live)", { autoClose: false, closeOnClick: false })
+            .openPopup();
+        } else {
+          liveMarker.setLatLng([lat, lon]);
+        }
+
+        if (!liveAccuracyCircle) {
+          liveAccuracyCircle = L.circle([lat, lon], {
+            radius: acc,
+            color: "#ff7e5f",
+            fillOpacity: 0.1,
+            weight: 1
+          }).addTo(map);
+        } else {
+          liveAccuracyCircle.setLatLng([lat, lon]);
+          liveAccuracyCircle.setRadius(acc);
+        }
+
+        if (firstUpdate) {
+          map.setView([lat, lon], 16);
+          firstUpdate = false;
+        }
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        updateStatus("Error getting location", "red");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
   }
 
-  if (liveMarker && map.hasLayer(liveMarker)) {
-    map.removeLayer(liveMarker);
+  function stopLiveTracking() {
+    if (watchId) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+
+    if (liveMarker && map.hasLayer(liveMarker)) {
+      map.removeLayer(liveMarker);
+    }
+    liveMarker = null;
+
+    if (liveAccuracyCircle && map.hasLayer(liveAccuracyCircle)) {
+      map.removeLayer(liveAccuracyCircle);
+    }
+    liveAccuracyCircle = null;
+
+    firstUpdate = true;
+
+    // re-enable Start, disable Stop
+    document.querySelector("button[onclick='startLiveTracking()']").disabled = false;
+    document.querySelector("button[onclick='stopLiveTracking()']").disabled = true;
+
+    updateStatus("Tracking stopped", "#555");
   }
-  liveMarker = null;
-
-  if (liveAccuracyCircle && map.hasLayer(liveAccuracyCircle)) {
-    map.removeLayer(liveAccuracyCircle);
-  }
-  liveAccuracyCircle = null;
-
-  firstUpdate = true;
-
-  // re-enable Start, disable Stop
-  document.querySelector("button[onclick='startLiveTracking()']").disabled = false;
-  document.querySelector("button[onclick='stopLiveTracking()']").disabled = true;
-}
-
 // Attach button actions
 document.getElementById("startTracking").addEventListener("click", startLiveTracking);
 document.getElementById("stopTracking").addEventListener("click", stopLiveTracking);
