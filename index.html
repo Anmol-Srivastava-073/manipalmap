@@ -513,6 +513,7 @@ watchId = navigator.geolocation.watchPosition(
 
     console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
 
+    // Live marker
     if (!liveMarker) {
       liveMarker = L.circleMarker([lat, lon], {
         radius: 10,
@@ -526,30 +527,6 @@ watchId = navigator.geolocation.watchPosition(
       liveMarker.setLatLng([lat, lon]);
     }
 
-    if (!liveAccuracyCircle) {
-      liveAccuracyCircle = L.circle([lat, lon], {
-        radius: acc,
-        color: '#ff7e5f',
-        fillOpacity: 0.1
-      }).addTo(map);
-    } else {
-      liveAccuracyCircle.setLatLng([lat, lon]);
-      liveAccuracyCircle.setRadius(acc);
-    }
-
-    map.setView([lat, lon], 17); // zoom in tighter for better accuracy
-  },
-  (err) => {
-    alert('Unable to get live position.');
-    console.error(err);
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 15000,       // wait up to 15 sec for GPS
-    maximumAge: 0         // always get fresh data, no cache
-  }
-);
-
     // Accuracy circle
     if (!liveAccuracyCircle) {
       liveAccuracyCircle = L.circle([lat, lon], {
@@ -562,21 +539,22 @@ watchId = navigator.geolocation.watchPosition(
       liveAccuracyCircle.setRadius(acc);
     }
 
-    // Only center the map on first update
+    // Center map only on first update
     if (firstUpdate) {
-      map.setView([lat, lon], 16); // zoom level 16 for better view
+      map.setView([lat, lon], 16); 
       firstUpdate = false;
     }
-
-  }, (err) => {
+  },
+  (err) => {
     alert('Unable to get live position.');
     console.error(err);
-  }, {
+  },
+  {
     enableHighAccuracy: true,
-    maximumAge: 1000,
-    timeout: 10000
-  });
-}
+    timeout: 15000,
+    maximumAge: 0
+  }
+);
 
     function stopLiveLocation() {
       if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
