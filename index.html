@@ -383,7 +383,9 @@ html, body {
       document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
     }
 
-    document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
+    // Safely bind only if the element exists
+    const cancelTripBtnEl = document.getElementById('cancelTripBtn');
+    if (cancelTripBtnEl) cancelTripBtnEl.addEventListener('click', cancelTrip);
     
     function showSuggestions(input) {
       const val = input.value.trim().toLowerCase();
@@ -609,9 +611,12 @@ let watchId;
 
     updateStatus("Tracking stopped", "#555");
   }
-// Attach button actions
-document.getElementById("startTracking").addEventListener("click", startLiveTracking);
-document.getElementById("stopTracking").addEventListener("click", stopLiveTracking);
+// Attach button actions (only if these elements exist)
+const startBtnEl = document.getElementById("startTracking");
+if (startBtnEl) startBtnEl.addEventListener("click", startLiveTracking);
+const stopBtnEl = document.getElementById("stopTracking");
+if (stopBtnEl) stopBtnEl.addEventListener("click", stopLiveTracking);
+
     function stopLiveLocation() {
       if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
       if (liveMarker) { map.removeLayer(liveMarker); liveMarker = null; }
@@ -634,7 +639,8 @@ document.getElementById("stopTracking").addEventListener("click", stopLiveTracki
     }
 
     document.getElementById('goBtn').addEventListener('click', navigate);
-    document.getElementById('liveToggle').addEventListener('click', toggleLive);
+    const liveToggleEl = document.getElementById('liveToggle');
+    if (liveToggleEl) liveToggleEl.addEventListener('click', toggleLive);
     document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
 
   </script>
