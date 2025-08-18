@@ -505,18 +505,14 @@ html, body {
 let liveMarker, liveAccuracyCircle;
 let firstUpdate = true;
 
-function startLiveLocation() {
-  if (!navigator.geolocation) {
-    alert('Geolocation not supported by your browser.');
-    return;
-  }
-
-  watchId = navigator.geolocation.watchPosition((pos) => {
+watchId = navigator.geolocation.watchPosition(
+  (pos) => {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
     const acc = pos.coords.accuracy || 20;
 
-    // Marker for your live location
+    console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
+
     if (!liveMarker) {
       liveMarker = L.circleMarker([lat, lon], {
         radius: 10,
@@ -529,6 +525,30 @@ function startLiveLocation() {
     } else {
       liveMarker.setLatLng([lat, lon]);
     }
+
+    if (!liveAccuracyCircle) {
+      liveAccuracyCircle = L.circle([lat, lon], {
+        radius: acc,
+        color: '#ff7e5f',
+        fillOpacity: 0.1
+      }).addTo(map);
+    } else {
+      liveAccuracyCircle.setLatLng([lat, lon]);
+      liveAccuracyCircle.setRadius(acc);
+    }
+
+    map.setView([lat, lon], 17); // zoom in tighter for better accuracy
+  },
+  (err) => {
+    alert('Unable to get live position.');
+    console.error(err);
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 15000,       // wait up to 15 sec for GPS
+    maximumAge: 0         // always get fresh data, no cache
+  }
+);
 
     // Accuracy circle
     if (!liveAccuracyCircle) {
