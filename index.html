@@ -503,20 +503,62 @@ html, body {
     let liveMarker = null;
     let liveAccuracyCircle = null;
 
-    function startLiveLocation() {
-      if (!navigator.geolocation) { alert('Geolocation not supported by your browser.'); return; }
+    let watchId;
+let liveMarker, liveAccuracyCircle;
+let firstUpdate = true;
 
-      watchId = navigator.geolocation.watchPosition((pos) => {
-        const lat = pos.coords.latitude; const lon = pos.coords.longitude; const acc = pos.coords.accuracy || 20;
-        if (!liveMarker) {
-          liveMarker = L.circleMarker([lat, lon], { radius: 10, fillColor: '#ff7e5f', color: '#fff', weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(map).bindPopup('You (Live)');
-        } else { liveMarker.setLatLng([lat, lon]); }
-        if (!liveAccuracyCircle) {
-          liveAccuracyCircle = L.circle([lat, lon], { radius: acc, color: '#ff7e5f', fillOpacity: 0.1 }).addTo(map);
-        } else { liveAccuracyCircle.setLatLng([lat, lon]); liveAccuracyCircle.setRadius(acc); }
-        map.panTo([lat, lon]);
-      }, (err) => { alert('Unable to get live position.'); console.error(err); }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+function startLiveLocation() {
+  if (!navigator.geolocation) {
+    alert('Geolocation not supported by your browser.');
+    return;
+  }
+
+  watchId = navigator.geolocation.watchPosition((pos) => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const acc = pos.coords.accuracy || 20;
+
+    // Marker for your live location
+    if (!liveMarker) {
+      liveMarker = L.circleMarker([lat, lon], {
+        radius: 10,
+        fillColor: '#ff7e5f',
+        color: '#fff',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.9
+      }).addTo(map).bindPopup('You (Live)');
+    } else {
+      liveMarker.setLatLng([lat, lon]);
     }
+
+    // Accuracy circle
+    if (!liveAccuracyCircle) {
+      liveAccuracyCircle = L.circle([lat, lon], {
+        radius: acc,
+        color: '#ff7e5f',
+        fillOpacity: 0.1
+      }).addTo(map);
+    } else {
+      liveAccuracyCircle.setLatLng([lat, lon]);
+      liveAccuracyCircle.setRadius(acc);
+    }
+
+    // Only center the map on first update
+    if (firstUpdate) {
+      map.setView([lat, lon], 16); // zoom level 16 for better view
+      firstUpdate = false;
+    }
+
+  }, (err) => {
+    alert('Unable to get live position.');
+    console.error(err);
+  }, {
+    enableHighAccuracy: true,
+    maximumAge: 1000,
+    timeout: 10000
+  });
+}
 
     function stopLiveLocation() {
       if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
