@@ -511,6 +511,10 @@ function startLiveTracking() {
     return;
   }
 
+  // Reset state if tracking was restarted
+  stopLiveTracking(); 
+  firstUpdate = true;
+
   watchId = navigator.geolocation.watchPosition(
     (pos) => {
       const lat = pos.coords.latitude;
@@ -518,6 +522,11 @@ function startLiveTracking() {
       const acc = pos.coords.accuracy || 20;
 
       console.log(`Lat: ${lat}, Lon: ${lon}, Accuracy: ${acc}m`);
+
+      if (!map) {
+        console.error("Leaflet map is not initialized yet.");
+        return;
+      }
 
       // Live marker
       if (!liveMarker) {
@@ -528,7 +537,10 @@ function startLiveTracking() {
           weight: 2,
           opacity: 1,
           fillOpacity: 0.9
-        }).addTo(map).bindPopup('You (Live)', { autoClose: false, closeOnClick: false }).openPopup();
+        })
+          .addTo(map)
+          .bindPopup("You (Live)", { autoClose: false, closeOnClick: false })
+          .openPopup();
       } else {
         liveMarker.setLatLng([lat, lon]);
       }
@@ -537,7 +549,7 @@ function startLiveTracking() {
       if (!liveAccuracyCircle) {
         liveAccuracyCircle = L.circle([lat, lon], {
           radius: acc,
-          color: '#ff7e5f',
+          color: "#ff7e5f",
           fillOpacity: 0.1,
           weight: 1
         }).addTo(map);
@@ -568,16 +580,20 @@ function stopLiveTracking() {
     navigator.geolocation.clearWatch(watchId);
     watchId = null;
   }
-  if (liveMarker) {
+
+  if (liveMarker && map.hasLayer(liveMarker)) {
     map.removeLayer(liveMarker);
-    liveMarker = null;
   }
-  if (liveAccuracyCircle) {
+  liveMarker = null;
+
+  if (liveAccuracyCircle && map.hasLayer(liveAccuracyCircle)) {
     map.removeLayer(liveAccuracyCircle);
-    liveAccuracyCircle = null;
   }
+  liveAccuracyCircle = null;
+
   firstUpdate = true;
 }
+
 
 // Attach button actions
 document.getElementById("startTracking").addEventListener("click", startLiveTracking);
