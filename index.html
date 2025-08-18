@@ -246,8 +246,8 @@ html, body {
   </div>
 
   <div class="mobile-button-container">
-  <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
-  <button class="live-toggle" id="liveToggle" aria-pressed="false">Start live location</button>
+  <button class="cancel-trip" id="stopTracking">Cancel Trip</button>
+  <button class="live-toggle" id="startTracking" aria-pressed="false">Start live location</button>
 </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -505,12 +505,9 @@ html, body {
 let liveMarker, liveAccuracyCircle;
 let firstUpdate = true;
 
-// Make sure this runs AFTER you create your Leaflet map
-// Example: const map = L.map('map').setView([0,0], 2);
-
 function startLiveTracking() {
   if (!navigator.geolocation) {
-    alert("Geolocation is not supported by your browser");
+    console.error("Geolocation not supported by your browser");
     return;
   }
 
@@ -556,8 +553,7 @@ function startLiveTracking() {
       }
     },
     (err) => {
-      alert('Unable to get live position.');
-      console.error(err);
+      console.error("Geolocation error:", err);
     },
     {
       enableHighAccuracy: true,
@@ -567,10 +563,25 @@ function startLiveTracking() {
   );
 }
 
-// Call AFTER your map is initialized
-startLiveTracking();
+function stopLiveTracking() {
+  if (watchId) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+  }
+  if (liveMarker) {
+    map.removeLayer(liveMarker);
+    liveMarker = null;
+  }
+  if (liveAccuracyCircle) {
+    map.removeLayer(liveAccuracyCircle);
+    liveAccuracyCircle = null;
+  }
+  firstUpdate = true;
+}
 
-
+// Attach button actions
+document.getElementById("startTracking").addEventListener("click", startLiveTracking);
+document.getElementById("stopTracking").addEventListener("click", stopLiveTracking);
     function stopLiveLocation() {
       if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
       if (liveMarker) { map.removeLayer(liveMarker); liveMarker = null; }
