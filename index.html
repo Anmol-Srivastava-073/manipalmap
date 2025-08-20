@@ -6,20 +6,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
   <style>
     html, body {
       height: 100%;
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     #map {
       height: 100vh;
       width: 100%;
       background: #dfe6e9;
     }
-
     .input-box {
       position: absolute;
       top: 15px;
@@ -38,7 +35,6 @@
       color: white;
       font-size: 15px;
     }
-
     .input-box input {
       flex-grow: 1;
       padding: 8px 12px;
@@ -48,12 +44,10 @@
       outline: none;
       color: #333;
     }
-
     .input-box input::placeholder {
       color: #666;
       font-style: italic;
     }
-
     .btn {
       background: rgba(255, 255, 255, 0.9);
       border: none;
@@ -66,11 +60,9 @@
       white-space: nowrap;
       font-size: 13px;
     }
-
     .btn:hover {
       background-color: #fff4f1;
     }
-
     #suggestions {
       position: absolute;
       top: 60px;
@@ -87,19 +79,16 @@
       z-index: 1600;
       font-size: 15px;
     }
-
     #suggestions div {
       padding: 12px 15px;
       cursor: pointer;
       border-bottom: 1px solid #eee;
       color: #333;
     }
-
     #suggestions div:hover {
       background: #f7d7ca;
       color: #ff7e5f;
     }
-
     .travel-info-box {
       position: absolute;
       bottom: 70px;
@@ -115,7 +104,6 @@
       font-size: 14px;
       line-height: 1.4;
     }
-
     .live-toggle {
       position: absolute;
       bottom: 18px;
@@ -133,11 +121,9 @@
       font-size: 13px;
       white-space: nowrap;
     }
-
     .live-toggle:hover {
       background: #feb47b;
     }
-
     .cancel-trip {
       position: absolute;
       bottom: 18px;
@@ -155,11 +141,9 @@
       font-size: 13px;
       white-space: nowrap;
     }
-
     .cancel-trip:hover {
       background: #ff7675;
     }
-
     /* Mobile adjustments */
     @media (max-width: 600px) {
       .mobile-button-container {
@@ -172,7 +156,6 @@
         gap: 8px;
         z-index: 1500;
       }
-
       .live-toggle,
       .cancel-trip {
         position: static;
@@ -183,7 +166,6 @@
         font-size: 13px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
-
       .travel-info-box {
         bottom: calc(14px + 2 * (40px + 8px) + 14px);
         left: 14px;
@@ -192,26 +174,22 @@
         font-size: 13px;
         padding: 12px 14px;
       }
-
       .input-box {
         flex-direction: column;
         gap: 10px;
         padding: 12px 14px;
         font-size: 13px;
       }
-
       .input-box input {
         font-size: 13px;
         padding: 8px 10px;
       }
-
       .btn {
         width: 100%;
         text-align: center;
         padding: 10px 0;
         font-size: 13px;
       }
-
       #suggestions {
         max-height: 140px;
         font-size: 14px;
@@ -219,30 +197,24 @@
     }
   </style>
 </head>
-
 <body>
   <div id="map" aria-hidden="false"></div>
-
   <div class="input-box" role="search" aria-label="Campus navigation">
     <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
     <button class="btn" title="Use current location" id="useCurrentBtn">📍</button>
     <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
     <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
   </div>
-
   <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
-
   <div class="travel-info-box" id="travelInfo" aria-live="polite">
     <b>Trip Info</b><br />
     Distance: -- km<br />
     Estimated time: -- mins
   </div>
-
   <div class="mobile-button-container">
     <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
     <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
   </div>
-
   <div id="offline-popup" style="
   position: fixed;
   bottom: 20px;
@@ -279,11 +251,47 @@
 ">
   📥 Download for Offline
 </button>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    
-    const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI0ZTBiODk3OGY1ZTQ3MTdhODg5NWZiMGJjNTc1OGIwIiwiaCI6Im11cm11cjY0In0='; 
+    // --- Start of CORRECTED JavaScript ---
+
+    // 1. Service Worker Registration (must be first)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('ServiceWorker registered successfully. Scope:', reg.scope);
+      }).catch(err => console.error('ServiceWorker registration failed:', err));
+
+      // Listen for messages from the Service Worker for prefetch progress
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        const data = event.data || {};
+        const progressEl = document.getElementById("offline-progress");
+        const statusEl = document.getElementById("offline-status");
+
+        if (data.type === 'PREFETCH_PROGRESS') {
+          const pct = Math.round((data.done / data.total) * 100);
+          progressEl.style.width = pct + "%";
+          statusEl.textContent = pct + "%";
+        }
+        if (data.type === 'PREFETCH_DONE') {
+          statusEl.textContent = "✅ Done!";
+          setTimeout(() => {
+            document.getElementById("offline-popup").style.display = "none";
+          }, 2000);
+        }
+      });
+    }
+
+    // 2. Map Initialization (independent of Service Worker)
+    const map = L.map('map').setView([26.8436, 75.565], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 3. Application Data & Functions (independent of Service Worker)
+    const ORS_API_KEY = 'YOUR_ORS_API_KEY'; // Replace with your actual key
     const LANDMARKS = {
+      // Your existing landmarks data
       "AB1 Block": [26.842586, 75.564249],
       "AB2 Block": [26.843117, 75.5661],
       "AB3 Block": [26.84407, 75.564072],
@@ -322,119 +330,20 @@
       "Administrative Block": [26.841672, 75.565992],
       "AWS Building": [26.843797, 75.566947],
     };
-
-    // Define two campus polygons (approximate) - hostel and college
-    // NOTE: These polygons are in [lat, lon] format for clarity, but the turf function
-    // expects [lon, lat], so they are correctly flipped below.
     const HOSTEL_POLYGON = [
-      [26.84337, 75.56231],
-      [26.83925, 75.56459],
-      [26.83862, 75.56178],
-      [26.84262, 75.56036]
+      [26.84337, 75.56231], [26.83925, 75.56459], [26.83862, 75.56178], [26.84262, 75.56036]
     ];
-
     const COLLEGE_POLYGON = [
-      [26.84622, 75.56238],
-      [26.83902, 75.56532],
-      [26.84450, 75.56806],
-      [26.84647, 75.56523]
+      [26.84622, 75.56238], [26.83902, 75.56532], [26.84450, 75.56806], [26.84647, 75.56523]
     ];
-     if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      console.log('ServiceWorker registered', reg.scope);
-    }).catch(err => console.error('ServiceWorker registration failed:', err));
-  }
+    let routeLayer = null;
+    let fromMarker = null;
+    let toMarker = null;
+    let subwayMarker = null;
+    let watchId = null;
+    let liveMarker = null;
+    let liveAccuracyCircle = null;
 
-  // =========================
-  // OFFLINE PREFETCH LOGIC
-  // =========================
-  // NEW: campus bounds to prefetch (tight around MUJ)
-  // You can tweak these numbers to enlarge/shrink the area.
-  const CAMPUS_BOUNDS = {
-    south: 26.8385,
-    west:  75.5595,
-    north: 26.8485,
-    east:  75.5715
-  };
-  const PREFETCH_ZOOMS = [15, 16, 17, 18]; // keep small to respect tile servers
-
-  // The same tile URL you use in L.tileLayer:
-  const TILE_URL_TMPL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  const SUBDOMAINS = ['a','b','c']; // used by OSM
-
-  // Convert lat/lon to tile X/Y
-  function lon2tileX(lon, z) {
-    return Math.floor((lon + 180) / 360 * Math.pow(2, z));
-  }
-  function lat2tileY(lat, z) {
-    const rad = lat * Math.PI / 180;
-    return Math.floor(
-      (1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2 * Math.pow(2, z)
-    );
-  }
-
-  // Build tile URLs for a bounding box and zoom levels
-  function buildTileURLList(bounds, zooms) {
-    const urls = [];
-    for (const z of zooms) {
-      const xMin = lon2tileX(bounds.west,  z);
-      const xMax = lon2tileX(bounds.east,  z);
-      const yMin = lat2tileY(bounds.north, z); // note: north->min y in WebMercator tiling
-      const yMax = lat2tileY(bounds.south, z);
-
-      for (let x = xMin; x <= xMax; x++) {
-        for (let y = yMin; y <= yMax; y++) {
-          // shuffle subdomain to spread requests
-          const s = SUBDOMAINS[(x + y) % SUBDOMAINS.length];
-          const url = TILE_URL_TMPL
-            .replace('{s}', s)
-            .replace('{z}', z)
-            .replace('{x}', x)
-            .replace('{y}', y);
-          urls.push(url);
-        }
-      }
-    }
-    return urls;
-  }
-
-  // Ask SW to prefetch a list of URLs
- // function prefetchTiles(urls) {
-   // if (!navigator.serviceWorker?.controller) {
-     // alert('Service Worker not active yet. Refresh once, then try again.');
-      //return;
-    //}
-    //navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', urls });
-  //}
-
-  // Clear the tile cache
-  function clearTileCache() {
-    if (!navigator.serviceWorker?.controller) {
-      alert('Service Worker not active yet. Refresh once, then try again.');
-      return;
-    }
-    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_TILE_CACHE' });
-  }
-
-  // Wire up buttons
-  document.getElementById('downloadOfflineBtn').addEventListener('click', async () => {
-    const urls = buildTileURLList(CAMPUS_BOUNDS, PREFETCH_ZOOMS);
-    // Keep it polite: warn user about how many tiles we’re going to cache.
-    if (urls.length > 1200) {
-      const ok = confirm(`This will cache ${urls.length} tiles. Continue?`);
-      if (!ok) return;
-    }
-    prefetchTiles(urls);
-    alert('Prefetch started. Tiles will be available offline once cached.');
-  });
-
-  document.getElementById('clearOfflineBtn').addEventListener('click', () => {
-    clearTileCache();
-    alert('Requested clearing of offline tiles.');
-  });
-
-
-    // Minimal turf-like helpers
     function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
     function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
     function turfBooleanPointInPolygon(pt, poly) {
@@ -452,71 +361,11 @@
 
     function campusOf([lat, lon]) {
       if (!lat || !lon) return null;
-      // Flip coords to [lon, lat] for turf helpers
       const point = turfPoint([lon, lat]);
-      // Flip polygon coords as well
       if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c => [c[1], c[0]])]))) return 'hostel';
       if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c => [c[1], c[0]])]))) return 'college';
       return null;
     }
-
-    // Initialize map centered on MUJ campus
-    const map = L.map('map').setView([26.8436, 75.565], 16);
-
-    // OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-    function lon2tile(lon, zoom) {
-  return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
-}
-
-function lat2tile(lat, zoom) {
-  return Math.floor(
-    (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
-  );
-}
-
-// Prefetch tiles in a bounding box
-function prefetchTiles(sw, bbox, minZoom, maxZoom) {
-  const [minLon, minLat, maxLon, maxLat] = bbox;
-  let urls = [];
-
-  for (let z = minZoom; z <= maxZoom; z++) {
-    const xMin = lon2tile(minLon, z);
-    const xMax = lon2tile(maxLon, z);
-    const yMin = lat2tile(maxLat, z); // note: y axis is inverted
-    const yMax = lat2tile(minLat, z);
-
-    for (let x = xMin; x <= xMax; x++) {
-      for (let y = yMin; y <= yMax; y++) {
-        urls.push(`/tiles/${z}/${x}/${y}.png`);
-      }
-    }
-  }
-
-  sw.controller.postMessage({ type: 'PREFETCH_TILES', urls });
-}
-
-// Example usage: MUJ campus bounding box
-
-document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready.then((sw) => {
-      const mujBBox = [75.70, 26.82, 75.82, 26.92]; // campus bounds
-      prefetchTiles(sw, mujBBox, 16, 18); // zoom levels
-    });
-  }
-});
-
-    let routeLayer = null;
-    let fromMarker = null;
-    let toMarker = null;
-    let subwayMarker = null;
-    let watchId = null;
-    let liveMarker = null;
-    let liveAccuracyCircle = null;
 
     function parseCoords(loc) {
       loc = loc.trim();
@@ -537,14 +386,11 @@ document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
     async function fetchRoute(start, end, useSubway = false) {
       const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
       const subwayCoords = LANDMARKS['Subway Entrance'];
-
       const coords = [];
       coords.push([start[1], start[0]]);
       if (useSubway) coords.push([subwayCoords[1], subwayCoords[0]]);
       coords.push([end[1], end[0]]);
-
       const body = { coordinates: coords };
-
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Authorization': ORS_API_KEY, 'Content-Type': 'application/json' },
@@ -555,50 +401,36 @@ document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
     }
 
     async function navigate() {
-      cancelTrip(); // Clear previous trip before navigating
+      cancelTrip();
       const fromInput = document.getElementById('from').value;
       const toInput = document.getElementById('to').value;
-
       if (!fromInput || !toInput) { alert('Please enter both From and To locations.'); return; }
-
       const fromCoords = parseCoords(fromInput);
       const toCoords = parseCoords(toInput);
-
       if (!fromCoords || !toCoords) { alert('Please enter valid locations or coordinates.'); return; }
-
       const fromCampus = campusOf(fromCoords);
       const toCampus = campusOf(toCoords);
-
       const mustUseSubway = fromCampus && toCampus && fromCampus !== toCampus;
       const useSubway = mustUseSubway;
-
       try {
         const routeGeojson = await fetchRoute(fromCoords, toCoords, useSubway);
-
         routeLayer = L.geoJSON(routeGeojson, {
           style: { color: '#ff7e5f', weight: 6, opacity: 0.85 },
         }).addTo(map);
-
         const bounds = routeLayer.getBounds();
         map.fitBounds(bounds.pad(0.15));
-
         const summary = routeGeojson.features[0].properties.summary;
         const distKm = summary.distance / 1000;
         const durationMins = Math.round(summary.duration / 60);
-
         const travelInfoEl = document.getElementById('travelInfo');
         travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${distKm.toFixed(2)} km<br>Estimated time: ${durationMins} mins`;
-
         fromMarker = L.marker(fromCoords, { title: 'Start (From)', icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
-
         toMarker = L.marker(toCoords, { title: 'End (To)', icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
-
         if (useSubway) {
           const sc = LANDMARKS['Subway Entrance'];
           subwayMarker = L.circleMarker(sc, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
           travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Note: Transfer via Subway is required between campuses.</small>`;
         }
-
       } catch (e) {
         alert('Could not calculate route: ' + e.message);
       }
@@ -665,7 +497,6 @@ document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
     function toggleLive() {
       const btn = document.getElementById('liveToggle');
       if (watchId) {
-        // Stop tracking
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
         if (liveMarker) map.removeLayer(liveMarker);
@@ -675,7 +506,6 @@ document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
         btn.textContent = 'Start Live Location';
         btn.setAttribute('aria-pressed', 'false');
       } else {
-        // Start tracking
         if (!navigator.geolocation) {
           alert('Geolocation not supported by your browser.');
           return;
@@ -712,80 +542,39 @@ document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
               liveAccuracyCircle.setLatLng([lat, lon]);
               liveAccuracyCircle.setRadius(acc);
             }
-
             map.setView([lat, lon], 17);
             btn.textContent = 'Stop Live Location';
           },
           (err) => {
             console.error("Geolocation error:", err);
             alert("Error getting location. Tracking stopped.");
-            toggleLive(); // Call to stop tracking
+            toggleLive();
           },
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
       }
     }
 
-    function prefetchTiles(sw, bbox, minZoom, maxZoom) {
-  const [minLon, minLat, maxLon, maxLat] = bbox;
-  let urls = [];
-
-  function lon2tile(lon, zoom) {
-    return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
-  }
-  function lat2tile(lat, zoom) {
-    return Math.floor(
-      (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1/Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
-    );
-  }
-
-  for (let z = minZoom; z <= maxZoom; z++) {
-    const xMin = lon2tile(minLon, z);
-    const xMax = lon2tile(maxLon, z);
-    const yMin = lat2tile(maxLat, z);
-    const yMax = lat2tile(minLat, z);
-
-    for (let x = xMin; x <= xMax; x++) {
-      for (let y = yMin; y <= yMax; y++) {
-        urls.push(`/tiles/${z}/${x}/${y}.png`);
+    function prefetchTiles() {
+      const bbox = [75.5595, 26.8385, 75.5715, 26.8485];
+      const zooms = [15, 16, 17, 18];
+      
+      if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+        alert('Service Worker is not active yet. Please refresh the page and try again.');
+        return;
       }
+      
+      document.getElementById("offline-popup").style.display = "block";
+      navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', bbox: bbox, zooms: zooms });
     }
-  }
-
-  // Show popup
-  document.getElementById("offline-popup").style.display = "block";
-
-  sw.controller.postMessage({ type: 'PREFETCH_TILES', urls });
-}
-
-// Listen for progress from SW
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    const data = event.data || {};
-    if (data.type === 'PREFETCH_PROGRESS') {
-      const pct = Math.round((data.done / data.total) * 100);
-      document.getElementById("offline-progress").style.width = pct + "%";
-      document.getElementById("offline-status").textContent = pct + "%";
-    }
-    if (data.type === 'PREFETCH_DONE') {
-      document.getElementById("offline-status").textContent = "✅ Done!";
-      setTimeout(() => {
-        document.getElementById("offline-popup").style.display = "none";
-      }, 2000);
-    }
-  });
-
-  navigator.serviceWorker.ready.then((sw) => {
-    const mujBBox = [75.70, 26.82, 75.82, 26.92];
-    prefetchTiles(sw, mujBBox, 16, 18);
-  });
-}
 
     // Attach event listeners to buttons
     document.getElementById('goBtn').addEventListener('click', navigate);
     document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
     document.getElementById('liveToggle').addEventListener('click', toggleLive);
     document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
+    document.getElementById('downloadOfflinebtn').addEventListener('click', prefetchTiles);
   </script>
 </body>
 </html>
+</body></html>
