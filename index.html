@@ -310,6 +310,100 @@
       [26.84450, 75.56806],
       [26.84647, 75.56523]
     ];
+     if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      console.log('ServiceWorker registered', reg.scope);
+    }).catch(err => console.error('ServiceWorker registration failed:', err));
+  }
+
+  // =========================
+  // OFFLINE PREFETCH LOGIC
+  // =========================
+  // NEW: campus bounds to prefetch (tight around MUJ)
+  // You can tweak these numbers to enlarge/shrink the area.
+  const CAMPUS_BOUNDS = {
+    south: 26.8385,
+    west:  75.5595,
+    north: 26.8485,
+    east:  75.5715
+  };
+  const PREFETCH_ZOOMS = [15, 16, 17, 18]; // keep small to respect tile servers
+
+  // The same tile URL you use in L.tileLayer:
+  const TILE_URL_TMPL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const SUBDOMAINS = ['a','b','c']; // used by OSM
+
+  // Convert lat/lon to tile X/Y
+  function lon2tileX(lon, z) {
+    return Math.floor((lon + 180) / 360 * Math.pow(2, z));
+  }
+  function lat2tileY(lat, z) {
+    const rad = lat * Math.PI / 180;
+    return Math.floor(
+      (1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2 * Math.pow(2, z)
+    );
+  }
+
+  // Build tile URLs for a bounding box and zoom levels
+  function buildTileURLList(bounds, zooms) {
+    const urls = [];
+    for (const z of zooms) {
+      const xMin = lon2tileX(bounds.west,  z);
+      const xMax = lon2tileX(bounds.east,  z);
+      const yMin = lat2tileY(bounds.north, z); // note: north->min y in WebMercator tiling
+      const yMax = lat2tileY(bounds.south, z);
+
+      for (let x = xMin; x <= xMax; x++) {
+        for (let y = yMin; y <= yMax; y++) {
+          // shuffle subdomain to spread requests
+          const s = SUBDOMAINS[(x + y) % SUBDOMAINS.length];
+          const url = TILE_URL_TMPL
+            .replace('{s}', s)
+            .replace('{z}', z)
+            .replace('{x}', x)
+            .replace('{y}', y);
+          urls.push(url);
+        }
+      }
+    }
+    return urls;
+  }
+
+  // Ask SW to prefetch a list of URLs
+  function prefetchTiles(urls) {
+    if (!navigator.serviceWorker?.controller) {
+      alert('Service Worker not active yet. Refresh once, then try again.');
+      return;
+    }
+    navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', urls });
+  }
+
+  // Clear the tile cache
+  function clearTileCache() {
+    if (!navigator.serviceWorker?.controller) {
+      alert('Service Worker not active yet. Refresh once, then try again.');
+      return;
+    }
+    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_TILE_CACHE' });
+  }
+
+  // Wire up buttons
+  document.getElementById('downloadOfflineBtn').addEventListener('click', async () => {
+    const urls = buildTileURLList(CAMPUS_BOUNDS, PREFETCH_ZOOMS);
+    // Keep it polite: warn user about how many tiles we’re going to cache.
+    if (urls.length > 1200) {
+      const ok = confirm(`This will cache ${urls.length} tiles. Continue?`);
+      if (!ok) return;
+    }
+    prefetchTiles(urls);
+    alert('Prefetch started. Tiles will be available offline once cached.');
+  });
+
+  document.getElementById('clearOfflineBtn').addEventListener('click', () => {
+    clearTileCache();
+    alert('Requested clearing of offline tiles.');
+  });
+
 
     // Minimal turf-like helpers
     function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
