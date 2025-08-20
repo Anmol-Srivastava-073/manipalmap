@@ -263,7 +263,7 @@
   </div>
   <div id="offline-status" style="margin-top: 6px; font-size: 12px; color: #666;">0%</div>
 </div>
-<button id="download-offline" style="
+<button id="downloadOfflinebtn" style="
   position: fixed;
   top: 20px;
   right: 20px;
@@ -406,13 +406,13 @@
   }
 
   // Ask SW to prefetch a list of URLs
-  function prefetchTiles(urls) {
-    if (!navigator.serviceWorker?.controller) {
-      alert('Service Worker not active yet. Refresh once, then try again.');
-      return;
-    }
-    navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', urls });
-  }
+ // function prefetchTiles(urls) {
+   // if (!navigator.serviceWorker?.controller) {
+     // alert('Service Worker not active yet. Refresh once, then try again.');
+      //return;
+    //}
+    //navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', urls });
+  //}
 
   // Clear the tile cache
   function clearTileCache() {
@@ -508,7 +508,7 @@ function prefetchTiles(sw, bbox, minZoom, maxZoom) {
 
 // Example usage: MUJ campus bounding box
 
-document.getElementById("download-offline").addEventListener("click", () => {
+document.getElementById("downloadOfflinebtn").addEventListener("click", () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then((sw) => {
       const mujBBox = [75.70, 26.82, 75.82, 26.92]; // campus bounds
