@@ -243,6 +243,27 @@
     <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
   </div>
 
+  <div id="offline-popup" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-family: sans-serif;
+  display: none;
+  z-index: 9999;
+  width: 300px;
+">
+  <div style="margin-bottom: 6px; font-weight: bold;">Downloading offline tiles…</div>
+  <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+    <div id="offline-progress" style="background: #4caf50; height: 100%; width: 0%;"></div>
+  </div>
+  <div id="offline-status" style="margin-top: 6px; font-size: 12px; color: #666;">0%</div>
+</div>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     // OpenRouteService API Key - free signup needed at https://openrouteservice.org
@@ -695,6 +716,61 @@ if ('serviceWorker' in navigator) {
         );
       }
     }
+
+    function prefetchTiles(sw, bbox, minZoom, maxZoom) {
+  const [minLon, minLat, maxLon, maxLat] = bbox;
+  let urls = [];
+
+  function lon2tile(lon, zoom) {
+    return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+  }
+  function lat2tile(lat, zoom) {
+    return Math.floor(
+      (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1/Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
+    );
+  }
+
+  for (let z = minZoom; z <= maxZoom; z++) {
+    const xMin = lon2tile(minLon, z);
+    const xMax = lon2tile(maxLon, z);
+    const yMin = lat2tile(maxLat, z);
+    const yMax = lat2tile(minLat, z);
+
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
+        urls.push(`/tiles/${z}/${x}/${y}.png`);
+      }
+    }
+  }
+
+  // Show popup
+  document.getElementById("offline-popup").style.display = "block";
+
+  sw.controller.postMessage({ type: 'PREFETCH_TILES', urls });
+}
+
+// Listen for progress from SW
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    const data = event.data || {};
+    if (data.type === 'PREFETCH_PROGRESS') {
+      const pct = Math.round((data.done / data.total) * 100);
+      document.getElementById("offline-progress").style.width = pct + "%";
+      document.getElementById("offline-status").textContent = pct + "%";
+    }
+    if (data.type === 'PREFETCH_DONE') {
+      document.getElementById("offline-status").textContent = "✅ Done!";
+      setTimeout(() => {
+        document.getElementById("offline-popup").style.display = "none";
+      }, 2000);
+    }
+  });
+
+  navigator.serviceWorker.ready.then((sw) => {
+    const mujBBox = [75.70, 26.82, 75.82, 26.92];
+    prefetchTiles(sw, mujBBox, 16, 18);
+  });
+}
 
     // Attach event listeners to buttons
     document.getElementById('goBtn').addEventListener('click', navigate);
