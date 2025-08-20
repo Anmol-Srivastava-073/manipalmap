@@ -1,130 +1,130 @@
-/* sw.js: Service Worker for MUJ Uninav offline tiles */
+const CACHE_NAME = 'manipal-uninav-cache-v1';
+const TILES_CACHE_NAME = 'manipal-uninav-tiles-v1';
 
-const APP_SHELL_CACHE = 'uninav-app-v1';
-const TILE_CACHE       = 'uninav-tiles-v1';
-
-// Adjust these to include your app shell assets you want available offline.
-const APP_SHELL = [
-  '/',                // if served from root; otherwise remove or set to your index path
-  '/index.html',      // update if your filename/path differs
-  'https://unpkg.com/leaflet/dist/leaflet.css',
-  'https://unpkg.com/leaflet/dist/leaflet.js',
-];
-
-// Basic install: cache the app shell (optional but nice)
+// Pre-cache essential files on install
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(APP_SHELL_CACHE).then(cache => cache.addAll(APP_SHELL).catch(() => {}))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        'https://unpkg.com/leaflet/dist/leaflet.css',
+        'https://unpkg.com/leaflet/dist/leaflet.js',
+      ]);
+    })
   );
-  self.skipWaiting();
 });
 
+// Activate event, used for cleaning up old caches
 self.addEventListener('activate', (event) => {
-  // Clean old caches if names changed
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(
-      keys
-        .filter(k => ![APP_SHELL_CACHE, TILE_CACHE].includes(k))
-        .map(k => caches.delete(k))
-    );
-    await self.clients.claim();
-  })());
+  const cacheWhitelist = [CACHE_NAME, TILES_CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
 
-// Helper: is this request a tile?
-function isTileRequest(req) {
-  const url = new URL(req.url);
-  return /tile\.openstreetmap\.org\/\d+\/\d+\/\d+\.png$/.test(url.pathname) ||
-         /\/tiles\/\d+\/\d+\/\d+\.png$/.test(url.pathname);
-}
-
-// Runtime caching strategy:
-// 1) For tiles -> Cache-first, then network fallback.
-// 2) For everything else -> Network-first, then cache fallback (optional).
+// Fetch event listener for handling network requests
 self.addEventListener('fetch', (event) => {
-  const req = event.request;
+  // Check if it's a tile request
+  if (event.request.url.includes('tile.openstreetmap.org')) {
+    event.respondWith(
+      caches.open(TILES_CACHE_NAME).then(cache => {
+        return cache.match(event.request).then(response => {
+          // Return from cache if found
+          if (response) {
+            return response;
+          }
 
-  if (isTileRequest(req)) {
-    event.respondWith(cacheFirstTiles(req));
+          // Otherwise, fetch from network and cache
+          return fetch(event.request).then(networkResponse => {
+            if (networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          }).catch(() => {
+            // Handle offline case (no network and not in cache)
+            // You might return a fallback image here
+            return new Response("Offline");
+          });
+        });
+      })
+    );
   } else {
-    event.respondWith(networkFirst(req));
+    // For other requests, use a standard cache-first strategy
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
+      })
+    );
   }
 });
 
-async function cacheFirstTiles(req) {
-  const cache = await caches.open(TILE_CACHE);
+// Listen for messages from the main page to trigger tile prefetching
+self.addEventListener('message', (event) => {
+  if (event.data.type === 'PREFETCH_TILES') {
+    const { bbox, zooms } = event.data;
+    const urls = buildTileURLList(bbox, zooms);
+    const total = urls.length;
+    let done = 0;
 
-  // Try cache
-  const cached = await cache.match(req, { ignoreSearch: true });
-  if (cached) return cached;
+    event.source.postMessage({ type: 'PREFETCH_PROGRESS', done, total });
 
-  // Else fetch from network and cache
-  try {
-    const resp = await fetch(req, { mode: 'cors' });
-    // clone and store (opaque responses can still be cached)
-    cache.put(req, resp.clone());
-    return resp;
-  } catch (err) {
-    // Optional: return a tiny transparent PNG as fallback
-    return new Response(new Uint8Array([137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,8,6,0,0,0,31,21,196,137,0,0,0,12,73,68,65,84,120,156,99,96,0,0,0,2,0,1,226,33,189,167,0,0,0,0,73,69,78,68,174,66,96,130]), {
-      headers: { 'Content-Type': 'image/png' },
-      status: 200
+    Promise.all(
+      urls.map(url => {
+        return caches.open(TILES_CACHE_NAME).then(cache => {
+          return fetch(url).then(response => {
+            if (response.status === 200) {
+              cache.put(url, response.clone());
+            }
+            done++;
+            event.source.postMessage({ type: 'PREFETCH_PROGRESS', done, total });
+          });
+        });
+      })
+    ).then(() => {
+      event.source.postMessage({ type: 'PREFETCH_DONE' });
+    }).catch(err => {
+      console.error('Prefetching failed:', err);
     });
   }
-}
-
-async function networkFirst(req) {
-  const cache = await caches.open(APP_SHELL_CACHE);
-  try {
-    const resp = await fetch(req);
-    // Cache a copy for next time (optional)
-    cache.put(req, resp.clone());
-    return resp;
-  } catch (err) {
-    const cached = await cache.match(req, { ignoreSearch: true });
-    if (cached) return cached;
-    // Last resort: a generic response or an offline page could go here
-    return new Response('Offline and not cached.', { status: 503 });
-  }
-}
-
-// Message channel: prefetch or clear tiles on demand
-self.addEventListener('message', async (event) => {
-  const data = event.data || {};
-  
-  if (data.type === 'PREFETCH_TILES' && Array.isArray(data.urls)) {
-  const cache = await caches.open(TILE_CACHE);
-  const total = data.urls.length;
-  let done = 0;
-
-  for (const url of data.urls) {
-    try {
-      const req = new Request(url, { mode: 'cors' });
-      const already = await cache.match(req, { ignoreSearch: true });
-      if (!already) {
-        const resp = await fetch(req);
-        await cache.put(req, resp.clone());
-        await new Promise(r => setTimeout(r, 50));
-      }
-    } catch (e) {}
-    done++;
-    notifyAllClients({ type: 'PREFETCH_PROGRESS', done, total });
-  }
-
-  notifyAllClients({ type: 'PREFETCH_DONE' });
-}
-
-  if (data.type === 'CLEAR_TILE_CACHE') {
-    await caches.delete(TILE_CACHE);
-    await caches.open(TILE_CACHE); // recreate empty cache
-    notifyAllClients({ type: 'TILES_CLEARED' });
-  }
 });
 
-async function notifyAllClients(message) {
-  const clientsArr = await self.clients.matchAll({ includeUncontrolled: true });
-  for (const client of clientsArr) {
-    client.postMessage(message);
+// Helper function to convert coordinates to tile URLs
+function lon2tile(lon, zoom) {
+  return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+}
+function lat2tile(lat, zoom) {
+  return Math.floor(
+    (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom)
+  );
+}
+function buildTileURLList(bbox, zooms) {
+  const [minLon, minLat, maxLon, maxLat] = bbox;
+  const TILE_URL_TMPL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const SUBDOMAINS = ['a', 'b', 'c'];
+  const urls = [];
+
+  for (let z = zooms[0]; z <= zooms[zooms.length - 1]; z++) {
+    const xMin = lon2tile(minLon, z);
+    const xMax = lon2tile(maxLon, z);
+    const yMin = lat2tile(maxLat, z);
+    const yMax = lat2tile(minLat, z);
+
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
+        const s = SUBDOMAINS[(x + y) % SUBDOMAINS.length];
+        const url = TILE_URL_TMPL.replace('{s}', s).replace('{z}', z).replace('{x}', x).replace('{y}', y);
+        urls.push(url);
+      }
+    }
   }
+  return urls;
 }
