@@ -614,7 +614,7 @@ document.getElementById("download-offline").addEventListener("click", () => {
     function showSuggestions(input) {
       const val = input.value.trim().toLowerCase();
       const suggestBox = document.getElementById('suggestions');
-      suggestBox.innerHTML = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjdlOTc2YTRjZTg1NDFjOTg5OTA3NjRkZjkzNjJlZjY5MGZmN2M2YTkxMWQ1ZjM3YzhmZWY4MjcxIiwiaCI6Im11cm11cjY0In0=';
+      suggestBox.innerHTML = '';
       if (!val) {
         suggestBox.style.display = 'none';
         return;
