@@ -263,7 +263,22 @@
   </div>
   <div id="offline-status" style="margin-top: 6px; font-size: 12px; color: #666;">0%</div>
 </div>
-
+<button id="download-offline" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+">
+  📥 Download for Offline
+</button>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     // OpenRouteService API Key - free signup needed at https://openrouteservice.org
@@ -492,14 +507,15 @@ function prefetchTiles(sw, bbox, minZoom, maxZoom) {
 }
 
 // Example usage: MUJ campus bounding box
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.ready.then((sw) => {
-    // Bounding box format: [minLon, minLat, maxLon, maxLat]
-    const mujBBox = [75.70, 26.82, 75.82, 26.92];
-    prefetchTiles(sw, mujBBox, 16, 18);  // zoom levels you want cached
-  });
-}
 
+document.getElementById("download-offline").addEventListener("click", () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then((sw) => {
+      const mujBBox = [75.70, 26.82, 75.82, 26.92]; // campus bounds
+      prefetchTiles(sw, mujBBox, 16, 18); // zoom levels
+    });
+  }
+});
 
     let routeLayer = null;
     let fromMarker = null;
