@@ -92,26 +92,28 @@ async function networkFirst(req) {
 // Message channel: prefetch or clear tiles on demand
 self.addEventListener('message', async (event) => {
   const data = event.data || {};
+  
   if (data.type === 'PREFETCH_TILES' && Array.isArray(data.urls)) {
-    const cache = await caches.open(TILE_CACHE);
-    // Fetch sequentially to avoid hammering tile server
-    for (const url of data.urls) {
-      try {
-        const req = new Request(url, { mode: 'cors' });
-        const already = await cache.match(req, { ignoreSearch: true });
-        if (!already) {
-          const resp = await fetch(req);
-          await cache.put(req, resp.clone());
-          // Brief delay to be polite
-          await new Promise(r => setTimeout(r, 50));
-        }
-      } catch (e) {
-        // Ignore single-tile failures
+  const cache = await caches.open(TILE_CACHE);
+  const total = data.urls.length;
+  let done = 0;
+
+  for (const url of data.urls) {
+    try {
+      const req = new Request(url, { mode: 'cors' });
+      const already = await cache.match(req, { ignoreSearch: true });
+      if (!already) {
+        const resp = await fetch(req);
+        await cache.put(req, resp.clone());
+        await new Promise(r => setTimeout(r, 50));
       }
-    }
-    // Optionally notify the page
-    notifyAllClients({ type: 'PREFETCH_DONE' });
+    } catch (e) {}
+    done++;
+    notifyAllClients({ type: 'PREFETCH_PROGRESS', done, total });
   }
+
+  notifyAllClients({ type: 'PREFETCH_DONE' });
+}
 
   if (data.type === 'CLEAR_TILE_CACHE') {
     await caches.delete(TILE_CACHE);
