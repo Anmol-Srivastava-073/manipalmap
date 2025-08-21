@@ -198,15 +198,15 @@
     #darkModeBtn {
       position: fixed;
       top: 20px;
-      right: 150px; /* Adjust as needed */
-      background: #4caf50;
+      right: 150px;
+      background: #ff7e5f;
       color: white;
       border: none;
       padding: 10px 16px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 3px 6px rgba(255, 126, 95, 0.6);
       z-index: 9999;
     }
   </style>
@@ -395,36 +395,6 @@
       isDark = !isDark;
       document.getElementById('darkModeBtn').innerHTML = isDark ? '☀️' : '🌙';
     }
-
-    const DarkModeControl = L.Control.extend({
-      options: { position: 'topleft' },
-      onAdd: function () {
-        const btn = L.DomUtil.create('button', 'leaflet-bar');
-        btn.id = 'darkModeBtn';
-        btn.type = 'button';
-        btn.title = 'Toggle Dark Mode';
-        btn.innerHTML = '🌙';
-        btn.style.width = '34px';
-        btn.style.height = '34px';
-        btn.style.lineHeight = '34px';
-        btn.style.fontSize = '18px';
-        btn.style.background = '#fff';
-        btn.style.border = 'none';
-        btn.style.cursor = 'pointer';
-
-        L.DomEvent.on(btn, 'click', (e) => {
-          L.DomEvent.stopPropagation(e);
-          toggleDark();
-        });
-
-        return btn;
-      }
-    });
-    map.addControl(new DarkModeControl());
-
-    // Event listener for the new button element
-    document.getElementById('darkModeBtn').addEventListener('click', toggleDark);
-
 
     function campusOf([lat, lon]) {
       if (!lat || !lon) return null;
@@ -643,6 +613,7 @@
     document.getElementById('liveToggle').addEventListener('click', toggleLive);
     document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
     document.getElementById('downloadOfflinebtn').addEventListener('click', prefetchTiles);
+    document.getElementById('darkModeBtn').addEventListener('click', toggleDark);
   </script>
 </body>
 </html>
