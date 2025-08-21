@@ -366,30 +366,68 @@
     }
 
     // Dark mode tile layer
-let darkLayer = L.tileLayer(
-  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', 
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-  }
+    const darkLayer = L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  { attribution: '&copy; OSM & CARTO' }
 );
 
 let isDark = false;
 
-// Toggle Dark/Light mode
-document.getElementById("darkModeBtn").addEventListener("click", function() {
-  isDark = !isDark;
-
-  if (isDark) {
+// 2) Single toggle function (updates ANY dark mode button if present)
+function toggleDark() {
+  if (!isDark) {
     map.addLayer(darkLayer);
-    this.setAttribute("aria-pressed", "true");
-    this.textContent = "☀️ Light Mode";
   } else {
     map.removeLayer(darkLayer);
-    this.setAttribute("aria-pressed", "false");
-    this.textContent = "🌙 Dark Mode";
+  }
+  isDark = !isDark;
+
+  // Update all buttons with this id (the floating one and the control one)
+  document.querySelectorAll('#darkModeBtn').forEach(b => {
+    b.setAttribute('aria-pressed', String(isDark));
+    b.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+  });
+}
+
+// 3) If your floating button exists, ensure it’s on top and wired up
+(() => {
+  const b = document.getElementById('darkModeBtn');
+  if (b) {
+    b.style.position = 'fixed';
+    b.style.top = '20px';
+    b.style.left = '20px';
+    b.style.zIndex = '10000';
+    b.addEventListener('click', toggleDark);
+  }
+})();
+
+// 4) Also add a Leaflet control so the toggle is guaranteed visible on the map
+const DarkModeControl = L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd: function () {
+    const btn = L.DomUtil.create('button', 'leaflet-bar');
+    btn.id = 'darkModeBtn';
+    btn.type = 'button';
+    btn.title = 'Toggle Dark Mode';
+    btn.innerHTML = '🌙';
+    btn.style.width = '34px';
+    btn.style.height = '34px';
+    btn.style.lineHeight = '34px';
+    btn.style.fontSize = '18px';
+    btn.style.background = '#fff';
+    btn.style.border = 'none';
+    btn.style.cursor = 'pointer';
+
+    // prevent map drag when clicking
+    L.DomEvent.on(btn, 'click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      toggleDark();
+    });
+
+    return btn;
   }
 });
-
+map.addControl(new DarkModeControl());
     function campusOf([lat, lon]) {
       if (!lat || !lon) return null;
       const point = turfPoint([lon, lat]);
