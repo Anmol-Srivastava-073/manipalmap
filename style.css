@@ -88,7 +88,7 @@ body { font-family: 'Outfit', sans-serif; }
 
 /* Glow Button */
 .glow-btn {
-  background: linear-gradient(90deg, #ffff699d, #ffdd00a9);
+  background: linear-gradient(90deg, #ffff69, #ffdd00);
   font-family: 'Outfit', sans-serif;
   color:#000000;
   animation: glowPulse 1.5s infinite ease-in-out;
