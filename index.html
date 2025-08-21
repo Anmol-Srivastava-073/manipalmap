@@ -202,6 +202,10 @@
   <div class="input-box" role="search" aria-label="Campus navigation">
     <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
     <button class="btn" title="Use current location" id="useCurrentBtn">📍</button>
+    <button id="darkModeBtn" class="btn" aria-pressed="false" 
+  style="position:fixed;top:20px;left:20px;z-index:2000;">
+  🌙 Dark Mode
+</button>
     <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
     <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
   </div>
@@ -212,10 +216,7 @@
     Distance: -- km<br />
     Estimated time: -- mins
   </div>
-  <button id="darkModeBtn" class="btn" aria-pressed="false" 
-  style="position:fixed;top:20px;left:20px;z-index:2000;">
-  🌙 Dark Mode
-</button>
+  
   <div class="mobile-button-container">
     <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
     <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
