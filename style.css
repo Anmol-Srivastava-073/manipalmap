@@ -88,13 +88,13 @@ body { font-family: 'Outfit', sans-serif; }
 
 /* Glow Button */
 .glow-btn {
-  background: linear-gradient(90deg, #ff69b4, #00bfff);
+  background: linear-gradient(90deg, #e1ff69, #fbff00);
   animation: glowPulse 1.5s infinite ease-in-out;
   text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
 .glow-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 25px rgba(255, 105, 180, 1), 0 0 50px rgba(0, 191, 255, 1);
+  box-shadow: 0 0 25px rgb(255, 238, 0), 0 0 50px rgb(248, 239, 164);
 }
 
 /* Map glow */
