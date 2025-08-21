@@ -205,6 +205,7 @@
     <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
     <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
   </div>
+  <button id="darkModeBtn" class="btn" style="position:fixed;top:20px;left:20px;z-index:2000;">🌙 Dark Mode</button>
   <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
   <div class="travel-info-box" id="travelInfo" aria-live="polite">
     <b>Trip Info</b><br />
@@ -382,6 +383,21 @@
       if (subwayMarker) { map.removeLayer(subwayMarker); subwayMarker = null; }
       document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
     }
+
+    let darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors'
+});
+let isDark = false;
+
+document.getElementById("darkModeBtn").addEventListener("click", () => {
+  if (!isDark) {
+    map.addLayer(darkLayer);
+    isDark = true;
+  } else {
+    map.removeLayer(darkLayer);
+    isDark = false;
+  }
+});
 
     async function fetchRoute(start, end, useSubway = false) {
       const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
