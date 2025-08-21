@@ -1,4 +1,4 @@
-“Good [morning/afternoon], everyone,
+“Greetings everybody,
 
 I’m excited to introduce you to Manipal UniNav—a smart, intuitive university navigation app designed to simplify life on campus for students, faculty, and visitors alike.
 
