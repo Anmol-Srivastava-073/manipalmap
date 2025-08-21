@@ -374,21 +374,20 @@ let darkLayer = L.tileLayer(
 
 let isDark = false;
 
-// Toggle on button click
+// Toggle Dark/Light mode
 document.getElementById("darkModeBtn").addEventListener("click", function() {
-  if (!isDark) {
+  isDark = !isDark;
+
+  if (isDark) {
     map.addLayer(darkLayer);
     this.setAttribute("aria-pressed", "true");
     this.textContent = "☀️ Light Mode";
-    isDark = true;
   } else {
     map.removeLayer(darkLayer);
     this.setAttribute("aria-pressed", "false");
     this.textContent = "🌙 Dark Mode";
-    isDark = false;
   }
 });
-
 
     function campusOf([lat, lon]) {
       if (!lat || !lon) return null;
