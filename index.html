@@ -212,7 +212,10 @@
     Distance: -- km<br />
     Estimated time: -- mins
   </div>
-  <button id="darkModeBtn" class="btn" style="position:fixed;top:20px;left:20px;z-index:2000;">🌙 Dark Mode</button>
+  <button id="darkModeBtn" class="btn" aria-pressed="false" 
+  style="position:fixed;top:20px;left:20px;z-index:2000;">
+  🌙 Dark Mode
+</button>
   <div class="mobile-button-container">
     <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
     <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
@@ -361,6 +364,32 @@
       return inside;
     }
 
+    // Dark mode tile layer
+let darkLayer = L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', 
+  {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+  }
+);
+
+let isDark = false;
+
+// Toggle on button click
+document.getElementById("darkModeBtn").addEventListener("click", function() {
+  if (!isDark) {
+    map.addLayer(darkLayer);
+    this.setAttribute("aria-pressed", "true");
+    this.textContent = "☀️ Light Mode";
+    isDark = true;
+  } else {
+    map.removeLayer(darkLayer);
+    this.setAttribute("aria-pressed", "false");
+    this.textContent = "🌙 Dark Mode";
+    isDark = false;
+  }
+});
+
+
     function campusOf([lat, lon]) {
       if (!lat || !lon) return null;
       const point = turfPoint([lon, lat]);
@@ -385,20 +414,7 @@
       document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
     }
 
-    let darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors'
-});
-let isDark = false;
-
-document.getElementById("darkModeBtn").addEventListener("click", () => {
-  if (!isDark) {
-    map.addLayer(darkLayer);
-    isDark = true;
-  } else {
-    map.removeLayer(darkLayer);
-    isDark = false;
-  }
-});
+    
 
     async function fetchRoute(start, end, useSubway = false) {
       const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
