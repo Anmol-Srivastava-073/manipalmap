@@ -195,6 +195,20 @@
         font-size: 14px;
       }
     }
+    #darkModeBtn {
+      position: fixed;
+      top: 20px;
+      right: 150px; /* Adjust as needed */
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
@@ -253,7 +267,10 @@
 ">
   📥 Download for Offline
 </button>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<button id="darkModeBtn" title="Toggle Dark Mode">🌙</button>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     // --- Start of CORRECTED JavaScript ---
 
@@ -376,9 +393,7 @@
         map.removeLayer(darkLayer);
       }
       isDark = !isDark;
-      document.querySelectorAll('#darkModeBtn').forEach(b => {
-        b.innerHTML = isDark ? '☀️' : '🌙';
-      });
+      document.getElementById('darkModeBtn').innerHTML = isDark ? '☀️' : '🌙';
     }
 
     const DarkModeControl = L.Control.extend({
@@ -406,6 +421,10 @@
       }
     });
     map.addControl(new DarkModeControl());
+
+    // Event listener for the new button element
+    document.getElementById('darkModeBtn').addEventListener('click', toggleDark);
+
 
     function campusOf([lat, lon]) {
       if (!lat || !lon) return null;
