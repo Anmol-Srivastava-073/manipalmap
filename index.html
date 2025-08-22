@@ -51,27 +51,34 @@
       </p>
     </section>
 
-    <!-- About -->
-    <section id="about" class="scroll-mt-28 w-full max-w-4xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-12">
-      <h2 class="refade-in navbar-font text-4xl font-bold text-[#963646] mb-4 text-center">About Manipal UniNav</h2>
-      <p class="navbar-font text-[#000000] leading-relaxed text-center sm:text-center">
-        Finding your way around a large university campus can be confusing, especially for new students or visitors. <b>Manipal UniNav</b> is our interactive navigation platform designed to make this easier. 
-        Manipal UniNav is built with a simple vision: to help everyone on campus find their way without hassle—whether it's a new student figuring out where their next class is, or a visitor locating the auditorium. With open-source tools and thoughtful design, we’ve created a solution that’s light, fast, and scalable.
-        The project is split into two core parts, each maintained in separate repositories and deployed individually:
-
-<br>The Interactive Map Module – This is the heart of the navigation experience. It uses maps sourced from OpenStreetMap and other open-source map providers, ensuring free and reliable access to detailed, customizable mapping data.
-
-For real-time routing and pathfinding, we’ve integrated the OpenRouteService (ORS) API, which provides accurate walking directions and seamless navigation.
-To make the navigation even more user-friendly, We've divided the university into two distinct zones:<br>
-
-The College Campus – housing academic blocks, libraries, labs, and administrative buildings.
-
-The Hostel Campus – including student housing, mess areas, and nearby recreational spots.
-
-This separation helps in organizing routes more efficiently and ensures users can easily toggle between academic and residential navigation.
-
-      </p>
-    </section>
+    <!-- About Section with Glow -->
+<section id="about" class="relative w-full max-w-4xl mx-auto my-16">
+  
+  <!-- Glow Halo Behind -->
+  <div class="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-40 bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500"></div>
+  
+  <!-- Actual Content -->
+  <div class="bg-[#F4E452] p-10 rounded-3xl shadow-xl">
+    <h2 class="text-4xl font-bold text-[#963646] mb-4 text-center">About Manipal UniNav</h2>
+    <p class="text-black leading-relaxed text-center">
+      Finding your way around a large university campus can be confusing, especially for new students or visitors. 
+      <b>Manipal UniNav</b> is our interactive navigation platform designed to make this easier. Manipal UniNav is built with a simple vision: 
+      to help everyone on campus find their way without hassle—whether it's a new student figuring out where their next class is, 
+      or a visitor locating the auditorium. With open-source tools and thoughtful design, we’ve created a solution that’s light, fast, and scalable. 
+      The project is split into two core parts, each maintained in separate repositories and deployed individually:
+      <br><br>
+      <b>The Interactive Map Module</b> – This is the heart of the navigation experience. It uses maps sourced from OpenStreetMap and other 
+      open-source map providers, ensuring free and reliable access to detailed, customizable mapping data. For real-time routing and pathfinding, 
+      we’ve integrated the OpenRouteService (ORS) API, which provides accurate walking directions and seamless navigation. 
+      <br><br>
+      We've divided the university into two distinct zones: 
+      <br><br>
+      <b>The College Campus</b> – housing academic blocks, libraries, labs, and administrative buildings.  
+      <b>The Hostel Campus</b> – including student housing, mess areas, and nearby recreational spots.  
+      This separation helps in organizing routes more efficiently and ensures users can easily toggle between academic and residential navigation.
+    </p>
+  </div>
+</section>
 
      <!-- Stats Section -->
     <section id="stats" class="w-full max-w-5xl text-center my-12">
@@ -203,5 +210,6 @@ This separation helps in organizing routes more efficiently and ensures users ca
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
