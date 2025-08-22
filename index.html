@@ -119,50 +119,79 @@
       </p>
     </section>
 
-    <!-- Guide Section -->
-<section id="guide" class="w-full max-w-6xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-12 text-center">
+  <!-- Guide Section (Slider) -->
+<section id="guide" class="w-full max-w-4xl mx-auto my-16 relative text-center">
   <h2 class="text-4xl font-bold text-[#963646] mb-10">HOW UNINAV WORKS?</h2>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-    
-    <!-- Step 1 -->
-    <div class="flex flex-col items-center text-center">
-      <img src="https://via.placeholder.com/250x500" alt="Step 1" class="rounded-2xl shadow-lg glow-map w-60 mb-4">
-      <h3 class="text-2xl font-semibold text-[#963646]">Step 1: Open the Website</h3>
-      <p class="navbar-font text-lg text-black mt-2">
-        Go to mujmaps.netlify.app on your browser. The homepage will load with the interactive MUJ campus map.
-      </p>
+  <!-- Slider Container -->
+  <div class="relative overflow-hidden rounded-3xl bg-[#F4E452] p-10 shadow-2xl">
+
+    <!-- Glow Halo -->
+    <div class="absolute inset-0 -z-10 blur-3xl opacity-40 bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500"></div>
+
+    <!-- Slides -->
+    <div id="slides" class="relative">
+      
+      <!-- Step 1 -->
+      <div class="slide">
+        <img src="https://via.placeholder.com/250x500" class="mx-auto w-48 rounded-2xl shadow-xl border-4 border-[#FF780A]" alt="Step 1">
+        <h3 class="text-2xl font-bold text-[#963646] mt-4">Step 1: Open the Website</h3>
+        <p class="text-black mt-2">Go to mujmaps.netlify.app on your browser. The homepage will load with the interactive MUJ campus map.</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="slide hidden">
+        <img src="https://via.placeholder.com/250x500" class="mx-auto w-48 rounded-2xl shadow-xl border-4 border-[#FF780A]" alt="Step 2">
+        <h3 class="text-2xl font-bold text-[#963646] mt-4">Step 2: Search for a Location</h3>
+        <p class="text-black mt-2">Use the search bar at the top to type in the name of a building, block, or facility (e.g., "Library", "Hostel", "Mess").</p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="slide hidden">
+        <img src="https://via.placeholder.com/250x500" class="mx-auto w-48 rounded-2xl shadow-xl border-4 border-[#FF780A]" alt="Step 3">
+        <h3 class="text-2xl font-bold text-[#963646] mt-4">Step 3: Get Directions</h3>
+        <p class="text-black mt-2">Click on the location to view details and select the option to get directions. The map will highlight the route for you.</p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="slide hidden">
+        <img src="https://via.placeholder.com/250x500" class="mx-auto w-48 rounded-2xl shadow-xl border-4 border-[#FF780A]" alt="Step 4">
+        <h3 class="text-2xl font-bold text-[#963646] mt-4">Step 4: Navigate the Campus</h3>
+        <p class="text-black mt-2">Follow the highlighted path on the map to easily reach your destination within the MUJ campus.</p>
+      </div>
+
     </div>
 
-    <!-- Step 2 -->
-    <div class="flex flex-col items-center text-center">
-      <img src="https://via.placeholder.com/250x500" alt="Step 2" class="rounded-2xl shadow-lg glow-map w-60 mb-4">
-      <h3 class="text-2xl font-semibold text-[#963646]">Step 2: Search for a Location</h3>
-      <p class="navbar-font text-lg text-black mt-2">
-     Use the search bar at the top to type in the name of a building, block, or facility (e.g., "Library", "Hostel", "Mess").
-      </p>
+    <!-- Controls -->
+    <div class="flex justify-between items-center mt-6">
+      <button id="prev" class="px-6 py-2 bg-[#963646] text-white rounded-full shadow-lg hover:bg-[#FF780A] transition">⬅ Prev</button>
+      <button id="next" class="px-6 py-2 bg-[#963646] text-white rounded-full shadow-lg hover:bg-[#FF780A] transition">Next ➡</button>
     </div>
-
-    <!-- Step 3 -->
-    <div class="flex flex-col items-center text-center">
-      <img src="https://via.placeholder.com/250x500" alt="Step 3" class="rounded-2xl shadow-lg glow-map w-60 mb-4">
-      <h3 class="text-2xl font-semibold text-[#963646]">Step 3: Get Directions</h3>
-      <p class="navbar-font text-lg text-black mt-2">
-        Click on the location to view details and select the option to get directions. The map will highlight the route for you.
-      </p>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="flex flex-col items-center text-center">
-      <img src="https://via.placeholder.com/250x500" alt="Step 4" class="rounded-2xl shadow-lg glow-map w-60 mb-4">
-      <h3 class="text-2xl font-semibold text-[#963646]">Step 4: Navigate the Campus</h3>
-      <p class="navbar-font text-lg text-black mt-2">
-       Follow the highlighted path on the map to easily reach your destination within the MUJ campus.
-      </p>
-    </div>
-
   </div>
 </section>
+
+<script>
+  const slides = document.querySelectorAll(".slide");
+  let current = 0;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("hidden", i !== index);
+    });
+  }
+
+  document.getElementById("next").addEventListener("click", () => {
+    current = (current + 1) % slides.length;
+    showSlide(current);
+  });
+
+  document.getElementById("prev").addEventListener("click", () => {
+    current = (current - 1 + slides.length) % slides.length;
+    showSlide(current);
+  });
+
+  showSlide(current);
+</script>
 
 
    <!-- Team Section -->
@@ -210,6 +239,7 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
