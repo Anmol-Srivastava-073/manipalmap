@@ -1,619 +1,634 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Manipal Uninav</title>
-  <link rel="icon" type="image/png" href="image/weblogo.png" />
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    #map {
-      height: 100vh;
-      width: 100%;
-      background: #dfe6e9;
-    }
-    .input-box {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1500;
-      background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      padding: 10px 14px;
-      display: flex;
-      gap: 10px;
-      max-width: 800px;
-      width: 90vw;
-      align-items: center;
-      color: white;
-      font-size: 15px;
-    }
-    .input-box input {
-      flex-grow: 1;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      outline: none;
-      color: #333;
-    }
-    .input-box input::placeholder {
-      color: #666;
-      font-style: italic;
-    }
-    .btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #ff7e5f;
-      transition: background-color 0.2s ease;
-      white-space: nowrap;
-      font-size: 13px;
-    }
-    .btn:hover {
-      background-color: #fff4f1;
-    }
-    #suggestions {
-      position: absolute;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: 800px;
-      width: 90vw;
-      background: white;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      border-radius: 10px;
-      max-height: 180px;
-      overflow-y: auto;
-      display: none;
-      z-index: 1600;
-      font-size: 15px;
-    }
-    #suggestions div {
-      padding: 12px 15px;
-      cursor: pointer;
-      border-bottom: 1px solid #eee;
-      color: #333;
-    }
-    #suggestions div:hover {
-      background: #f7d7ca;
-      color: #ff7e5f;
-    }
-    .travel-info-box {
-      position: absolute;
-      bottom: 70px;
-      left: 18px;
-      z-index: 1500;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 14px 18px;
-      border-radius: 10px;
-      color: #333;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      font-weight: 600;
-      min-width: 180px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    .live-toggle {
-      position: absolute;
-      bottom: 18px;
-      right: 18px;
-      z-index: 1500;
-      background: #ff7e5f;
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
-      transition: background-color 0.25s ease;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .live-toggle:hover {
-      background: #feb47b;
-    }
-    .cancel-trip {
-      position: absolute;
-      bottom: 18px;
-      left: 18px;
-      z-index: 1500;
-      background: #d63031;
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
-      transition: background-color 0.25s ease;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .cancel-trip:hover {
-      background: #ff7675;
-    }
-    /* Mobile adjustments */
-    @media (max-width: 600px) {
-      .mobile-button-container {
-        position: absolute;
-        bottom: 14px;
-        left: 14px;
-        right: 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        z-index: 1500;
-      }
-      .live-toggle,
-      .cancel-trip {
-        position: static;
-        width: 100%;
-        margin: 0;
-        border-radius: 10px;
-        padding: 10px 0;
-        font-size: 13px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      }
-      .travel-info-box {
-        bottom: calc(14px + 2 * (40px + 8px) + 14px);
-        left: 14px;
-        right: 14px;
-        min-width: auto;
-        font-size: 13px;
-        padding: 12px 14px;
-      }
-      .input-box {
-        flex-direction: column;
-        gap: 10px;
-        padding: 12px 14px;
-        font-size: 13px;
-      }
-      .input-box input {
-        font-size: 13px;
-        padding: 8px 10px;
-      }
-      .btn {
-        width: 100%;
-        text-align: center;
-        padding: 10px 0;
-        font-size: 13px;
-      }
-      #suggestions {
-        max-height: 140px;
-        font-size: 14px;
-      }
-    }
-    #darkModeBtn {
-      position: fixed;
-      top: 20px;
-      right: 150px;
-      background: #ff7e5f;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      box-shadow: 0 3px 6px rgba(255, 126, 95, 0.6);
-      z-index: 9999;
-    }
-  </style>
+  <title>Manipal Uninav</title>
+  <link rel="icon" type="image/png" href="image/weblogo.png" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #map {
+      height: 100vh;
+      width: 100%;
+      background: #dfe6e9;
+      transition: background-color 0.5s ease;
+    }
+    /* New CSS rule for dark mode background */
+    .dark-mode #map {
+      background: #2f3640;
+    }
+    .input-box {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1500;
+      background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+      max-width: 800px;
+      width: 90vw;
+      align-items: center;
+      color: white;
+      font-size: 15px;
+    }
+    .input-box input {
+      flex-grow: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      outline: none;
+      color: #333;
+    }
+    .input-box input::placeholder {
+      color: #666;
+      font-style: italic;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #ff7e5f;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+    .btn:hover {
+      background-color: #fff4f1;
+    }
+    #suggestions {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 800px;
+      width: 90vw;
+      background: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1600;
+      font-size: 15px;
+    }
+    #suggestions div {
+      padding: 12px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      color: #333;
+    }
+    #suggestions div:hover {
+      background: #f7d7ca;
+      color: #ff7e5f;
+    }
+    .travel-info-box {
+      position: absolute;
+      bottom: 70px;
+      left: 18px;
+      z-index: 1500;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 14px 18px;
+      border-radius: 10px;
+      color: #333;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      font-weight: 600;
+      min-width: 180px;
+      font-size: 14px;
+      line-height: 1.4;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+    /* New CSS rule for dark mode info box */
+    .dark-mode .travel-info-box {
+      background: rgba(47, 54, 64, 0.95);
+      color: white;
+    }
+    .live-toggle {
+      position: absolute;
+      bottom: 18px;
+      right: 18px;
+      z-index: 1500;
+      background: #ff7e5f;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+      transition: background-color 0.25s ease;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .live-toggle:hover {
+      background: #feb47b;
+    }
+    .cancel-trip {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      z-index: 1500;
+      background: #d63031;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
+      transition: background-color 0.25s ease;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .cancel-trip:hover {
+      background: #ff7675;
+    }
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .mobile-button-container {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        right: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 1500;
+      }
+      .live-toggle,
+      .cancel-trip {
+        position: static;
+        width: 100%;
+        margin: 0;
+        border-radius: 10px;
+        padding: 10px 0;
+        font-size: 13px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      .travel-info-box {
+        bottom: calc(14px + 2 * (40px + 8px) + 14px);
+        left: 14px;
+        right: 14px;
+        min-width: auto;
+        font-size: 13px;
+        padding: 12px 14px;
+      }
+      .input-box {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 14px;
+        font-size: 13px;
+      }
+      .input-box input {
+        font-size: 13px;
+        padding: 8px 10px;
+      }
+      .btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 13px;
+      }
+      #suggestions {
+        max-height: 140px;
+        font-size: 14px;
+      }
+    }
+    #darkModeBtn {
+      position: fixed;
+      top: 20px;
+      right: 150px;
+      background: #ff7e5f;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 3px 6px rgba(255, 126, 95, 0.6);
+      z-index: 9999;
+    }
+  </style>
 </head>
 <body>
-  <div id="map" aria-hidden="false"></div>
-  <div class="input-box" role="search" aria-label="Campus navigation">
-    <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
-    <button class="btn" title="Use current location" id="useCurrentBtn">📍</button>
-    <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
-    <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
-  </div>
-  
-  <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
-  <div class="travel-info-box" id="travelInfo" aria-live="polite">
-    <b>Trip Info</b><br />
-    Distance: -- km<br />
-    Estimated time: -- mins
-  </div>
-  
-  <div class="mobile-button-container">
-    <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
-    <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
-  </div>
-  <div id="offline-popup" style="
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  padding: 12px 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  font-family: sans-serif;
-  display: none;
-  z-index: 9999;
-  width: 300px;
+  <div id="map" aria-hidden="false"></div>
+  <div class="input-box" role="search" aria-label="Campus navigation">
+    <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
+    <button class="btn" title="Use current location" id="useCurrentBtn">📍</button>
+    <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
+    <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
+  </div>
+  
+  <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
+  <div class="travel-info-box" id="travelInfo" aria-live="polite">
+    <b>Trip Info</b><br />
+    Distance: -- km<br />
+    Estimated time: -- mins
+  </div>
+  
+  <div class="mobile-button-container">
+    <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
+    <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
+  </div>
+  <div id="offline-popup" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-family: sans-serif;
+  display: none;
+  z-index: 9999;
+  width: 300px;
 ">
-  <div style="margin-bottom: 6px; font-weight: bold;">Downloading offline tiles…</div>
-  <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
-    <div id="offline-progress" style="background: #4caf50; height: 100%; width: 0%;"></div>
-  </div>
-  <div id="offline-status" style="margin-top: 6px; font-size: 12px; color: #666;">0%</div>
+  <div style="margin-bottom: 6px; font-weight: bold;">Downloading offline tiles…</div>
+  <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+    <div id="offline-progress" style="background: #4caf50; height: 100%; width: 0%;"></div>
+  </div>
+  <div id="offline-status" style="margin-top: 6px; font-size: 12px; color: #666;">0%</div>
 </div>
 <button id="downloadOfflinebtn" style="
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-  z-index: 9999;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
 ">
-  📥 Download for Offline
+  📥 Download for Offline
 </button>
 
 <button id="darkModeBtn" title="Toggle Dark Mode">🌙</button>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    // --- Start of CORRECTED JavaScript ---
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // --- Start of CORRECTED JavaScript ---
 
-    // 1. Service Worker Registration (must be first)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(reg => {
-        console.log('ServiceWorker registered successfully. Scope:', reg.scope);
-      }).catch(err => console.error('ServiceWorker registration failed:', err));
+    // 1. Service Worker Registration (must be first)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('ServiceWorker registered successfully. Scope:', reg.scope);
+      }).catch(err => console.error('ServiceWorker registration failed:', err));
 
-      // Listen for messages from the Service Worker for prefetch progress
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        const data = event.data || {};
-        const progressEl = document.getElementById("offline-progress");
-        const statusEl = document.getElementById("offline-status");
+      // Listen for messages from the Service Worker for prefetch progress
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        const data = event.data || {};
+        const progressEl = document.getElementById("offline-progress");
+        const statusEl = document.getElementById("offline-status");
 
-        if (data.type === 'PREFETCH_PROGRESS') {
-          const pct = Math.round((data.done / data.total) * 100);
-          progressEl.style.width = pct + "%";
-          statusEl.textContent = pct + "%";
-        }
-        if (data.type === 'PREFETCH_DONE') {
-          statusEl.textContent = "✅ Done!";
-          setTimeout(() => {
-            document.getElementById("offline-popup").style.display = "none";
-          }, 2000);
-        }
-      });
-    }
+        if (data.type === 'PREFETCH_PROGRESS') {
+          const pct = Math.round((data.done / data.total) * 100);
+          progressEl.style.width = pct + "%";
+          statusEl.textContent = pct + "%";
+        }
+        if (data.type === 'PREFETCH_DONE') {
+          statusEl.textContent = "✅ Done!";
+          setTimeout(() => {
+            document.getElementById("offline-popup").style.display = "none";
+          }, 2000);
+        }
+      });
+    }
 
-    // 2. Map Initialization (independent of Service Worker)
-    const map = L.map('map').setView([26.8436, 75.565], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    // 2. Map Initialization (independent of Service Worker)
+    const map = L.map('map').setView([26.8436, 75.565], 16);
+    const lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-    // 3. Application Data & Functions (independent of Service Worker)
-    const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjdlOTc2YTRjZTg1NDFjOTg5OTA3NjRkZjkzNjJlZjY5MGZmN2M2YTkxMWQ1ZjM3YzhmZWY4MjcxIiwiaCI6Im11cm11cjY0In0='; // Replace with your actual key
-    const LANDMARKS = {
-      // Your existing landmarks data
-      "AB1 Block": [26.842586, 75.564249],
-      "AB2 Block": [26.843117, 75.5661],
-      "AB3 Block": [26.84407, 75.564072],
-      "BlueDove Mess": [26.840432, 75.561798],
-      "BluSpring(INDYA) Mess": [26.841255, 75.561567],
-      "Laundry": [26.840202, 75.561454],
-      "Old Mess": [26.843112, 75.565209],
-      "Central Library": [26.841648, 75.565944],
-      "Lecture Hall Complex/ AB4 Block": [26.844338, 75.564705],
-      "Main Gate": [26.840729, 75.566325],
-      "Gate 2": [26.841524, 75.563868],
-      "Grand Stairs": [26.842507, 75.565467],
-      "Block G1": [26.840815, 75.563450],
-      "Block G2": [26.840642, 75.562629],
-      "Block G3": [26.840518, 75.562956],
-      "Block G4": [26.840587, 75.562146],
-      "G4 Badminton Court": [26.840350, 75.562369],
-      "Gym": [26.841210, 75.561594],
-      "Block B1": [26.841782, 75.562967],
-      "Block B3": [26.841413, 75.562431],
-      "Block B5": [26.841729, 75.561921],
-      "Block B2": [26.842045, 75.562189],
-      "Block B6": [26.842165, 75.561690],
-      "Block B7": [26.841859, 75.560896],
-      "Transformer": [26.841538, 75.560730],
-      "Chiller Panel Room": [26.841275, 75.560800],
-      "GHS Library": [26.840317, 75.561444],
-      "Jogger's Park": [26.840092, 75.563310],
-      "Subway Entrance": [26.842031, 75.563313],
-      "Saras Juice Corner": [26.840758, 75.563485],
-      "Subway Wraps": [26.841445, 75.563090],
-      "Taste Of India": [26.841445, 75.563090],
-      "Chatkara": [26.841445, 75.563090],
-      "Waffle Shop": [26.841399, 75.562809],
-      "Cook House": [26.840952, 75.563493],
-      "Administrative Block": [26.841672, 75.565992],
-      "AWS Building": [26.843797, 75.566947],
-    };
-    const HOSTEL_POLYGON = [
-      [26.84337, 75.56231], [26.83925, 75.56459], [26.83862, 75.56178], [26.84262, 75.56036]
-    ];
-    const COLLEGE_POLYGON = [
-      [26.84622, 75.56238], [26.83902, 75.56532], [26.84450, 75.56806], [26.84647, 75.56523]
-    ];
-    let routeLayer = null;
-    let fromMarker = null;
-    let toMarker = null;
-    let subwayMarker = null;
-    let watchId = null;
-    let liveMarker = null;
-    let liveAccuracyCircle = null;
+    // 3. Application Data & Functions (independent of Service Worker)
+    const ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjdlOTc2YTRjZTg1NDFjOTg5OTA3NjRkZjkzNjJlZjY5MGZmN2M2YTkxMWQ1ZjM3YzhmZWY4MjcxIiwiaCI6Im11cm11cjY0In0='; // Replace with your actual key
+    const LANDMARKS = {
+      // Your existing landmarks data
+      "AB1 Block": [26.842586, 75.564249],
+      "AB2 Block": [26.843117, 75.5661],
+      "AB3 Block": [26.84407, 75.564072],
+      "BlueDove Mess": [26.840432, 75.561798],
+      "BluSpring(INDYA) Mess": [26.841255, 75.561567],
+      "Laundry": [26.840202, 75.561454],
+      "Old Mess": [26.843112, 75.565209],
+      "Central Library": [26.841648, 75.565944],
+      "Lecture Hall Complex/ AB4 Block": [26.844338, 75.564705],
+      "Main Gate": [26.840729, 75.566325],
+      "Gate 2": [26.841524, 75.563868],
+      "Grand Stairs": [26.842507, 75.565467],
+      "Block G1": [26.840815, 75.563450],
+      "Block G2": [26.840642, 75.562629],
+      "Block G3": [26.840518, 75.562956],
+      "Block G4": [26.840587, 75.562146],
+      "G4 Badminton Court": [26.840350, 75.562369],
+      "Gym": [26.841210, 75.561594],
+      "Block B1": [26.841782, 75.562967],
+      "Block B3": [26.841413, 75.562431],
+      "Block B5": [26.841729, 75.561921],
+      "Block B2": [26.842045, 75.562189],
+      "Block B6": [26.842165, 75.561690],
+      "Block B7": [26.841859, 75.560896],
+      "Transformer": [26.841538, 75.560730],
+      "Chiller Panel Room": [26.841275, 75.560800],
+      "GHS Library": [26.840317, 75.561444],
+      "Jogger's Park": [26.840092, 75.563310],
+      "Subway Entrance": [26.842031, 75.563313],
+      "Saras Juice Corner": [26.840758, 75.563485],
+      "Subway Wraps": [26.841445, 75.563090],
+      "Taste Of India": [26.841445, 75.563090],
+      "Chatkara": [26.841445, 75.563090],
+      "Waffle Shop": [26.841399, 75.562809],
+      "Cook House": [26.840952, 75.563493],
+      "Administrative Block": [26.841672, 75.565992],
+      "AWS Building": [26.843797, 75.566947],
+    };
+    const HOSTEL_POLYGON = [
+      [26.84337, 75.56231], [26.83925, 75.56459], [26.83862, 75.56178], [26.84262, 75.56036]
+    ];
+    const COLLEGE_POLYGON = [
+      [26.84622, 75.56238], [26.83902, 75.56532], [26.84450, 75.56806], [26.84647, 75.56523]
+    ];
+    let routeLayer = null;
+    let fromMarker = null;
+    let toMarker = null;
+    let subwayMarker = null;
+    let watchId = null;
+    let liveMarker = null;
+    let liveAccuracyCircle = null;
 
-    function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
-    function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
-    function turfBooleanPointInPolygon(pt, poly) {
-      const x = pt.geometry.coordinates[0], y = pt.geometry.coordinates[1];
-      const vs = poly.geometry.coordinates[0];
-      let inside = false;
-      for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        const xi = vs[i][0], yi = vs[i][1];
-        const xj = vs[j][0], yj = vs[j][1];
-        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi + 0.0) + xi);
-        if (intersect) inside = !inside;
-      }
-      return inside;
-    }
+    function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
+    function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
+    function turfBooleanPointInPolygon(pt, poly) {
+      const x = pt.geometry.coordinates[0], y = pt.geometry.coordinates[1];
+      const vs = poly.geometry.coordinates[0];
+      let inside = false;
+      for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        const xi = vs[i][0], yi = vs[i][1];
+        const xj = vs[j][0], yj = vs[j][1];
+        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi + 0.0) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
 
-    // Dark mode tile layer
-    const darkLayer = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      { attribution: '&copy; OSM & CARTO' }
-    );
+    // Corrected dark mode tile layer (Positron)
+    const darkLayer = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      { attribution: '&copy; OpenStreetMap &copy; CartoDB' }
+    );
 
-    let isDark = false;
+    let isDark = false;
 
-    function toggleDark() {
-      if (!isDark) {
-        map.addLayer(darkLayer);
-      } else {
-        map.removeLayer(darkLayer);
-      }
-      isDark = !isDark;
-      document.getElementById('darkModeBtn').innerHTML = isDark ? '☀️' : '🌙';
-    }
+    function toggleDark() {
+      if (!isDark) {
+        map.removeLayer(lightLayer);
+        map.addLayer(darkLayer);
+        document.body.classList.add('dark-mode');
+      } else {
+        map.removeLayer(darkLayer);
+        map.addLayer(lightLayer);
+        document.body.classList.remove('dark-mode');
+      }
+      isDark = !isDark;
+      document.getElementById('darkModeBtn').innerHTML = isDark ? '☀️' : '🌙';
+    }
 
-    function campusOf([lat, lon]) {
-      if (!lat || !lon) return null;
-      const point = turfPoint([lon, lat]);
-      if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c => [c[1], c[0]])]))) return 'hostel';
-      if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c => [c[1], c[0]])]))) return 'college';
-      return null;
-    }
+    function campusOf([lat, lon]) {
+      if (!lat || !lon) return null;
+      const point = turfPoint([lon, lat]);
+      if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c => [c[1], c[0]])]))) return 'hostel';
+      if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c => [c[1], c[0]])]))) return 'college';
+      return null;
+    }
 
-    function parseCoords(loc) {
-      loc = loc.trim();
-      if (LANDMARKS[loc]) return LANDMARKS[loc];
-      const match = loc.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
-      if (match) return [parseFloat(match[1]), parseFloat(match[3])];
-      return null;
-    }
+    function parseCoords(loc) {
+      loc = loc.trim();
+      if (LANDMARKS[loc]) return LANDMARKS[loc];
+      const match = loc.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
+      if (match) return [parseFloat(match[1]), parseFloat(match[3])];
+      return null;
+    }
 
-    function cancelTrip() {
-      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
-      if (fromMarker) { map.removeLayer(fromMarker); fromMarker = null; }
-      if (toMarker) { map.removeLayer(toMarker); toMarker = null; }
-      if (subwayMarker) { map.removeLayer(subwayMarker); subwayMarker = null; }
-      document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
-    }
+    function cancelTrip() {
+      if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+      if (fromMarker) { map.removeLayer(fromMarker); fromMarker = null; }
+      if (toMarker) { map.removeLayer(toMarker); toMarker = null; }
+      if (subwayMarker) { map.removeLayer(subwayMarker); subwayMarker = null; }
+      document.getElementById('travelInfo').innerHTML = `<b>Trip Info</b><br>Distance: -- km<br>Estimated time: -- mins`;
+    }
 
-    
+    
 
-    async function fetchRoute(start, end, useSubway = false) {
-      const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
-      const subwayCoords = LANDMARKS['Subway Entrance'];
-      const coords = [];
-      coords.push([start[1], start[0]]);
-      if (useSubway) coords.push([subwayCoords[1], subwayCoords[0]]);
-      coords.push([end[1], end[0]]);
-      const body = { coordinates: coords };
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Authorization': ORS_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error('Routing request failed: ' + res.statusText);
-      return res.json();
-    }
+    async function fetchRoute(start, end, useSubway = false) {
+      const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
+      const subwayCoords = LANDMARKS['Subway Entrance'];
+      const coords = [];
+      coords.push([start[1], start[0]]);
+      if (useSubway) coords.push([subwayCoords[1], subwayCoords[0]]);
+      coords.push([end[1], end[0]]);
+      const body = { coordinates: coords };
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Authorization': ORS_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error('Routing request failed: ' + res.statusText);
+      return res.json();
+    }
 
-    async function navigate() {
-      cancelTrip();
-      const fromInput = document.getElementById('from').value;
-      const toInput = document.getElementById('to').value;
-      if (!fromInput || !toInput) { alert('Please enter both From and To locations.'); return; }
-      const fromCoords = parseCoords(fromInput);
-      const toCoords = parseCoords(toInput);
-      if (!fromCoords || !toCoords) { alert('Please enter valid locations or coordinates.'); return; }
-      const fromCampus = campusOf(fromCoords);
-      const toCampus = campusOf(toCoords);
-      const mustUseSubway = fromCampus && toCampus && fromCampus !== toCampus;
-      const useSubway = mustUseSubway;
-      try {
-        const routeGeojson = await fetchRoute(fromCoords, toCoords, useSubway);
-        routeLayer = L.geoJSON(routeGeojson, {
-          style: { color: '#ff7e5f', weight: 6, opacity: 0.85 },
-        }).addTo(map);
-        const bounds = routeLayer.getBounds();
-        map.fitBounds(bounds.pad(0.15));
-        const summary = routeGeojson.features[0].properties.summary;
-        const distKm = summary.distance / 1000;
-        const durationMins = Math.round(summary.duration / 60);
-        const travelInfoEl = document.getElementById('travelInfo');
-        travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${distKm.toFixed(2)} km<br>Estimated time: ${durationMins} mins`;
-        fromMarker = L.marker(fromCoords, { title: 'Start (From)', icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
-        toMarker = L.marker(toCoords, { title: 'End (To)', icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
-        if (useSubway) {
-          const sc = LANDMARKS['Subway Entrance'];
-          subwayMarker = L.circleMarker(sc, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
-          travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Note: Transfer via Subway is required between campuses.</small>`;
-        }
-      } catch (e) {
-        alert('Could not calculate route: ' + e.message);
-      }
-    }
+    async function navigate() {
+      cancelTrip();
+      const fromInput = document.getElementById('from').value;
+      const toInput = document.getElementById('to').value;
+      if (!fromInput || !toInput) { alert('Please enter both From and To locations.'); return; }
+      const fromCoords = parseCoords(fromInput);
+      const toCoords = parseCoords(toInput);
+      if (!fromCoords || !toCoords) { alert('Please enter valid locations or coordinates.'); return; }
+      const fromCampus = campusOf(fromCoords);
+      const toCampus = campusOf(toCoords);
+      const mustUseSubway = fromCampus && toCampus && fromCampus !== toCampus;
+      const useSubway = mustUseSubway;
+      try {
+        const routeGeojson = await fetchRoute(fromCoords, toCoords, useSubway);
+        routeLayer = L.geoJSON(routeGeojson, {
+          style: { color: '#ff7e5f', weight: 6, opacity: 0.85 },
+        }).addTo(map);
+        const bounds = routeLayer.getBounds();
+        map.fitBounds(bounds.pad(0.15));
+        const summary = routeGeojson.features[0].properties.summary;
+        const distKm = summary.distance / 1000;
+        const durationMins = Math.round(summary.duration / 60);
+        const travelInfoEl = document.getElementById('travelInfo');
+        travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${distKm.toFixed(2)} km<br>Estimated time: ${durationMins} mins`;
+        fromMarker = L.marker(fromCoords, { title: 'Start (From)', icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+        toMarker = L.marker(toCoords, { title: 'End (To)', icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+        if (useSubway) {
+          const sc = LANDMARKS['Subway Entrance'];
+          subwayMarker = L.circleMarker(sc, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
+          travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Note: Transfer via Subway is required between campuses.</small>`;
+        }
+      } catch (e) {
+        alert('Could not calculate route: ' + e.message);
+      }
+    }
 
-    function showSuggestions(input) {
-      const val = input.value.trim().toLowerCase();
-      const suggestBox = document.getElementById('suggestions');
-      suggestBox.innerHTML = '';
-      if (!val) {
-        suggestBox.style.display = 'none';
-        return;
-      }
-      const matches = Object.keys(LANDMARKS).filter((name) => name.toLowerCase().includes(val));
-      if (matches.length === 0) {
-        suggestBox.style.display = 'none';
-        return;
-      }
-      suggestBox.style.display = 'block';
-      matches.forEach((name) => {
-        const div = document.createElement('div');
-        div.textContent = name;
-        div.setAttribute('role', 'option');
-        div.addEventListener('click', () => {
-          input.value = name;
-          suggestBox.style.display = 'none';
-          input.focus();
-        });
-        suggestBox.appendChild(div);
-      });
-    }
+    function showSuggestions(input) {
+      const val = input.value.trim().toLowerCase();
+      const suggestBox = document.getElementById('suggestions');
+      suggestBox.innerHTML = '';
+      if (!val) {
+        suggestBox.style.display = 'none';
+        return;
+      }
+      const matches = Object.keys(LANDMARKS).filter((name) => name.toLowerCase().includes(val));
+      if (matches.length === 0) {
+        suggestBox.style.display = 'none';
+        return;
+      }
+      suggestBox.style.display = 'block';
+      matches.forEach((name) => {
+        const div = document.createElement('div');
+        div.textContent = name;
+        div.setAttribute('role', 'option');
+        div.addEventListener('click', () => {
+          input.value = name;
+          suggestBox.style.display = 'none';
+          input.focus();
+        });
+        suggestBox.appendChild(div);
+      });
+    }
 
-    ['from', 'to'].forEach((id) => {
-      const el = document.getElementById(id);
-      el.addEventListener('input', () => showSuggestions(el));
-      el.addEventListener('focus', () => showSuggestions(el));
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          navigate();
-        }
-      });
-    });
+    ['from', 'to'].forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => showSuggestions(el));
+      el.addEventListener('focus', () => showSuggestions(el));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          navigate();
+        }
+      });
+    });
 
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('#suggestions') && !e.target.closest('#from') && !e.target.closest('#to')) {
-        document.getElementById('suggestions').style.display = 'none';
-      }
-    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#suggestions') && !e.target.closest('#from') && !e.target.closest('#to')) {
+        document.getElementById('suggestions').style.display = 'none';
+      }
+    });
 
-    function useCurrentLocationAsFrom() {
-      if (!navigator.geolocation) {
-        alert('Geolocation not supported by your browser.');
-        return;
-      }
-      navigator.geolocation.getCurrentPosition((pos) => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        document.getElementById('from').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-        map.setView([lat, lon], 17);
-      }, () => alert('Unable to get your current location.'));
-    }
+    function useCurrentLocationAsFrom() {
+      if (!navigator.geolocation) {
+        alert('Geolocation not supported by your browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        document.getElementById('from').value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        map.setView([lat, lon], 17);
+      }, () => alert('Unable to get your current location.'));
+    }
 
-    function toggleLive() {
-      const btn = document.getElementById('liveToggle');
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        if (liveMarker) map.removeLayer(liveMarker);
-        if (liveAccuracyCircle) map.removeLayer(liveAccuracyCircle);
-        liveMarker = null;
-        liveAccuracyCircle = null;
-        btn.textContent = 'Start Live Location';
-        btn.setAttribute('aria-pressed', 'false');
-      } else {
-        if (!navigator.geolocation) {
-          alert('Geolocation not supported by your browser.');
-          return;
-        }
-        btn.textContent = '...Tracking';
-        btn.setAttribute('aria-pressed', 'true');
-        watchId = navigator.geolocation.watchPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            const acc = pos.coords.accuracy || 20;
+    function toggleLive() {
+      const btn = document.getElementById('liveToggle');
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        if (liveMarker) map.removeLayer(liveMarker);
+        if (liveAccuracyCircle) map.removeLayer(liveAccuracyCircle);
+        liveMarker = null;
+        liveAccuracyCircle = null;
+        btn.textContent = 'Start Live Location';
+        btn.setAttribute('aria-pressed', 'false');
+      } else {
+        if (!navigator.geolocation) {
+          alert('Geolocation not supported by your browser.');
+          return;
+        }
+        btn.textContent = '...Tracking';
+        btn.setAttribute('aria-pressed', 'true');
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const acc = pos.coords.accuracy || 20;
 
-            if (!liveMarker) {
-              liveMarker = L.circleMarker([lat, lon], {
-                radius: 10,
-                fillColor: '#ff7e5f',
-                color: '#fff',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9
-              }).addTo(map).bindPopup("You (Live)").openPopup();
-            } else {
-              liveMarker.setLatLng([lat, lon]);
-            }
+            if (!liveMarker) {
+              liveMarker = L.circleMarker([lat, lon], {
+                radius: 10,
+                fillColor: '#ff7e5f',
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9
+              }).addTo(map).bindPopup("You (Live)").openPopup();
+            } else {
+              liveMarker.setLatLng([lat, lon]);
+            }
 
-            if (!liveAccuracyCircle) {
-              liveAccuracyCircle = L.circle([lat, lon], {
-                radius: acc,
-                color: "#ff7e5f",
-                fillOpacity: 0.1,
-                weight: 1
-              }).addTo(map);
-            } else {
-              liveAccuracyCircle.setLatLng([lat, lon]);
-              liveAccuracyCircle.setRadius(acc);
-            }
-            map.setView([lat, lon], 17);
-            btn.textContent = 'Stop Live Location';
-          },
-          (err) => {
-            console.error("Geolocation error:", err);
-            alert("Error getting location. Tracking stopped.");
-            toggleLive();
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-        );
-      }
-    }
+            if (!liveAccuracyCircle) {
+              liveAccuracyCircle = L.circle([lat, lon], {
+                radius: acc,
+                color: "#ff7e5f",
+                fillOpacity: 0.1,
+                weight: 1
+              }).addTo(map);
+            } else {
+              liveAccuracyCircle.setLatLng([lat, lon]);
+              liveAccuracyCircle.setRadius(acc);
+            }
+            map.setView([lat, lon], 17);
+            btn.textContent = 'Stop Live Location';
+          },
+          (err) => {
+            console.error("Geolocation error:", err);
+            alert("Error getting location. Tracking stopped.");
+            toggleLive();
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+      }
+    }
 
-    function prefetchTiles() {
-      const bbox = [75.5595, 26.8385, 75.5715, 26.8485];
-      const zooms = [15, 16, 17, 18];
-      
-      if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
-        alert('Service Worker is not active yet. Please refresh the page and try again.');
-        return;
-      }
-      
-      document.getElementById("offline-popup").style.display = "block";
-      navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', bbox: bbox, zooms: zooms });
-    }
+    function prefetchTiles() {
+      const bbox = [75.5595, 26.8385, 75.5715, 26.8485];
+      const zooms = [15, 16, 17, 18];
+      
+      if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+        alert('Service Worker is not active yet. Please refresh the page and try again.');
+        return;
+      }
+      
+      document.getElementById("offline-popup").style.display = "block";
+      navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', bbox: bbox, zooms: zooms });
+    }
 
-    // Attach event listeners to buttons
-    document.getElementById('goBtn').addEventListener('click', navigate);
-    document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
-    document.getElementById('liveToggle').addEventListener('click', toggleLive);
-    document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
-    document.getElementById('downloadOfflinebtn').addEventListener('click', prefetchTiles);
-    document.getElementById('darkModeBtn').addEventListener('click', toggleDark);
-  </script>
+    // Attach event listeners to buttons
+    document.getElementById('goBtn').addEventListener('click', navigate);
+    document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
+    document.getElementById('liveToggle').addEventListener('click', toggleLive);
+    document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
+    document.getElementById('downloadOfflinebtn').addEventListener('click', prefetchTiles);
+    document.getElementById('darkModeBtn').addEventListener('click', toggleDark);
+  </script>
 </body>
 </html>
