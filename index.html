@@ -120,143 +120,91 @@
     </section>
 
 <!-- HOW UNINAV WORKS — compact slider -->
-<section id="how-it-works" class="w-full px-4 my-10">
-  <div class="relative mx-auto max-w-xl">
-    <h2 class="text-center text-3xl font-extrabold text-[#F4E452] mb-4">
-      HOW UNINAV WORKS
-    </h2>
+<section id="how-it-works" class="w-full max-w-3xl mx-auto text-center my-16">
+<h1 class="text-5xl font-extrabold text-[#F4E452] mb-10 drop-shadow-lg">HOW UNINAV WORKS?</h1>
 
-    <!-- Slider shell -->
-    <div class="relative overflow-hidden rounded-2xl bg-[#F4E452]/10 ring-1 ring-black/10 shadow-lg">
 
-      <!-- Track (JS sets width & slide widths) -->
-      <div id="hiw-track" class="flex transition-transform duration-600 ease-out">
+<!-- Slider Container -->
+<div class="relative overflow-hidden">
+<div id="slider" class="flex transition-transform duration-700 ease-in-out">
+<!-- Step 1 -->
+<div class="w-full flex-shrink-0 text-center p-6">
+<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/1.png" alt="Step 1" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-3/4">
+<h3 class="text-xl font-bold text-[#963646] mb-2">Step 1: Open the Website</h3>
+<p class="text-gray-800 text-base">Go to mujmaps.netlify.app on your browser. The homepage will load with the interactive MUJ campus map.</p>
+</div>
+</div>
 
-        <!-- Slide 1 -->
-        <article class="p-4">
-          <div class="rounded-xl bg-[#FFF06A] p-4 shadow">
-            <h3 class="text-lg font-bold text-[#963646] mb-3">Step 1: Open the Website</h3>
-            <img
-              src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/1.png"
-              alt="Step 1"
-              class="w-full max-h-56 object-contain rounded-lg mb-3"
-            />
-            <p class="text-gray-800 text-sm">
-              Go to mujmaps.netlify.app on your browser. The homepage will load with the interactive MUJ campus map.
-            </p>
-          </div>
-        </article>
 
-        <!-- Slide 2 -->
-        <article class="p-4">
-          <div class="rounded-xl bg-[#FFF06A] p-4 shadow">
-            <h3 class="text-lg font-bold text-[#963646] mb-3">Step 2: Search Your Location</h3>
-            <img
-              src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/2.png"
-              alt="Step 2"
-              class="w-full max-h-56 object-contain rounded-lg mb-3"
-            />
-            <p class="text-gray-800 text-sm">
-              Use the search bar to type the name of a building, block, or facility (e.g., “Library”, “Hostel”, “Mess”).
-            </p>
-          </div>
-        </article>
+<!-- Step 2 -->
+<div class="w-full flex-shrink-0 text-center p-6">
+<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/2.png" alt="Step 2" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-3/4">
+<h3 class="text-xl font-bold text-[#963646] mb-2">Step 2: Search for a Location</h3>
+<p class="text-gray-800 text-base">Use the search bar at the top to type in the name of a building, block, or facility (e.g., "Library", "Hostel", "Mess").</p>
+</div>
+</div>
 
-        <!-- Slide 3 -->
-        <article class="p-4">
-          <div class="rounded-xl bg-[#FFF06A] p-4 shadow">
-            <h3 class="text-lg font-bold text-[#963646] mb-3">Step 3: Get Directions</h3>
-            <img
-              src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/phonemockup.png"
-              alt="Step 3"
-              class="w-full max-h-56 object-contain rounded-lg mb-3"
-            />
-            <p class="text-gray-800 text-sm">
-              Click a result to view details and tap “Directions”. The route will be highlighted on the map.
-            </p>
-          </div>
-        </article>
 
-        <!-- Slide 4 -->
-        <article class="p-4">
-          <div class="rounded-xl bg-[#FFF06A] p-4 shadow">
-            <h3 class="text-lg font-bold text-[#963646] mb-3">Step 4: Navigate the Campus</h3>
-            <img
-              src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/4.png"
-              alt="Step 4"
-              class="w-full max-h-56 object-contain rounded-lg mb-3"
-            />
-            <p class="text-gray-800 text-sm">
-              Follow the highlighted path to reach your destination within the MUJ campus.
-            </p>
-          </div>
-        </article>
+<!-- Step 3 -->
+<div class="w-full flex-shrink-0 text-center p-6">
+<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/phonemockup.png" alt="Step 3" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-3/4">
+<h3 class="text-xl font-bold text-[#963646] mb-2">Step 3: Get Directions</h3>
+<p class="text-gray-800 text-base">Click on the location to view details and select the option to get directions. The map will highlight the route for you.</p>
+</div>
+</div>
 
-      </div>
 
-      <!-- Prev / Next -->
-      <button id="hiw-prev"
-        class="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 grid place-items-center rounded-full bg-[#963646] text-white shadow-md">
-        ‹
-      </button>
-      <button id="hiw-next"
-        class="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 grid place-items-center rounded-full bg-[#963646] text-white shadow-md">
-        ›
-      </button>
-    </div>
+<!-- Step 4 -->
+<div class="w-full flex-shrink-0 text-center p-6">
+<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/4.png" alt="Step 4" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-3/4">
+<h3 class="text-xl font-bold text-[#963646] mb-2">Step 4: Navigate the Campus</h3>
+<p class="text-gray-800 text-base">Follow the highlighted path on the map to easily reach your destination within the MUJ campus.</p>
+</div>
+</div>
 
-    <!-- Dots -->
-    <div id="hiw-dots" class="mt-3 flex items-center justify-center gap-2">
-      <button class="hiw-dot h-2.5 w-2.5 rounded-full bg-white/30" data-index="0"></button>
-      <button class="hiw-dot h-2.5 w-2.5 rounded-full bg-white/30" data-index="1"></button>
-      <button class="hiw-dot h-2.5 w-2.5 rounded-full bg-white/30" data-index="2"></button>
-      <button class="hiw-dot h-2.5 w-2.5 rounded-full bg-white/30" data-index="3"></button>
-    </div>
-  </div>
+
+</div>
+
+
+<!-- Navigation buttons -->
+<button id="prev" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">‹</button>
+<button id="next" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">›</button>
+</div>
 </section>
 
+
+<style>
+@keyframes glow {
+0%, 100% { box-shadow: 0 0 15px rgba(150, 54, 70, 0.6); }
+50% { box-shadow: 0 0 30px rgba(150, 54, 70, 1); }
+}
+.animate-glow {
+animation: glow 2s infinite ease-in-out;
+}
+</style>
+
+
 <script>
-(() => {
-  const track = document.getElementById('hiw-track');
-  const slides = Array.from(track.children);
-  const prev = document.getElementById('hiw-prev');
-  const next = document.getElementById('hiw-next');
-  const dots = Array.from(document.querySelectorAll('#hiw-dots .hiw-dot'));
-  let i = 0;
+const slider = document.getElementById('slider');
+const slides = slider.children.length;
+let index = 0;
 
-  // Make track and slides responsive and compact
-  function sizeSlides() {
-    track.style.width = `${slides.length * 100}%`;
-    slides.forEach(s => { s.style.width = `${100 / slides.length}%`; });
-    setHeight();
-  }
 
-  function setHeight() {
-    // Match container height to active slide for a tight fit
-    const container = track.parentElement;
-    const active = slides[i].querySelector('.rounded-xl');
-    container.style.height = active.offsetHeight + 16 + 'px'; // + small padding
-  }
+document.getElementById('next').addEventListener('click', () => {
+index = (index + 1) % slides;
+slider.style.transform = `translateX(-${index * 100}%)`;
+});
 
-  function go(n) {
-    i = (n + slides.length) % slides.length;
-    track.style.transform = `translateX(-${i * (100 / slides.length)}%)`;
-    dots.forEach((d, idx) => {
-      d.classList.toggle('bg-white', idx === i);
-      d.classList.toggle('bg-white/30', idx !== i);
-    });
-    setHeight();
-  }
 
-  prev.addEventListener('click', () => go(i - 1));
-  next.addEventListener('click', () => go(i + 1));
-  dots.forEach(d => d.addEventListener('click', () => go(+d.dataset.index)));
-
-  window.addEventListener('load', () => { sizeSlides(); go(0); });
-  window.addEventListener('resize', setHeight);
-})();
+document.getElementById('prev').addEventListener('click', () => {
+index = (index - 1 + slides) % slides;
+slider.style.transform = `translateX(-${index * 100}%)`;
+});
 </script>
-
 
 
 
@@ -307,6 +255,7 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
