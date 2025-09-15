@@ -1,59 +1,77 @@
-// Typewriter effect
+// This script runs after the entire HTML document is fully loaded and parsed.
 document.addEventListener("DOMContentLoaded", () => {
-  const text = "Explore the vibrant life and architecture of Manipal University and its hostels with our one-stop map navigator.";
-  const element = document.getElementById("typewriter");
-  let index = 0;
-  setTimeout(() => {
-    const typing = setInterval(() => {
-      element.textContent += text.charAt(index);
-      index++;
-      if (index === text.length) clearInterval(typing);
-    }, 50);
-  }, 2000);
-});
+  // Mobile Menu Toggle
+  const menuToggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
+  const navItems = navLinks.querySelectorAll("a");
 
-// Mobile Menu Toggle
-document.getElementById("menu-toggle").addEventListener("click", () => {
-  document.getElementById("nav-links").classList.toggle("hidden");
-});
-
-// Counter animations
-const counters = document.querySelectorAll('.counter');
-let started = false;
-const speed = 50;
-
-function animateCounters() {
-  counters.forEach(counter => {
-    const updateCount = () => {
-      const target = +counter.getAttribute('data-target');
-      const count = +counter.innerText;
-      const increment = Math.ceil(target / speed);
-      if (count < target) {
-        counter.innerText = count + increment;
-        setTimeout(updateCount, 40);
-      } else {
-        counter.innerText = target + "+";
-      }
-    };
-    updateCount();
-  });
-}
-
-window.addEventListener("scroll", () => {
-  const statsSection = document.getElementById("stats");
-  if (!started) {
-    const rect = statsSection.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom >= 0) {
-      started = true;
-      animateCounters();
-    }
+  // Toggle mobile menu on click
+  if (menuToggle) {
+    menuToggle.addEventListener("click", () => {
+      navLinks.classList.toggle("hidden");
+    });
   }
-});
 
+  // Hide mobile menu when a navigation link is clicked
+  navItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      navLinks.classList.add("hidden");
+    });
+  });
+
+  // Typewriter effect for the hero section
+  const typewriterElement = document.getElementById("typewriter");
+  if (typewriterElement) {
+    const text =
+      "Explore the vibrant life and architecture of Manipal University and its hostels with our one-stop map navigator.";
+    let index = 0;
+
+    const typing = setInterval(() => {
+      typewriterElement.textContent += text.charAt(index);
+      index++;
+      if (index === text.length) {
+        clearInterval(typing);
+      }
+    }, 50); // Adjust typing speed here
+  }
+
+  // Counter animation using Intersection Observer
+  const counters = document.querySelectorAll(".counter");
+  const speed = 200; // The total number of steps to reach the target
+
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const counter = entry.target;
+          const target = +counter.getAttribute("data-target");
+          const updateCount = () => {
+            const count = +counter.innerText;
+            const increment = target / speed;
+
+            if (count < target) {
+              counter.innerText = Math.ceil(count + increment);
+              setTimeout(updateCount, 1);
+            } else {
+              counter.innerText = target;
+            }
+          };
+          updateCount();
+          observer.unobserve(counter); // Stop observing after animation
+        }
+      });
+    },
+    { threshold: 0.5 }
+  ); // Trigger when 50% of the element is visible
+
+  counters.forEach((counter) => {
+    observer.observe(counter);
+  });
+
+  // Service Worker Registration
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => console.log('Service Worker registered:', reg))
       .catch(err => console.log('Service Worker failed:', err));
   }
-
-
+});
