@@ -1,27 +1,31 @@
-const cacheName = 'muj-navigator-v1';
-const assetsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+const CACHE_NAME = "muj-navigator-cache-v1";
+const urlsToCache = [
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png"
 ];
 
-// Install
-self.addEventListener('install', event => {
+// Install SW
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(cacheName).then(cache => cache.addAll(assetsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-// Activate
-self.addEventListener('activate', event => {
+// Activate SW
+self.addEventListener("activate", event => {
   event.waitUntil(self.clients.claim());
 });
 
-// Fetch
-self.addEventListener('fetch', event => {
+// Fetch requests
+self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
