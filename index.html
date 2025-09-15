@@ -159,57 +159,61 @@
         }
         /* Mobile adjustments */
         @media (max-width: 600px) {
-            .mobile-button-container {
-                position: fixed;
-                bottom: 15px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 95%;
-                max-width: 400px;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                z-index: 1500;
-            }
-            .live-toggle,
-            .cancel-trip {
-                position: static;
-                width: 100%;
-                margin: 0;
-                border-radius: 12px;
-                padding: 12px 0;
-                font-size: 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-            .travel-info-box {
-                bottom: 85px;
-                left: 14px;
-                right: 14px;
-                min-width: auto;
-                font-size: 13px;
-                padding: 12px 14px;
-            }
-            .input-box {
-                flex-direction: column;
-                gap: 10px;
-                padding: 12px 14px;
-                font-size: 13px;
-            }
-            .input-box input {
-                font-size: 13px;
-                padding: 8px 10px;
-            }
-            .btn {
-                width: 100%;
-                text-align: center;
-                padding: 10px 0;
-                font-size: 13px;
-            }
-            #suggestions {
-                max-height: 140px;
-                font-size: 14px;
-            }
-        }
+    .mobile-button-container {
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1500;
+    }
+    .live-toggle,
+    .cancel-trip {
+        position: static;
+        width: 100%;
+        margin: 0;
+        border-radius: 12px;
+        padding: 12px 0;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .travel-info-box {
+        position: fixed; /* Changed to fixed to better handle different screen sizes */
+        bottom: 120px; /* Adjusted to sit above the mobile button container */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95%;
+        max-width: 400px;
+        min-width: auto;
+        font-size: 13px;
+        padding: 12px 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .input-box {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+    .input-box input {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+    .btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 13px;
+    }
+    #suggestions {
+        max-height: 140px;
+        font-size: 14px;
+    }
+}
         #downloadOfflinebtn, #darkModeBtn {
             position: fixed;
             top: 20px;
