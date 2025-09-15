@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#007bff">
   <title>Manipal Uninav</title>
   <link rel="icon" type="image/png" href="image/weblogo.png" />
   <meta charset="utf-8" />
@@ -621,6 +623,13 @@
       document.getElementById("offline-popup").style.display = "block";
       navigator.serviceWorker.controller.postMessage({ type: 'PREFETCH_TILES', bbox: bbox, zooms: zooms });
     }
+    if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js")
+        .then(reg => console.log("SW registered:", reg))
+        .catch(err => console.log("SW registration failed:", err));
+    });
+  }
 
     // Attach event listeners to buttons
     document.getElementById('goBtn').addEventListener('click', navigate);
