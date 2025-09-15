@@ -1,247 +1,349 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#007bff">
-  <title>Manipal Uninav</title>
-  <link rel="icon" type="image/png" href="image/weblogo.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#ff7e5f">
+    <title>Manipal UniNav</title>
+    <link rel="icon" type="image/png" href="image/weblogo.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .navbar-font {
+            font-family: 'Outfit', sans-serif;
+        }
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+        .logo-shine {
+            background: linear-gradient(135deg, #FF780A, #F4E452, #FF780A);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(150, 54, 70, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(150, 54, 70, 1); }
+        }
+        .stat-card {
+            background-color: #f4e452;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            width: 250px;
+            text-align: center;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+        }
+        .stat-card.glow {
+            animation: glow 2s infinite ease-in-out;
+        }
+        .glow-btn {
+            background: linear-gradient(135deg, #F4E452, #FF780A);
+            background-size: 200% auto;
+            color: black;
+            font-weight: bold;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 20px rgba(244, 228, 82, 0.4);
+            animation: glow-btn-anim 2s infinite;
+        }
+        .glow-btn:hover {
+            background-position: right center;
+            box-shadow: 0 15px 30px rgba(244, 228, 82, 0.6);
+        }
+        @keyframes glow-btn-anim {
+            0% { box-shadow: 0 0 10px rgba(244, 228, 82, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(244, 228, 82, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(244, 228, 82, 0.4); }
+        }
+        .header-gradient {
+            background: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%);
+            color: white;
+        }
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        #typewriter {
+            overflow: hidden;
+            border-right: .15em solid orange;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typewriter 4s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: orange; }
+        }
+        @media (max-width: 639px) {
+            #nav-links {
+                background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(255,120,10,0.9));
+            }
+        }
+    </style>
 </head>
-<body class="header-gradient backdrop-blur-md shadow-md">
+<body class="header-gradient font-sans">
 
-    <nav class="sticky top-0 z-50 w-full bg-gradient-to-r from-black via-orange-600 to-[#FF780A] bg-opacity-95 backdrop-blur-md shadow-md">
-    <div class="max-w-10xl mx-auto px-8">
-      <div class="flex justify-between items-center h-20">
-        
-                <a href="#hero" class="logo-shine navbar-font text-black text-3xl font-bold tracking-tight">
-          Manipal UniNav
-        </a>
+    <header class="sticky top-0 z-50 w-full bg-gradient-to-r from-black via-orange-600 to-[#FF780A] bg-opacity-95 backdrop-blur-md shadow-md">
+        <nav class="max-w-10xl mx-auto px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="#hero" class="logo-shine navbar-font text-black text-3xl font-bold tracking-tight">
+                    Manipal UniNav
+                </a>
+                <button id="menu-toggle" class="sm:hidden text-white text-3xl focus:outline-none">☰</button>
+                <div id="nav-links" class="hidden sm:flex space-x-8 flex-col sm:flex-row sm:items-center sm:space-x-8 absolute sm:static top-20 right-0 sm:top-auto sm:right-auto bg-transparent p-4 sm:p-0 rounded-lg sm:rounded-none shadow-lg sm:shadow-none">
+                    <a href="#home" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Home</a>
+                    <a href="#about" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">About</a>
+                    <a href="#stats" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Stats</a>
+                    <a href="#maps" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Maps</a>
+                    <a href="#how-it-works" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Guide</a>
+                    <a href="#team" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Team</a>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-                <button id="menu-toggle" class="sm:hidden text-white text-3xl focus:outline-none">☰</button>
+    <main class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+        <section id="hero" class="navbar-font w-full max-w-4xl text-center my-12 md:my-20">
+            <h2 class="text-4xl sm:text-6xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
+                Welcome To
+            </h2>
+            <h1 class="fade-in text-4xl sm:text-8xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
+                Manipal UniNav
+            </h1>
+            <p class="mt-4 text-lg text-[#FF780A] max-w-3xl mx-auto">
+                <br><span id="typewriter"></span>
+            </p>
+        </section>
+        
+        <section id="about" class="relative w-full max-w-4xl mx-auto my-16">
+            <div class="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-40 bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500"></div>
+            <div class="bg-[#F4E452] p-10 rounded-3xl shadow-xl">
+                <h2 class="text-4xl font-bold text-[#963646] mb-4 text-center">About Manipal UniNav</h2>
+                <p class="text-black leading-relaxed text-center">
+                    Finding your way around a large university campus can be confusing, especially for new students or visitors.
+                    <b>Manipal UniNav</b> is our interactive navigation platform designed to make this easier. Manipal UniNav is built with a simple vision:
+                    to help everyone on campus find their way without hassle—whether it's a new student figuring out where their next class is,
+                    or a visitor locating the auditorium. With open-source tools and thoughtful design, we’ve created a solution that’s light, fast, and scalable.
+                    The project is split into two core parts, each maintained in separate repositories and deployed individually:
+                    <br><br>
+                    <b>The Interactive Map Module</b> – This is the heart of the navigation experience. It uses maps sourced from OpenStreetMap and other
+                    open-source map providers, ensuring free and reliable access to detailed, customizable mapping data. For real-time routing and pathfinding,
+                    we’ve integrated the OpenRouteService (ORS) API, which provides accurate walking directions and seamless navigation.
+                    <br><br>
+                    We've divided the university into two distinct zones:
+                    <br><br>
+                    <b>The College Campus</b> – housing academic blocks, libraries, labs, and administrative buildings.
+                    <b>The Hostel Campus</b> – including student housing, mess areas, and nearby recreational spots.
+                    This separation helps in organizing routes more efficiently and ensures users can easily toggle between academic and residential navigation.
+                </p>
+            </div>
+        </section>
+        
+        <section id="stats" class="w-full max-w-5xl text-center my-12">
+            <h2 class="text-5xl font-bold text-[#F4E452] mb-6">UNINAV'S PROSPECTIVE IMPACT</h2>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-8">
+                <div class="stat-card glow">
+                    <h3 class="counter text-5xl font-extrabold text-[#963646]" data-target="6000">0</h3>
+                    <p class="text-black">Students Will Be Helped</p>
+                </div>
+                <div class="stat-card glow">
+                    <h3 class="counter text-5xl font-extrabold text-[#963646]" data-target="30">0</h3>
+                    <p class="text-black">Buildings Covered</p>
+                </div>
+                <div class="stat-card glow">
+                    <h3 class="counter text-5xl font-extrabold text-[#963646]" data-target="10">0</h3>
+                    <p class="text-black">Guides Available</p>
+                </div>
+            </div>
+        </section>
+        
+        <div class="flex justify-center my-6">
+            <a href="https://mujmaps.netlify.app" target="_blank"
+               class="glow-btn px-10 py-5 text-2xl text-black flex items-center justify-center text-black rounded-full shadow-lg">
+                Open Campus Map
+            </a>
+        </div>
+        
+        <section id="maps" class="w-full max-w-4xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-12 text-center">
+            <h2 class="navbar-font text-4xl font-bold text-[#963646] mb-6">Campus Map</h2>
+            <a href="https://mujmaps.netlify.app" target="_blank" class="block rounded-2xl overflow-hidden shadow-lg transform transition duration-300 hover:scale-105">
+                <iframe src="https://mujmaps.netlify.app" class="w-full h-96 pointer-events-none" style="border:0;" loading="lazy"></iframe>
+            </a>
+            <p class="mt-4 text-black navbar-font">
+                Click the map above to explore the full interactive MUJ Navigator.
+            </p>
+        </section>
+        
+        <section id="how-it-works" class="w-full max-w-4xl mx-auto text-center my-16">
+            <h1 class="text-6xl font-extrabold text-[#F4E452] mb-10 drop-shadow-lg">HOW UNINAV WORKS?</h1>
+            <div class="relative overflow-hidden">
+                <div id="slider" class="flex transition-transform duration-700 ease-in-out">
+                    <div class="w-full flex-shrink-0 text-center p-6">
+                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+                            <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/1.png" alt="Step 1" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
+                            <h3 class="text-2xl font-bold text-[#963646] mb-2">Step 1: Open the Website</h3>
+                            <p class="text-gray-800 text-base">Go to mujmaps.netlify.app on your browser. The homepage will load with the interactive MUJ campus map.</p>
+                        </div>
+                    </div>
+                    <div class="w-full flex-shrink-0 text-center p-6">
+                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+                            <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/2.png" alt="Step 2" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
+                            <h3 class="text-2xl font-bold text-[#963646] mb-2">Step 2: Search for a Location</h3>
+                            <p class="text-gray-800 text-base">Use the search bar at the top to type in the name of a building, block, or facility (e.g., "Library", "Hostel", "Mess").</p>
+                        </div>
+                    </div>
+                    <div class="w-full flex-shrink-0 text-center p-6">
+                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+                            <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/phonemockup.png" alt="Step 3" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
+                            <h3 class="text-2xl font-bold text-[#963646] mb-2">Step 3: Get Directions</h3>
+                            <p class="text-gray-800 text-base">Click on the location to view details and select the option to get directions. The map will highlight the route for you.</p>
+                        </div>
+                    </div>
+                    <div class="w-full flex-shrink-0 text-center p-6">
+                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
+                            <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/4.png" alt="Step 4" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
+                            <h3 class="text-2xl font-bold text-[#963646] mb-2">Step 4: Navigate the Campus</h3>
+                            <p class="text-gray-800 text-base">Follow the highlighted path on the map to easily reach your destination within the MUJ campus.</p>
+                        </div>
+                    </div>
+                </div>
+                <button id="prev" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">‹</button>
+                <button id="next" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">›</button>
+            </div>
+        </section>
+        
+        <section id="team" class="w-full max-w-6xl text-center my-20">
+            <h1 class="text-6xl font-extrabold text-[#F4E452] mb-12 drop-shadow-lg">Meet The Team</h1>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-12">
+                <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50">
+                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                    <img src="./image/bhargavi.jpeg"
+                         class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Bhargavi">
+                    <h3 class="text-2xl font-bold text-[#963646] mt-4">Bhargavi Chaudhary</h3>
+                    <p class="text-gray-600">UI/UX Designer</p>
+                </div>
+                <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50">
+                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                    <img src="./image/anmol.jpeg"
+                         class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Anmol">
+                    <h3 class="text-2xl font-bold text-[#963646] mt-4">Anmol Srivastava</h3>
+                    <p class="text-gray-600">Lead Developer</p>
+                </div>
+                <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50">
+                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                    <img src="./image/tavishi.jpeg"
+                         class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Tavishi">
+                    <h3 class="text-2xl font-bold text-[#963646] mt-4">Tavishi Singh</h3>
+                    <p class="text-gray-600">Content & Maps</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="w-full text-center text-[#F4E452] py-6 mt-12 border-t border-gray-200">
+            © 2025 Manipal UniNav. Made with ❤️ by Team CCG(Campus Compass Guide). All rights reserved.
+        </footer>
+    </main>
 
-                <div id="nav-links" class="hidden sm:flex space-x-8 flex-col sm:flex-row sm:items-center sm:space-x-8 absolute sm:static top-20 right-0 sm:top-auto sm:right-auto bg-transparent p-4 sm:p-0 rounded-lg sm:rounded-none shadow-lg sm:shadow-none">
-          <a href="#home" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Home</a>
-          <a href="#about" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">About</a>
-          <a href="#stats" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Stats</a>
-          <a href="#maps" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Maps</a>
-          <a href="#how-it-works" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Guide</a>
-          <a href="#team" class="text-xl toggle-button navbar-font text-white hover:text-yellow-300 transition">Team</a>
-        </div>
-      </div>
-    </div>
-  </nav>
+    <script>
+        // Menu toggle functionality for mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
 
-  <main class="min-h-screen flex flex-col items-center p-4 sm:p-8">
-    
-        <section id="hero" class="navbar-font w-full max-w-4xl text-center my-12 md:my-20 ">
-      <h2 class="text-4xl sm:text-6xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
-        Welcome To
-      </h2>
-      <h1 class="fade-in text-4xl sm:text-8xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
-        Manipal UniNav 
-      </h1>
-      <p class="mt-4 text-lg text-[#FF780A] max-w-3xl mx-auto">
-        <br><span id="typewriter"></span>
-      </p>
-    </section>
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('hidden');
+            navLinks.classList.toggle('absolute');
+            navLinks.classList.toggle('flex-col');
+            navLinks.classList.toggle('sm:hidden');
+            navLinks.classList.toggle('sm:static');
+        });
 
-    <section id="about" class="relative w-full max-w-4xl mx-auto my-16">
-  
-    <div class="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-40 bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500"></div>
-  
-    <div class="bg-[#F4E452] p-10 rounded-3xl shadow-xl">
-    <h2 class="text-4xl font-bold text-[#963646] mb-4 text-center">About Manipal UniNav</h2>
-    <p class="text-black leading-relaxed text-center">
-      Finding your way around a large university campus can be confusing, especially for new students or visitors. 
-      <b>Manipal UniNav</b> is our interactive navigation platform designed to make this easier. Manipal UniNav is built with a simple vision: 
-      to help everyone on campus find their way without hassle—whether it's a new student figuring out where their next class is, 
-      or a visitor locating the auditorium. With open-source tools and thoughtful design, we’ve created a solution that’s light, fast, and scalable. 
-      The project is split into two core parts, each maintained in separate repositories and deployed individually:
-      <br><br>
-      <b>The Interactive Map Module</b> – This is the heart of the navigation experience. It uses maps sourced from OpenStreetMap and other 
-      open-source map providers, ensuring free and reliable access to detailed, customizable mapping data. For real-time routing and pathfinding, 
-      we’ve integrated the OpenRouteService (ORS) API, which provides accurate walking directions and seamless navigation. 
-      <br><br>
-      We've divided the university into two distinct zones: 
-      <br><br>
-      <b>The College Campus</b> – housing academic blocks, libraries, labs, and administrative buildings.  
-      <b>The Hostel Campus</b> – including student housing, mess areas, and nearby recreational spots.  
-      This separation helps in organizing routes more efficiently and ensures users can easily toggle between academic and residential navigation.
-    </p>
-  </div>
-</section>
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('.toggle-button').forEach(link => {
+            link.addEventListener('click', () => {
+                if (!navLinks.classList.contains('hidden')) {
+                    navLinks.classList.add('hidden');
+                    navLinks.classList.add('sm:flex');
+                }
+            });
+        });
 
-         <section id="stats" class="w-full max-w-5xl text-center my-12">
-    <h2 class="text-5xl font-bold text-[#F4E452] mb-6"> UNINAV'S PROSPECTIVE IMPACT</h2>
-    <div class="flex flex-col sm:flex-row justify-center items-center gap-8">
-        <div class="stat-card glow">
-          <h3 class="counter text-5xl font-extrabold text-white" data-target="6000">0</h3>
-          <p class="text-[#F4E452]">Students Will Be Helped</p>
-        </div>
-        <div class="stat-card glow">
-          <h3 class="counter text-5xl font-extrabold text-white" data-target="30"></h3>
-          <p class="text-[#F4E452]">Buildings Covered</p>
-        </div>
-        <div class="stat-card glow">
-          <h3 class="counter text-5xl font-extrabold text-white" data-target="10"></h3>
-          <p class="text-[#F4E452]">Guides Available</p>
-        </div>
-    </div>
-</section>
-    
-    
-        <!-- Open Campus Map Button -->
-    <div class="flex justify-center my-6">
-      <a href="https://mujmaps.netlify.app" target="_blank" 
-         class="glow-btn px-10 py-5 text-2xl text-black flex items-center justify-center text-black rounded-full shadow-lg">
-        Open Campus Map
-      </a>
-    </div>
+        // Typewriter effect
+        const text = "A campus navigation platform to make your journey smoother!";
+        const typewriterEl = document.getElementById('typewriter');
+        let i = 0;
 
-        <section id="maps" class="w-full max-w-4xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-12 text-center">
-      <h2 class="navbar-font text-4xl font-bold text-[#963646] mb-6">Campus Map</h2>
-      <a href="https://mujmaps.netlify.app" target="_blank" class="block rounded-2xl overflow-hidden shadow-lg transform transition duration-300 hover:scale-105">
-        <iframe src="https://mujmaps.netlify.app" class="w-full h-96 pointer-events-none" style="border:0;" loading="lazy"></iframe>
-      </a>
-      <p class="mt-4 text-[#000000] navbar-font">
-        Click the map above to explore the full interactive MUJ Navigator.
-      </p>
-    </section>
+        function typeWriter() {
+            if (i < text.length) {
+                typewriterEl.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50); // Adjust typing speed
+            }
+        }
+        document.addEventListener('DOMContentLoaded', typeWriter);
 
-<section id="how-it-works" class="w-full max-w-4xl mx-auto text-center my-16">
-<h1 class="text-6xl font-extrabold text-[#F4E452] mb-10 drop-shadow-lg">HOW UNINAV WORKS?</h1>
+        // Counter animation
+        const counters = document.querySelectorAll('.counter');
+        const options = {
+            root: null,
+            threshold: 0.5
+        };
 
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = parseInt(entry.target.getAttribute('data-target'));
+                    let count = 0;
+                    const interval = setInterval(() => {
+                        if (count < target) {
+                            count += Math.ceil(target / 100);
+                            if (count > target) count = target;
+                            entry.target.textContent = count;
+                        } else {
+                            clearInterval(interval);
+                        }
+                    }, 20); // Adjust counting speed
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, options);
 
-<div class="relative overflow-hidden">
-<div id="slider" class="flex transition-transform duration-700 ease-in-out">
-<div class="w-full flex-shrink-0 text-center p-6">
-<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/1.png" alt="Step 1" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-<h3 class="text-2xl font-bold text-[#963646] mb-2">Step 1: Open the Website</h3>
-<p class="text-gray-800 text-base">Go to mujmaps.netlify.app on your browser. The homepage will load with the interactive MUJ campus map.</p>
-</div>
-</div>
+        counters.forEach(counter => {
+            observer.observe(counter);
+        });
 
+        // Image slider logic
+        const slider = document.getElementById('slider');
+        const slides = slider.children.length;
+        let index = 0;
 
-<div class="w-full flex-shrink-0 text-center p-6">
-<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/2.png" alt="Step 2" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-<h3 class="text-2xl font-bold text-[#963646] mb-2">Step 2: Search for a Location</h3>
-<p class="text-gray-800 text-base">Use the search bar at the top to type in the name of a building, block, or facility (e.g., "Library", "Hostel", "Mess").</p>
-</div>
-</div>
+        document.getElementById('next').addEventListener('click', () => {
+            index = (index + 1) % slides;
+            slider.style.transform = `translateX(-${index * 100}%)`;
+        });
 
-
-<div class="w-full flex-shrink-0 text-center p-6">
-<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/phonemockup.png" alt="Step 3" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-<h3 class="text-2xl font-bold text-[#963646] mb-2">Step 3: Get Directions</h3>
-<p class="text-gray-800 text-base">Click on the location to view details and select the option to get directions. The map will highlight the route for you.</p>
-</div>
-</div>
-
-
-<div class="w-full flex-shrink-0 text-center p-6">
-<div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-<img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/4.png" alt="Step 4" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-<h3 class="text-2xl font-bold text-[#963646] mb-2">Step 4: Navigate the Campus</h3>
-<p class="text-gray-800 text-base">Follow the highlighted path on the map to easily reach your destination within the MUJ campus.</p>
-</div>
-</div>
-
-
-</div>
-
-
-<button id="prev" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">‹</button>
-<button id="next" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">›</button>
-</div>
-</section>
-
-
-<style>
-@keyframes glow {
-0%, 100% { box-shadow: 0 0 15px rgba(150, 54, 70, 0.6); }
-50% { box-shadow: 0 0 30px rgba(150, 54, 70, 1); }
-}
-.animate-glow {
-animation: glow 2s infinite ease-in-out;
-}
-</style>
-
-
-<script>
-const slider = document.getElementById('slider');
-const slides = slider.children.length;
-let index = 0;
-
-
-document.getElementById('next').addEventListener('click', () => {
-index = (index + 1) % slides;
-slider.style.transform = `translateX(-${index * 100}%)`;
-});
-
-
-document.getElementById('prev').addEventListener('click', () => {
-index = (index - 1 + slides) % slides;
-slider.style.transform = `translateX(-${index * 100}%)`;
-});
-</script>
-
-
-
-
-
-  <section id="team" class="w-full max-w-6xl text-center my-20">
-  <h1 class="text-6xl font-extrabold text-[#F4E452] mb-12 drop-shadow-lg">Meet The Team</h1>
-  
-  <div class="flex flex-col sm:flex-row justify-center items-center gap-12">
-    
-        <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
-      <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/bhargavi.jpeg" 
-           class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Bhargavi">
-      <h3 class="text-2xl font-bold text-[#963646] mt-4">Bhargavi Chaudhary</h3>
-      <p class="text-gray-600">UI/UX Designer</p>
-    </div>
-    
-        <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50">
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
-      <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/anmol.jpeg" 
-           class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Anmol">
-      <h3 class="text-2xl font-bold text-[#963646] mt-4">Anmol Srivastava</h3>
-      <p class="text-gray-600">Lead Developer</p>
-    </div>
-    
-        <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50">
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
-      <img src="https://raw.githubusercontent.com/Anmol-Srivastava-073/manipalmap/refs/heads/main/image/tavishi.jpeg" 
-           class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Tavishi">
-      <h3 class="text-2xl font-bold text-[#963646] mt-4">Tavishi Singh</h3>
-      <p class="text-gray-600">Content & Maps</p>
-    </div>
-    
-  </div>
-</section>
-        <footer class="w-full text-center text-[#F4E452] py-6 mt-12 border-t border-gray-200">
-      © 2025 Manipal UniNav. Made with ❤️ by Team CCG(Campus Compass Guide). All rights reserved.
-    </footer>
-  </main>
-
-  <script src="script.js"></script>
+        document.getElementById('prev').addEventListener('click', () => {
+            index = (index - 1 + slides) % slides;
+            slider.style.transform = `translateX(-${index * 100}%)`;
+        });
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
