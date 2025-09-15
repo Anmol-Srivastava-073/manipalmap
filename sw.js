@@ -1,75 +1,54 @@
-const CACHE_NAME = "muj-navigator-cache-v1";
-const urlsToCache = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
-];
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-// Install Service Worker and cache assets
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('Opened cache and adding assets to it.');
-      return cache.addAll(urlsToCache);
-    })
-  );
-  self.skipWaiting(); // Forces the waiting service worker to become the active service worker
+const CACHE = "pwabuilder-page";
+
+// The correct offline fallback page name.
+const offlineFallbackPage = "offline.html";
+
+// This listener handles a message from the main page to skip the waiting phase,
+// which is useful for updating the service worker immediately.
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
-// Activate Service Worker and clean up old caches
-self.addEventListener("activate", event => {
-  const cacheWhitelist = [CACHE_NAME];
+// During the install phase, the service worker caches the offline fallback page.
+self.addEventListener('install', async (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      // Take control of uncontrolled clients immediately
-      return self.clients.claim();
-    })
+    caches.open(CACHE)
+      .then((cache) => cache.add(offlineFallbackPage))
   );
 });
 
-// Fetch requests using a cache-first strategy with network fallback
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      // If a response is found in the cache, return it
-      if (response) {
-        return response;
-      }
+// Enables navigation preload if it's supported by the browser. This allows the browser
+// to start fetching a navigation request in parallel with the service worker starting up.
+if (workbox.navigationPreload.isSupported()) {
+  workbox.navigationPreload.enable();
+}
 
-      // If no response is found, fetch from the network
-      return fetch(event.request).then(networkResponse => {
-        // Check if we received a valid response
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+// The fetch event listener intercepts network requests.
+self.addEventListener('fetch', (event) => {
+  // Check if the request is a navigation request (i.e., a new page load).
+  if (event.request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        // Try to use the preloaded response if available.
+        const preloadResp = await event.preloadResponse;
+        if (preloadResp) {
+          return preloadResp;
         }
 
-        // IMPORTANT: Clone the response. A response is a stream and
-        // can only be consumed once. We must clone it so that we can
-        // put it in the cache and also return the original to the browser.
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return networkResponse;
-      });
-    }).catch(() => {
-      // Optional: Handle offline fallbacks for specific requests
-      if (event.request.mode === 'navigate') {
-        return caches.match('/index.html');
+        // Otherwise, try to get the response from the network.
+        const networkResp = await fetch(event.request);
+        return networkResp;
+      } catch (error) {
+        // If the network request fails (e.g., user is offline),
+        // serve the cached offline fallback page.
+        const cache = await caches.open(CACHE);
+        const cachedResp = await cache.match(offlineFallbackPage);
+        return cachedResp;
       }
-    })
-  );
+    })());
+  }
 });
-
