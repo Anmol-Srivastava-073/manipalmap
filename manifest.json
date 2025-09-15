@@ -1,8 +1,11 @@
 {
   "name": "MUJ Navigator",
   "short_name": "Navigator",
+  "description": "An interactive campus navigation service for Manipal University Jaipur.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
   "icons": [
@@ -14,6 +17,11 @@
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-1024.png",
+      "sizes": "1024x1024",
       "type": "image/png"
     }
   ]
