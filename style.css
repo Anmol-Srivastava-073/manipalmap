@@ -2,10 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Apply Outfit font to the entire document */
+/* Apply Outfit font and larger base font size to the entire document */
 @layer base {
   html {
     font-family: 'Outfit', sans-serif;
+    font-size: 18px; /* Base font size for better readability */
+  }
+  h1 {
+    font-size: 4rem; /* Adjusting font size for main headings */
+    line-height: 1.2;
+  }
+  h2 {
+    font-size: 2.5rem; /* Adjusting font size for subheadings */
   }
 }
 
@@ -28,6 +36,7 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shineMove 3s linear infinite;
+  font-size: 2.5rem; /* Increased logo size */
 }
 @keyframes shineMove {
   from { background-position: 200% center; }
@@ -40,6 +49,7 @@
   border-radius: 8px;
   padding: 8px 16px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 1.25rem; /* Larger navigation text */
 }
 .toggle-button:hover {
   border-color: #FFD700;
@@ -71,7 +81,7 @@
 /* Stats cards styling */
 .stat-card {
   background: rgba(255, 255, 255, 0.05);
-  padding: 2rem;
+  padding: 3rem; /* Increased padding */
   border-radius: 1.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -91,6 +101,7 @@
 /* Team cards hover effect */
 .team-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 2.5rem; /* Increased padding */
 }
 .team-card:hover {
   transform: translateY(-10px);
@@ -102,6 +113,7 @@
   background: linear-gradient(90deg, #ffff69, #ffdd00);
   color: #000000;
   text-shadow: 0 0 5px rgba(0,0,0,0.5);
+  font-size: 1.5rem; /* Larger button text */
 }
 .glow-btn:hover {
   transform: scale(1.1);
