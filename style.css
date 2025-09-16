@@ -7,7 +7,7 @@
   html {
     font-family: 'Outfit', sans-serif;
     font-size: 18px; /* Base font size for better readability, as seen in the video */
-    scroll-padding-top: 5rem; /* Pushes content down to not hide behind sticky header */
+    scroll-padding-top: 5rem; /* This is the key fix for the scrolling issue */
   }
   h1 {
     font-size: 4rem; /* Adjusting font size for main headings */
