@@ -2,11 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Apply Outfit font and larger base font size to the entire document */
+/* Apply Outfit font and a larger base font size to the entire document */
 @layer base {
   html {
     font-family: 'Outfit', sans-serif;
-    font-size: 18px; /* Base font size for better readability */
+    font-size: 18px; /* Base font size for better readability, as seen in the video */
+    scroll-padding-top: 5rem; /* Pushes content down to not hide behind sticky header */
   }
   h1 {
     font-size: 4rem; /* Adjusting font size for main headings */
@@ -128,5 +129,5 @@
 @keyframes pulse-glow {
   0% { box-shadow: 0 0 15px rgba(255,120,10,.7), 0 0 30px rgba(255,228,82,.5); }
   50% { box-shadow: 0 0 25px rgba(255,120,10,.9), 0 0 45px rgba(255,228,82,.8); }
-  100% { box-shadow: 0 0 15px rgba(255,120,10,.7), 0 0 30px rgba(255,228,82,.5); }
+  100% { box-shadow: 0 0 15px rgba(255,120,10,.7), 0 0 30px rgba(255,120,10,.4); }
 }
