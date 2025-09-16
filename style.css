@@ -9,7 +9,7 @@
   }
 }
 
-/* Background animation for the header */
+/* Background animation for the main body */
 .header-gradient {
   background: linear-gradient(180deg, #4f3007, black, #8e4a07, black, #843f02);
   background-size: 100% 400%;
