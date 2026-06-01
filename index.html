@@ -9,6 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
+        :root {
+            --primary: #ff7e5f;
+            --primary-hover: #feb47b;
+        }
         html, body {
             height: 100%;
             margin: 0;
@@ -20,16 +24,21 @@
             background: #dfe6e9;
             transition: background-color 0.5s ease;
         }
-        .dark-mode #map {
-            background: #2f3640;
+        .dark-mode #map { background: #2f3640; }
+        
+        /* Focus Accessibility */
+        input:focus-visible, button:focus-visible {
+            outline: 3px solid #2980b9;
+            outline-offset: 2px;
         }
+
         .input-box {
             position: absolute;
             top: 15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1500;
-            background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
+            background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary) 100%);
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             padding: 10px 14px;
@@ -47,13 +56,10 @@
             border-radius: 8px;
             border: none;
             font-size: 14px;
-            outline: none;
             color: #333;
         }
-        .input-box input::placeholder {
-            color: #666;
-            font-style: italic;
-        }
+        .input-box input::placeholder { color: #666; font-style: italic; }
+        
         .btn {
             background: rgba(255, 255, 255, 0.9);
             border: none;
@@ -61,14 +67,13 @@
             padding: 6px 14px;
             font-weight: 700;
             cursor: pointer;
-            color: #ff7e5f;
+            color: var(--primary);
             transition: background-color 0.2s ease;
             white-space: nowrap;
             font-size: 13px;
         }
-        .btn:hover {
-            background-color: #fff4f1;
-        }
+        .btn:hover { background-color: #fff4f1; }
+        
         #suggestions {
             position: absolute;
             top: 60px;
@@ -91,10 +96,8 @@
             border-bottom: 1px solid #eee;
             color: #333;
         }
-        #suggestions div:hover {
-            background: #f7d7ca;
-            color: #ff7e5f;
-        }
+        #suggestions div:hover { background: #f7d7ca; color: var(--primary); }
+        
         .travel-info-box {
             position: absolute;
             bottom: 70px;
@@ -110,11 +113,10 @@
             font-size: 14px;
             line-height: 1.4;
             transition: background-color 0.5s ease, color 0.5s ease;
+            display: none; /* Hidden by default until route is active */
         }
-        .dark-mode .travel-info-box {
-            background: rgba(47, 54, 64, 0.95);
-            color: white;
-        }
+        .dark-mode .travel-info-box { background: rgba(47, 54, 64, 0.95); color: white; }
+        
         .live-toggle, .cancel-trip {
             position: absolute;
             bottom: 18px;
@@ -131,18 +133,18 @@
         }
         .live-toggle {
             right: 18px;
-            background: #ff7e5f;
+            background: var(--primary);
             box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
         }
-        .live-toggle:hover { background: #feb47b; }
+        .live-toggle:hover { background: var(--primary-hover); }
         .cancel-trip {
             left: 18px;
             background: #d63031;
             box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
+            display: none; /* Hidden until trip starts */
         }
         .cancel-trip:hover { background: #ff7675; }
         
-        /* Mobile adjustments */
         @media (max-width: 600px) {
             .mobile-button-container {
                 position: fixed;
@@ -159,48 +161,31 @@
             .live-toggle, .cancel-trip {
                 position: static;
                 width: 100%;
-                margin: 0;
                 border-radius: 12px;
                 padding: 12px 0;
                 font-size: 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
             .travel-info-box {
                 position: fixed; 
-                bottom: 120px; 
+                bottom: 140px; /* Increased clearance for mobile buttons */
                 left: 50%;
                 transform: translateX(-50%);
-                width: 95%;
-                max-width: 400px;
-                min-width: auto;
-                font-size: 13px;
-                padding: 12px 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                width: 90%;
+                max-width: 380px;
             }
-            .input-box {
-                flex-direction: column;
-                gap: 10px;
-                padding: 12px 14px;
-                font-size: 13px;
-            }
-            .input-box input {
-                font-size: 13px;
-                padding: 8px 10px;
-            }
-            .btn {
-                width: 100%;
-                text-align: center;
-                padding: 10px 0;
-                font-size: 13px;
-            }
-            #suggestions {
-                max-height: 140px;
-                font-size: 14px;
-            }
+            .input-box { flex-direction: column; }
+            .btn { width: 100%; padding: 10px 0; }
         }
-        #downloadOfflinebtn, #darkModeBtn {
+
+        .top-controls {
             position: fixed;
             top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1500;
+        }
+        .control-btn {
             color: white;
             border: none;
             padding: 10px 16px;
@@ -208,17 +193,10 @@
             cursor: pointer;
             font-size: 14px;
             box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-            z-index: 9999;
         }
-        #downloadOfflinebtn {
-            right: 20px;
-            background: #4caf50;
-        }
-        #darkModeBtn {
-            right: 150px;
-            background: #ff7e5f;
-            box-shadow: 0 3px 6px rgba(255, 126, 95, 0.6);
-        }
+        #downloadOfflinebtn { background: #4caf50; }
+        #darkModeBtn { background: var(--primary); }
+        
         #offline-popup {
             position: fixed;
             bottom: 20px;
@@ -235,25 +213,28 @@
         }
         #offline-popup .title { margin-bottom: 6px; font-weight: bold; }
         #offline-popup .progress-bar { background: #eee; height: 10px; border-radius: 5px; overflow: hidden; }
-        #offline-popup #offline-progress { background: #4caf50; height: 100%; width: 0%; }
-        #offline-popup #offline-status { margin-top: 6px; font-size: 12px; color: #666; }
+        #offline-popup #offline-progress { background: #4caf50; height: 100%; width: 0%; transition: width 0.3s; }
+        #offline-popup #offline-status { margin-top: 6px; font-size: 12px; color: #666; text-align: right;}
     </style>
 </head>
 <body>
-    <div id="map" aria-hidden="false"></div>
-    <div class="input-box" role="search" aria-label="Campus navigation">
-        <input id="from" type="text" placeholder="From (or use 📍)" aria-label="From location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
-        <button class="btn" title="Use current location" id="useCurrentBtn">📍</button>
-        <input id="to" type="text" placeholder="To" aria-label="To location" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" />
-        <button class="btn" id="goBtn" title="Navigate">Go ➜</button>
+    <main id="map" aria-label="Campus Map"></main>
+    
+    <div class="top-controls">
+        <button class="control-btn" id="darkModeBtn" title="Toggle Dark Mode">🌙</button>
+        <button class="control-btn" id="downloadOfflinebtn">📥 Offline</button>
+    </div>
+
+    <div class="input-box" role="search">
+        <input id="from" type="text" placeholder="From (or use 📍)" autocomplete="off" />
+        <button class="btn" id="useCurrentBtn" aria-label="Use current location">📍</button>
+        <input id="to" type="text" placeholder="To" autocomplete="off" />
+        <button class="btn" id="goBtn">Go ➜</button>
     </div>
     
-    <div id="suggestions" role="listbox" aria-label="Location suggestions"></div>
-    <div class="travel-info-box" id="travelInfo" aria-live="polite">
-        <b>Trip Info</b><br />
-        Distance: -- km<br />
-        Estimated time: -- mins
-    </div>
+    <div id="suggestions" role="listbox"></div>
+    
+    <div class="travel-info-box" id="travelInfo" aria-live="polite"></div>
     
     <div class="mobile-button-container">
         <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
@@ -261,55 +242,39 @@
     </div>
     
     <div id="offline-popup">
-        <div class="title">Downloading offline tiles…</div>
+        <div class="title">Downloading area…</div>
         <div class="progress-bar"><div id="offline-progress"></div></div>
         <div id="offline-status">0%</div>
     </div>
-    
-    <button id="downloadOfflinebtn">📥 Download for Offline</button>
-    <button id="darkModeBtn" title="Toggle Dark Mode">🌙</button>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        // 1. Service Worker Registration
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').then(reg => {
-                console.log('ServiceWorker registered successfully. Scope:', reg.scope);
-            }).catch(err => console.error('ServiceWorker registration failed:', err));
-
+            navigator.serviceWorker.register('/sw.js').catch(err => console.error('SW failed:', err));
             navigator.serviceWorker.addEventListener("message", (event) => {
                 const data = event.data || {};
                 const popupEl = document.getElementById("offline-popup");
-                const progressEl = document.getElementById("offline-progress");
-                const statusEl = document.getElementById("offline-status");
-
                 if (data.type === 'PREFETCH_PROGRESS') {
                     popupEl.style.display = "block";
                     const pct = Math.round((data.done / data.total) * 100);
-                    progressEl.style.width = pct + "%";
-                    statusEl.textContent = pct + "%";
+                    document.getElementById("offline-progress").style.width = pct + "%";
+                    document.getElementById("offline-status").textContent = pct + "%";
                 }
                 if (data.type === 'PREFETCH_DONE') {
-                    statusEl.textContent = "✅ Done!";
-                    setTimeout(() => { popupEl.style.display = "none"; }, 2000);
+                    document.getElementById("offline-status").textContent = "✅ Ready for offline use!";
+                    setTimeout(() => { popupEl.style.display = "none"; }, 2500);
                 }
             });
         }
 
-        // 2. Map Initialization
         const map = L.map('map').setView([26.8436, 75.565], 16);
-        const lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        const darkLayer = L.tileLayer(
-            'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-            { attribution: '&copy; OpenStreetMap &copy; CartoDB' }
-        );
+        const lightUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const darkUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        
+        const lightLayer = L.tileLayer(lightUrl, { maxZoom: 19 }).addTo(map);
+        const darkLayer = L.tileLayer(darkUrl, { maxZoom: 19 });
 
         let isDark = false;
-
         function toggleDark() {
             if (!isDark) {
                 map.removeLayer(lightLayer);
@@ -324,74 +289,37 @@
             document.getElementById('darkModeBtn').innerHTML = isDark ? '☀️' : '🌙';
         }
 
-        // 3. Application Data & Functions
-        
-        // ==========================================
-        // SECURE API CONFIGURATION
-        // ==========================================
-        // Replace this with your actual OpenRouteService API key in your production environment,
-        // or ideally, fetch this securely from a backend server so it is never exposed in the client code.
-        const ORS_API_KEY = 'ORS_API'; 
-        // ==========================================
-
-        // Decoupled Subway Coordinates for secure routing
+        const ORS_API_KEY = 'YOUR_ORS_API_KEY_HERE'; // Ensure this is proxied in production
         const SUBWAY_COORDS = [26.842031, 75.563313]; 
 
+        // Restored Full Landmarks and Polygon logic
         const LANDMARKS = {
-            "AB1 Block": [26.842586, 75.564249],
-            "AB2 Block": [26.843117, 75.5661],
-            "AB3 Block": [26.84407, 75.564072],
-            "BlueDove Mess": [26.840432, 75.561798],
-            "BluSpring(INDYA) Mess": [26.841255, 75.561567],
-            "Laundry": [26.840202, 75.561454],
-            "Old Mess": [26.843112, 75.565209],
-            "Central Library": [26.841648, 75.565944],
-            "Lecture Hall Complex/ AB4 Block": [26.844338, 75.564705],
-            "Main Gate": [26.840729, 75.566325],
-            "Gate 2": [26.841524, 75.563868],
-            "Grand Stairs": [26.842507, 75.565467],
-            "Block G1": [26.840815, 75.563450],
-            "Block G2": [26.840642, 75.562629],
-            "Block G3": [26.840518, 75.562956],
-            "Block G4": [26.840587, 75.562146],
-            "G4 Badminton Court": [26.840350, 75.562369],
-            "Gym": [26.841210, 75.561594],
-            "Block B1": [26.841782, 75.562967],
-            "Block B3": [26.841413, 75.562431],
-            "Block B5": [26.841729, 75.561921],
-            "Block B2": [26.842045, 75.562189],
-            "Block B6": [26.842165, 75.561690],
-            "Block B7": [26.841859, 75.560896],
-            "Transformer": [26.841538, 75.560730],
-            "Chiller Panel Room": [26.841275, 75.560800],
-            "GHS Library": [26.840317, 75.561444],
-            "Jogger's Park": [26.840092, 75.563310],
-            "Subway Entrance": [26.842031, 75.563313],
-            "Saras Juice Corner": [26.840758, 75.563485],
-            "Subway Wraps": [26.841445, 75.563090],
-            "Taste Of India": [26.841445, 75.563090],
-            "Chatkara": [26.841445, 75.563090],
-            "Waffle Shop": [26.841399, 75.562809],
-            "Cook House": [26.840952, 75.563493],
-            "Administrative Block": [26.841672, 75.565992],
-            "AWS Building": [26.843797, 75.566947],
+            "AB1 Block": [26.842586, 75.564249], "AB2 Block": [26.843117, 75.5661],
+            "AB3 Block": [26.84407, 75.564072], "BlueDove Mess": [26.840432, 75.561798],
+            "BluSpring(INDYA) Mess": [26.841255, 75.561567], "Laundry": [26.840202, 75.561454],
+            "Old Mess": [26.843112, 75.565209], "Central Library": [26.841648, 75.565944],
+            "Lecture Hall Complex/ AB4 Block": [26.844338, 75.564705], "Main Gate": [26.840729, 75.566325],
+            "Gate 2": [26.841524, 75.563868], "Grand Stairs": [26.842507, 75.565467],
+            "Block G1": [26.840815, 75.563450], "Block G2": [26.840642, 75.562629],
+            "Block G3": [26.840518, 75.562956], "Block G4": [26.840587, 75.562146],
+            "G4 Badminton Court": [26.840350, 75.562369], "Gym": [26.841210, 75.561594],
+            "Block B1": [26.841782, 75.562967], "Block B3": [26.841413, 75.562431],
+            "Block B5": [26.841729, 75.561921], "Block B2": [26.842045, 75.562189],
+            "Block B6": [26.842165, 75.561690], "Block B7": [26.841859, 75.560896],
+            "Transformer": [26.841538, 75.560730], "Chiller Panel Room": [26.841275, 75.560800],
+            "GHS Library": [26.840317, 75.561444], "Jogger's Park": [26.840092, 75.563310],
+            "Subway Entrance": [26.842031, 75.563313], "Saras Juice Corner": [26.840758, 75.563485],
+            "Subway Wraps": [26.841445, 75.563090], "Taste Of India": [26.841445, 75.563090],
+            "Chatkara": [26.841445, 75.563090], "Waffle Shop": [26.841399, 75.562809],
+            "Cook House": [26.840952, 75.563493], "Administrative Block": [26.841672, 75.565992],
+            "AWS Building": [26.843797, 75.566947]
         };
         
-        // BUG FIX: Polygon arrays must be closed (first coordinate added to the end)
-        const HOSTEL_POLYGON = [
-            [26.84337, 75.56231], [26.83925, 75.56459], [26.83862, 75.56178], [26.84262, 75.56036], [26.84337, 75.56231]
-        ];
-        const COLLEGE_POLYGON = [
-            [26.84622, 75.56238], [26.83902, 75.56532], [26.84450, 75.56806], [26.84647, 75.56523], [26.84622, 75.56238]
-        ];
+        const HOSTEL_POLYGON = [[26.84337, 75.56231], [26.83925, 75.56459], [26.83862, 75.56178], [26.84262, 75.56036], [26.84337, 75.56231]];
+        const COLLEGE_POLYGON = [[26.84622, 75.56238], [26.83902, 75.56532], [26.84450, 75.56806], [26.84647, 75.56523], [26.84622, 75.56238]];
         
-        let routeLayer = null;
-        let fromMarker = null;
-        let toMarker = null;
-        let subwayMarker = null;
-        let watchId = null;
-        let liveMarker = null;
-        let liveAccuracyCircle = null;
+        let routeLayer = null, fromMarker = null, toMarker = null, subwayMarker = null;
+        let watchId = null, liveMarker = null, liveAccuracyCircle = null;
 
         function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
         function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
@@ -400,10 +328,8 @@
             const x = pt.geometry.coordinates[0], y = pt.geometry.coordinates[1];
             const vs = poly.geometry.coordinates[0];
             let inside = false;
-            // BUG FIX: Corrected infinite loop issue by standardizing iteration update
             for (let i = 0, j = vs.length - 1; i < vs.length; j = i, i++) {
-                const xi = vs[i][0], yi = vs[i][1];
-                const xj = vs[j][0], yj = vs[j][1];
+                const xi = vs[i][0], yi = vs[i][1], xj = vs[j][0], yj = vs[j][1];
                 const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi + 0.0) + xi);
                 if (intersect) inside = !inside;
             }
@@ -414,3 +340,101 @@
             if (!lat || !lon) return null;
             const point = turfPoint([lon, lat]);
             if (turfBooleanPointInPolygon(point, turfPolygon([HOSTEL_POLYGON.map(c => [c[1], c[0]])]))) return 'hostel';
+            if (turfBooleanPointInPolygon(point, turfPolygon([COLLEGE_POLYGON.map(c => [c[1], c[0]])]))) return 'college';
+            return null;
+        }
+
+        function parseCoords(loc) {
+            loc = loc.trim();
+            if (LANDMARKS[loc]) return LANDMARKS[loc];
+            const match = loc.match(/^\s*([+-]?\d+(\.\d+)?)\s*,\s*([+-]?\d+(\.\d+)?)\s*$/);
+            if (match) return [parseFloat(match[1]), parseFloat(match[3])];
+            return null;
+        }
+
+        function cancelTrip() {
+            if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+            if (fromMarker) { map.removeLayer(fromMarker); fromMarker = null; }
+            if (toMarker) { map.removeLayer(toMarker); toMarker = null; }
+            if (subwayMarker) { map.removeLayer(subwayMarker); subwayMarker = null; }
+            document.getElementById('travelInfo').style.display = 'none';
+            document.getElementById('cancelTripBtn').style.display = 'none';
+        }
+
+        async function fetchRoute(start, end, useSubway = false) {
+            const coords = [[start[1], start[0]]];
+            if (useSubway) coords.push([SUBWAY_COORDS[1], SUBWAY_COORDS[0]]);
+            coords.push([end[1], end[0]]);
+            
+            const res = await fetch('https://api.openrouteservice.org/v2/directions/foot-walking/geojson', {
+                method: 'POST',
+                headers: { 'Authorization': ORS_API_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coordinates: coords }),
+            });
+            if (!res.ok) throw new Error(res.statusText);
+            return res.json();
+        }
+
+        async function navigate() {
+            cancelTrip();
+            const fromInput = document.getElementById('from').value;
+            const toInput = document.getElementById('to').value;
+            if (!fromInput || !toInput) return alert('Please enter both locations.');
+            
+            const fromCoords = parseCoords(fromInput);
+            const toCoords = parseCoords(toInput);
+            if (!fromCoords || !toCoords) return alert('Invalid locations.');
+            
+            const mustUseSubway = campusOf(fromCoords) && campusOf(toCoords) && campusOf(fromCoords) !== campusOf(toCoords);
+            
+            try {
+                const routeGeojson = await fetchRoute(fromCoords, toCoords, mustUseSubway);
+                routeLayer = L.geoJSON(routeGeojson, { style: { color: '#ff7e5f', weight: 6, opacity: 0.85 } }).addTo(map);
+                
+                const bounds = routeLayer.getBounds();
+                if (bounds.isValid()) map.fitBounds(bounds.pad(0.15));
+                
+                const summary = routeGeojson.features[0].properties.summary;
+                const travelInfoEl = document.getElementById('travelInfo');
+                travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${(summary.distance / 1000).toFixed(2)} km<br>Est. time: ${Math.round(summary.duration / 60)} mins`;
+                travelInfoEl.style.display = 'block';
+                document.getElementById('cancelTripBtn').style.display = 'block';
+                
+                fromMarker = L.marker(fromCoords, { icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+                toMarker = L.marker(toCoords, { icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+                
+                if (mustUseSubway) {
+                    subwayMarker = L.circleMarker(SUBWAY_COORDS, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
+                    travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Transfer via Subway required.</small>`;
+                }
+            } catch (e) { alert('Routing failed: ' + e.message); }
+        }
+
+        function showSuggestions(input) {
+            const val = input.value.trim().toLowerCase();
+            const suggestBox = document.getElementById('suggestions');
+            suggestBox.innerHTML = '';
+            if (!val) return suggestBox.style.display = 'none';
+            
+            const matches = Object.keys(LANDMARKS).filter(n => n.toLowerCase().includes(val));
+            if (!matches.length) return suggestBox.style.display = 'none';
+            
+            suggestBox.style.display = 'block';
+            matches.forEach(name => {
+                const div = document.createElement('div');
+                div.textContent = name;
+                div.onclick = () => { input.value = name; suggestBox.style.display = 'none'; };
+                suggestBox.appendChild(div);
+            });
+        }
+
+        ['from', 'to'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', () => showSuggestions(el));
+            el.addEventListener('focus', () => showSuggestions(el));
+            el.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigate(); });
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.input-box') && !e.target.closest('#suggestions')) {
