@@ -1,5 +1,5 @@
-const CACHE_NAME = 'manipal-uninav-cache-v3';
-const TILES_CACHE_NAME = 'manipal-uninav-tiles-v3';
+const CACHE_NAME = 'manipal-uninav-cache-v4';
+const TILES_CACHE_NAME = 'manipal-uninav-tiles-v4';
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -9,8 +9,8 @@ self.addEventListener('install', (event) => {
                 '/index.html',
                 '/manifest.json',
                 '/image/weblogo.png',
-                'https://unpkg.com/leaflet/dist/leaflet.css',
-                'https://unpkg.com/leaflet/dist/leaflet.js'
+                'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'
             ]);
         })
     );
