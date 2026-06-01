@@ -8,7 +8,7 @@ self.addEventListener('install', (event) => {
                 '/',
                 '/index.html',
                 '/manifest.json',
-                '/image/weblogo.png', // Added logo to cache
+                '/image/weblogo.png',
                 'https://unpkg.com/leaflet/dist/leaflet.css',
                 'https://unpkg.com/leaflet/dist/leaflet.js'
             ]);
@@ -63,7 +63,6 @@ self.addEventListener('fetch', (event) => {
 
 self.addEventListener('message', (event) => {
     if (event.data.type === 'PREFETCH_TILES') {
-        // Now accepts the active tileUrlTemplate from the frontend
         const { bbox, zooms, tileUrlTemplate } = event.data;
         const tileUrls = buildTileURLList(bbox, zooms, tileUrlTemplate);
         const total = tileUrls.length;
