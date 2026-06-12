@@ -9,11 +9,11 @@ export default async function handler(req, res) {
         const response = await fetch('https://api.openrouteservice.org/v2/directions/foot-walking/geojson', {
             method: 'POST',
             headers: {
-                'Authorization': process.env.ORS_API_KEY, 
+                'Authorization': 'Bearer ' + process.env.ORS_API_KEY,  // ← add Bearer
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ coordinates })
-        });
+        body: JSON.stringify({ coordinates })
+    });
 
         if (!response.ok) {
             throw new Error(`ORS API responded with ${response.status}`);
