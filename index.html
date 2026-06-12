@@ -1,185 +1,262 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#000000">
-    <title>Manipal UniNav</title>
-    <link rel="icon" type="image/png" href="image/weblogo.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#FF6B1A" />
+  <title>Manipal UniNav</title>
+  <link rel="icon" type="image/png" href="image/weblogo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-[#050505] text-gray-200 font-outfit relative overflow-x-hidden">
-    <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-[#FF780A] rounded-full blur-[150px] opacity-10 pointer-events-none z-0"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-[#F4E452] rounded-full blur-[150px] opacity-10 pointer-events-none z-0"></div>
+<body>
 
-    <div id="home"></div> 
-    
-    <header class="fixed top-0 z-50 w-full glass-nav border-b border-white/10 transition-all duration-300">
-        <nav class="max-w-7xl mx-auto px-6 sm:px-12">
-            <div class="flex justify-between items-center h-20">
-                <a href="#hero" class="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF780A] to-[#F4E452] shadow-[0_0_15px_rgba(255,120,10,0.5)]"></span>
-                    Uni<span class="text-[#FF780A]">Nav</span>
-                </a>
-                <button id="menu-toggle" class="sm:hidden text-white text-3xl focus:outline-none z-50">☰</button>
-                <div id="nav-links" class="hidden sm:flex space-x-8 flex-col sm:flex-row absolute sm:static top-20 left-0 w-full sm:w-auto bg-[#0a0a0a] sm:bg-transparent p-6 sm:p-0 border-b border-white/10 sm:border-none">
-                    <a href="#home" class="nav-link">Home</a>
-                    <a href="#about" class="nav-link">About</a>
-                    <a href="#stats" class="nav-link">Stats</a>
-                    <a href="#maps" class="nav-link">Maps</a>
-                    <a href="#how-it-works" class="nav-link">Guide</a>
-                    <a href="#team" class="nav-link">Team</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+  <!-- ============ NAVBAR ============ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo">
+        <div class="nav-logo-mark">MU</div>
+        <span class="nav-logo-text">Manipal <span>UniNav</span></span>
+      </a>
 
-    <main class="min-h-screen flex flex-col items-center pt-24 px-4 sm:px-8 relative z-10">
-        
-        <section id="hero" class="w-full max-w-6xl text-center my-32 flex flex-col items-center justify-center">
-            <div class="inline-block mb-4 px-4 py-1.5 rounded-full border border-[#FF780A]/30 bg-[#FF780A]/10 text-[#F4E452] text-sm font-semibold tracking-wide backdrop-blur-md">
-                MUJ Campus Navigation System
-            </div>
-            <h1 class="text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-tight leading-tight mb-6">
-                Navigate the <br />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF780A] via-[#F4E452] to-[#FF780A] animate-gradient-x">Campus Faster.</span>
-            </h1>
-            <p class="mt-2 text-xl text-gray-400 max-w-2xl mx-auto font-light h-16">
-                <span id="typewriter"></span><span class="cursor">|</span>
-            </p>
-            <div class="mt-10 flex gap-6">
-                <a href="https://manipalmaplive.vercel.app/" target="_blank" class="glossy-btn px-8 py-4 rounded-full text-black font-bold text-lg flex items-center gap-2 transition-all">
-                    Open Map
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </a>
-            </div>
-        </section>
+      <button id="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
 
-        <section id="about" class="w-full max-w-6xl mx-auto my-24">
-            <div class="glass-card p-10 md:p-16 rounded-[2.5rem] relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-[#FF780A] opacity-10 rounded-full blur-[80px] group-hover:opacity-20 transition-opacity duration-700"></div>
-                <h2 class="text-3xl md:text-5xl font-black text-white mb-8">System Architecture</h2>
-                <div class="grid md:grid-cols-2 gap-12 text-gray-300 font-light text-lg leading-relaxed">
-                    <div>
-                        <p class="mb-6">
-                            Finding your way around a large university campus can be confusing. <strong class="text-white font-semibold">Manipal UniNav</strong> is built with a simple functional vision: to help everyone on campus find their way without hassle through a light, fast, and scalable tool.
-                        </p>
-                        <p>
-                            The core navigation experience uses maps sourced from <span class="text-[#F4E452]">OpenStreetMap</span>. For real-time routing and pathfinding mechanics, we integrated the <span class="text-[#F4E452]">OpenRouteService (ORS) API</span>, which provides highly accurate walking directions.
-                        </p>
-                    </div>
-                    <div class="bg-black/40 border border-white/5 rounded-2xl p-8 backdrop-blur-md">
-                        <h3 class="text-[#FF780A] font-bold text-xl mb-4 border-b border-white/10 pb-2">Zonal Mapping</h3>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3">
-                                <span class="text-[#F4E452] mt-1">✦</span>
-                                <div><strong class="text-white block">The College Campus</strong> Housing academic blocks, libraries, labs, and administrative buildings.</div>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <span class="text-[#F4E452] mt-1">✦</span>
-                                <div><strong class="text-white block">The Hostel Campus</strong> Including student housing, mess areas, and recreational spots.</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#stats">Stats</a></li>
+        <li><a href="#maps">Maps</a></li>
+        <li><a href="#how-it-works">Guide</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="https://manipalmaplive.vercel.app/" target="_blank" class="nav-cta">Open Map</a></li>
+      </ul>
+    </div>
+  </nav>
 
-        <section id="stats" class="w-full max-w-6xl my-24">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass-card p-10 rounded-3xl text-center border-t-4 border-t-[#FF780A] hover:-translate-y-2 transition-transform duration-300">
-                    <h3 class="counter text-6xl font-black text-white mb-2" data-target="6000">0</h3>
-                    <p class="text-[#FF780A] font-semibold tracking-wider uppercase text-sm">Students Helped</p>
-                </div>
-                <div class="glass-card p-10 rounded-3xl text-center border-t-4 border-t-[#F4E452] hover:-translate-y-2 transition-transform duration-300">
-                    <h3 class="counter text-6xl font-black text-white mb-2" data-target="30">0</h3>
-                    <p class="text-[#F4E452] font-semibold tracking-wider uppercase text-sm">Buildings Covered</p>
-                </div>
-                <div class="glass-card p-10 rounded-3xl text-center border-t-4 border-t-[#FF780A] hover:-translate-y-2 transition-transform duration-300">
-                    <h3 class="counter text-6xl font-black text-white mb-2" data-target="10">0</h3>
-                    <p class="text-[#FF780A] font-semibold tracking-wider uppercase text-sm">Guides Available</p>
-                </div>
-            </div>
-        </section>
+  <!-- ============ HERO ============ -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
 
-        <section id="maps" class="w-full max-w-6xl my-24">
-            <div class="glass-card p-4 rounded-[2rem] shadow-2xl shadow-[#FF780A]/10 border border-white/10 group cursor-pointer relative overflow-hidden">
-                <a href="https://manipalmaplive.vercel.app/" target="_blank" class="block relative rounded-3xl overflow-hidden">
-                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500 z-10 flex items-center justify-center">
-                        <span class="bg-[#FF780A] text-black font-bold px-6 py-3 rounded-full opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-[0_0_20px_rgba(255,120,10,0.6)]">Launch Interactive Map</span>
-                    </div>
-                    <img src="image/mapintro.png" alt="MUJ Campus Map Preview" class="w-full h-[500px] object-cover group-hover:scale-105 transition-transform duration-700" />
-                </a>
-            </div>
-        </section>
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Manipal University Jaipur</div>
 
-        <section id="how-it-works" class="w-full max-w-6xl mx-auto my-24">
-            <h2 class="text-4xl md:text-5xl font-black text-white text-center mb-16">How It Works</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center group hover:border-[#FF780A]/50 transition-colors">
-                    <div class="w-12 h-12 bg-[#FF780A]/20 text-[#FF780A] rounded-full flex items-center justify-center font-black text-xl mb-6">1</div>
-                    <img src="./image/1.png" alt="Step 1" class="rounded-xl mb-6 w-full object-cover h-32 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <h3 class="text-xl font-bold text-white mb-2">Access Portal</h3>
-                    <p class="text-sm text-gray-400 font-light">Open the navigator in your browser to load the interactive campus map.</p>
-                </div>
-                <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center group hover:border-[#F4E452]/50 transition-colors">
-                    <div class="w-12 h-12 bg-[#F4E452]/20 text-[#F4E452] rounded-full flex items-center justify-center font-black text-xl mb-6">2</div>
-                    <img src="./image/2.png" alt="Step 2" class="rounded-xl mb-6 w-full object-cover h-32 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <h3 class="text-xl font-bold text-white mb-2">Search Location</h3>
-                    <p class="text-sm text-gray-400 font-light">Type the name of a building, block, or facility in the top search bar.</p>
-                </div>
-                <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center group hover:border-[#FF780A]/50 transition-colors">
-                    <div class="w-12 h-12 bg-[#FF780A]/20 text-[#FF780A] rounded-full flex items-center justify-center font-black text-xl mb-6">3</div>
-                    <img src="./image/phonemockup.png" alt="Step 3" class="rounded-xl mb-6 w-full object-cover h-32 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <h3 class="text-xl font-bold text-white mb-2">Generate Route</h3>
-                    <p class="text-sm text-gray-400 font-light">Select your destination and click 'Directions' to calculate the optimal path.</p>
-                </div>
-                <div class="glass-card p-6 rounded-3xl flex flex-col items-center text-center group hover:border-[#F4E452]/50 transition-colors">
-                    <div class="w-12 h-12 bg-[#F4E452]/20 text-[#F4E452] rounded-full flex items-center justify-center font-black text-xl mb-6">4</div>
-                    <img src="./image/4.png" alt="Step 4" class="rounded-xl mb-6 w-full object-cover h-32 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <h3 class="text-xl font-bold text-white mb-2">Navigate</h3>
-                    <p class="text-sm text-gray-400 font-light">Follow the highlighted polyline on the map to reach your exact destination.</p>
-                </div>
-            </div>
-        </section>
+      <h1 class="hero-title">
+        Navigate your<br />
+        campus with <span class="accent">precision.</span>
+      </h1>
+      <span class="hero-subtitle-line">UniNav</span>
 
-        <section id="team" class="w-full max-w-6xl text-center my-24">
-            <h2 class="text-4xl md:text-5xl font-black text-white mb-16">Engineering & Design</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div class="glass-card p-8 rounded-[2.5rem] flex flex-col items-center group relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-b from-[#FF780A]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-[#FF780A] to-[#F4E452] mb-6 relative z-10 shadow-[0_0_20px_rgba(255,120,10,0.3)]">
-                        <img src="./image/bhargavi.jpeg" class="w-full h-full rounded-full object-cover border-4 border-black" alt="Bhargavi">
-                    </div>
-                    <h3 class="text-2xl font-bold text-white relative z-10">Bhargavi Chaudhary</h3>
-                    <p class="text-[#FF780A] font-medium tracking-wide text-sm uppercase mt-2 relative z-10">UI/UX Designer</p>
-                </div>
-                <div class="glass-card p-8 rounded-[2.5rem] flex flex-col items-center group relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-b from-[#F4E452]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-[#F4E452] to-[#FF780A] mb-6 relative z-10 shadow-[0_0_20px_rgba(244,228,82,0.3)]">
-                        <img src="./image/anmol.jpeg" class="w-full h-full rounded-full object-cover border-4 border-black" alt="Anmol">
-                    </div>
-                    <h3 class="text-2xl font-bold text-white relative z-10">Anmol Srivastava</h3>
-                    <p class="text-[#F4E452] font-medium tracking-wide text-sm uppercase mt-2 relative z-10">Lead Developer</p>
-                </div>
-                <div class="glass-card p-8 rounded-[2.5rem] flex flex-col items-center group relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-b from-[#FF780A]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-[#FF780A] to-[#F4E452] mb-6 relative z-10 shadow-[0_0_20px_rgba(255,120,10,0.3)]">
-                        <img src="./image/tavishi.jpeg" class="w-full h-full rounded-full object-cover border-4 border-black" alt="Tavishi">
-                    </div>
-                    <h3 class="text-2xl font-bold text-white relative z-10">Tavishi Singh</h3>
-                    <p class="text-[#FF780A] font-medium tracking-wide text-sm uppercase mt-2 relative z-10">Content & Maps</p>
-                </div>
-            </div>
-        </section>
+      <p class="hero-desc">
+        <strong>Manipal UniNav</strong> is an open-source interactive map platform
+        built for students and visitors at MUJ — covering academic blocks,
+        hostels, mess areas, and every path in between.
+      </p>
 
-        <footer class="w-full text-center text-gray-500 py-10 mt-12 border-t border-white/10 font-light text-sm">
-            © 2025 Manipal UniNav. Open Source Functional Utility. Team CCG.
-        </footer>
-    </main>
-    <script src="script.js"></script>
+      <div class="hero-actions">
+        <a href="https://manipalmaplive.vercel.app/" target="_blank" class="btn-primary">
+          Open Campus Map
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M7 1L13 7L7 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#about" class="btn-secondary">
+          Learn more
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V13M1 7L7 13L13 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+
+        <div class="about-left reveal">
+          <div class="section-label">About the Project</div>
+          <h2 class="section-title">Built for every <span class="amber">student</span> on campus.</h2>
+          <p class="section-body">
+            Finding your way around a large university campus can be disorienting,
+            especially for first-year students and guests.
+            <strong>Manipal UniNav</strong> was built to solve that — a lightweight,
+            open-source navigation platform that runs fast and scales with the campus.
+          </p>
+          <p class="section-body">
+            Using maps sourced from <strong>OpenStreetMap</strong> and routing via
+            the <strong>OpenRouteService API</strong>, UniNav delivers walking
+            directions and seamless navigation without any app download required.
+          </p>
+        </div>
+
+        <div class="about-right reveal reveal-delay-1">
+          <div class="about-card">
+            <div class="about-card-tag">Module 01</div>
+            <div class="about-card-title">Academic Campus</div>
+            <div class="about-card-body">
+              Navigate to lecture halls, laboratories, libraries, and administrative blocks.
+              Routes optimized for pedestrian pathways across the main campus.
+            </div>
+          </div>
+          <div class="about-card">
+            <div class="about-card-tag">Module 02</div>
+            <div class="about-card-title">Hostel Campus</div>
+            <div class="about-card-body">
+              Explore student housing zones, mess facilities, and nearby recreational
+              spots. Separated routing for the residential area.
+            </div>
+          </div>
+          <div class="about-card">
+            <div class="about-card-tag">Technology</div>
+            <div class="about-card-title">Open Source Stack</div>
+            <div class="about-card-body">
+              OpenStreetMap data, OpenRouteService for pathfinding, deployed on
+              Vercel — entirely free, fast, and community-driven.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section id="stats">
+    <div class="section-inner">
+      <div class="section-label reveal">Impact</div>
+      <h2 class="section-title reveal reveal-delay-1">UniNav's <span class="amber">prospective</span> reach.</h2>
+
+      <div class="stats-bar reveal reveal-delay-2">
+        <div class="stat-item">
+          <div class="stat-number">
+            <span class="counter" data-target="6000">0</span><span class="stat-plus">+</span>
+          </div>
+          <div class="stat-label">Students Helped</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">
+            <span class="counter" data-target="30">0</span>
+          </div>
+          <div class="stat-label">Buildings Covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">
+            <span class="counter" data-target="10">0</span>
+          </div>
+          <div class="stat-label">Navigation Guides</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MAP PREVIEW ============ -->
+  <section id="maps">
+    <div class="section-inner">
+      <div class="section-label reveal">Live Map</div>
+      <h2 class="section-title reveal reveal-delay-1">The full <span class="amber">interactive</span> campus map.</h2>
+
+      <div class="map-preview-wrap reveal reveal-delay-2">
+        <a href="https://manipalmaplive.vercel.app/" target="_blank">
+          <img src="image/mapintro.png" alt="MUJ Campus Map Preview" />
+          <div class="map-overlay">
+            <div class="map-overlay-text">
+              <strong>Click to explore</strong> — Full interactive MUJ Navigator
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how-it-works">
+    <div class="section-inner">
+      <div class="section-label reveal">Guide</div>
+      <h2 class="section-title reveal reveal-delay-1">How <span class="amber">UniNav</span> works.</h2>
+
+      <div class="steps-grid reveal reveal-delay-2">
+        <div class="step-item">
+          <div class="step-num">01</div>
+          <div class="step-title">Open the Website</div>
+          <div class="step-body">
+            Go to manipalmap.vercel.app in your browser. The homepage loads with the
+            full interactive MUJ campus map ready to use.
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">02</div>
+          <div class="step-title">Search a Location</div>
+          <div class="step-body">
+            Type a building, block, or facility name into the search bar —
+            Library, Hostel, Mess, Admin Block, and more.
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">03</div>
+          <div class="step-title">Get Directions</div>
+          <div class="step-body">
+            Select your destination and tap Get Directions. The map draws
+            a walking route optimized for campus paths.
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">04</div>
+          <div class="step-title">Navigate the Campus</div>
+          <div class="step-body">
+            Follow the highlighted route to reach your destination. Switch
+            between Academic and Hostel campus zones as needed.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEAM ============ -->
+  <section id="team">
+    <div class="section-inner">
+      <div class="section-label reveal">The Team</div>
+      <h2 class="section-title reveal reveal-delay-1">The people <span class="amber">behind</span> UniNav.</h2>
+
+      <div class="team-grid">
+        <div class="team-card reveal reveal-delay-1">
+          <img src="./image/bhargavi.jpeg" alt="Bhargavi Chaudhary" class="team-avatar" />
+          <div class="team-name">Bhargavi Chaudhary</div>
+          <div class="team-role">UI / UX Design</div>
+        </div>
+        <div class="team-card reveal reveal-delay-2">
+          <img src="./image/anmol.jpeg" alt="Anmol Srivastava" class="team-avatar" />
+          <div class="team-name">Anmol Srivastava</div>
+          <div class="team-role">Lead Developer</div>
+        </div>
+        <div class="team-card reveal reveal-delay-3">
+          <img src="./image/tavishi.jpeg" alt="Tavishi Singh" class="team-avatar" />
+          <div class="team-name">Tavishi Singh</div>
+          <div class="team-role">Content &amp; Maps</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="footer-inner">
+      <p class="footer-copy">
+        &copy; 2025 <strong>Manipal UniNav</strong>. Made by Team CCG — Campus Compass Guide.
+      </p>
+      <nav class="footer-links">
+        <a href="#hero">Home</a>
+        <a href="#about">About</a>
+        <a href="https://manipalmaplive.vercel.app/" target="_blank">Open Map</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
