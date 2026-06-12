@@ -32,6 +32,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
+    // Never intercept API calls — pass straight to network
+    if (requestUrl.pathname.startsWith('/api/')) {
+        return;
+    }
+
     if (event.request.url.startsWith('http')) {
         if (requestUrl.hostname.includes('tile.openstreetmap.org') || requestUrl.hostname.includes('basemaps.cartocdn.com')) {
             event.respondWith(
