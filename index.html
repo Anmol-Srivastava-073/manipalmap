@@ -1,170 +1,750 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ff7e5f">
-    <title>Manipal UniNav</title>
-    <link rel="icon" type="image/png" href="image/weblogo.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manipal UniNav — MUJ Campus Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0A0F1E;
+      --navy2:  #111827;
+      --slate:  #1C2B4A;
+      --amber:  #F5A623;
+      --teal:   #00C9B8;
+      --text:   #E8E4DC;
+      --muted:  #8A96A8;
+      --white:  #FFFFFF;
+      --card-bg: rgba(28, 43, 74, 0.6);
+      --grid-line: rgba(245, 166, 35, 0.07);
+    }
+
+    html { scroll-padding-top: 72px; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--navy);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── GRID TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAVBAR ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10, 15, 30, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(245, 166, 35, 0.15);
+    }
+    nav {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1.3rem;
+      color: var(--white); text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+      letter-spacing: -0.02em;
+    }
+    .logo-pin {
+      width: 32px; height: 32px;
+      background: var(--amber);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px rgba(245,166,35,0.5);
+    }
+    .logo-pin::after {
+      content: '';
+      width: 10px; height: 10px;
+      background: var(--navy);
+      border-radius: 50%;
+      transform: rotate(45deg);
+    }
+
+    .nav-links {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      padding: 7px 14px; border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: var(--amber); background: rgba(245,166,35,0.08); }
+
+    .btn-nav {
+      background: var(--amber);
+      color: var(--navy) !important;
+      font-weight: 700 !important;
+      border-radius: 8px !important;
+      padding: 8px 18px !important;
+      transition: box-shadow 0.2s, transform 0.2s !important;
+    }
+    .btn-nav:hover {
+      box-shadow: 0 0 20px rgba(245,166,35,0.5) !important;
+      transform: translateY(-1px);
+      background: var(--amber) !important;
+    }
+
+    #menu-toggle {
+      display: none;
+      background: none; border: none;
+      color: var(--text); font-size: 1.5rem; cursor: pointer;
+      padding: 6px;
+    }
+
+    @media (max-width: 700px) {
+      #menu-toggle { display: block; }
+      .nav-links {
+        display: none; flex-direction: column;
+        position: absolute; top: 68px; left: 0; right: 0;
+        background: rgba(10,15,30,0.97);
+        border-bottom: 1px solid rgba(245,166,35,0.15);
+        padding: 16px 24px 24px;
+        gap: 4px;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1rem; padding: 12px 8px; }
+    }
+
+    /* ── SHARED ── */
+    section { position: relative; z-index: 1; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .section-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700; color: var(--white);
+      line-height: 1.1; letter-spacing: -0.03em;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 92vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 80px 24px 60px;
+    }
+    .hero-inner { max-width: 760px; position: relative; }
+
+    /* crosshair pin */
+    .crosshair {
+      width: 80px; height: 80px;
+      margin: 0 auto 32px;
+      position: relative;
+    }
+    .crosshair-ring {
+      position: absolute; inset: 0;
+      border: 2px solid var(--amber);
+      border-radius: 50%;
+      animation: ringPulse 2.4s ease-in-out infinite;
+    }
+    .crosshair-ring:nth-child(2) {
+      inset: 14px;
+      border-color: var(--teal);
+      animation-delay: 0.4s;
+    }
+    .crosshair-dot {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .crosshair-dot::before, .crosshair-dot::after {
+      content: '';
+      position: absolute;
+      background: var(--amber);
+      border-radius: 2px;
+    }
+    .crosshair-dot::before { width: 2px; height: 28px; }
+    .crosshair-dot::after  { width: 28px; height: 2px; }
+    .pin-center {
+      width: 10px; height: 10px;
+      background: var(--teal);
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: 0 0 12px var(--teal);
+      animation: pinBlink 1.8s ease-in-out infinite;
+    }
+    @keyframes ringPulse {
+      0%,100% { opacity: 0.9; transform: scale(1); }
+      50%      { opacity: 0.3; transform: scale(1.12); }
+    }
+    @keyframes pinBlink {
+      0%,100% { box-shadow: 0 0 8px var(--teal); }
+      50%      { box-shadow: 0 0 20px var(--teal), 0 0 40px rgba(0,201,184,0.3); }
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--teal); border: 1px solid rgba(0,201,184,0.35);
+      border-radius: 100px; padding: 5px 14px; margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.8rem, 8vw, 5rem);
+      font-weight: 700; line-height: 1.05;
+      letter-spacing: -0.04em; color: var(--white);
+    }
+    .hero-title .accent { color: var(--amber); }
+    .hero-sub {
+      margin-top: 20px;
+      font-size: 1.05rem; line-height: 1.7;
+      color: var(--muted); max-width: 560px; margin-left: auto; margin-right: auto;
+    }
+    #typewriter { color: var(--text); }
+    .cursor {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--amber);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: cursorBlink 0.8s step-end infinite;
+    }
+    @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .hero-cta {
+      margin-top: 40px;
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--amber); color: var(--navy);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      padding: 14px 30px; border-radius: 10px;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+      transition: box-shadow 0.25s, transform 0.2s;
+      letter-spacing: -0.01em;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 28px rgba(245,166,35,0.55);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 600;
+      padding: 14px 26px; border-radius: 10px;
+      border: 1px solid rgba(232,228,220,0.2);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── ABOUT ── */
+    #about { padding: 100px 0; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: start;
+    }
+    @media(max-width:680px){ .about-grid{ grid-template-columns:1fr; } }
+
+    .about-text p {
+      font-size: 1rem; line-height: 1.8;
+      color: var(--muted); margin-bottom: 16px;
+    }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+
+    .zone-cards { display: flex; flex-direction: column; gap: 14px; }
+    .zone-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(245,166,35,0.12);
+      border-radius: 14px; padding: 20px 22px;
+      display: flex; gap: 16px; align-items: flex-start;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .zone-card:hover {
+      border-color: rgba(245,166,35,0.35);
+      box-shadow: 0 0 20px rgba(245,166,35,0.07);
+    }
+    .zone-icon {
+      width: 42px; height: 42px; flex-shrink: 0;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .zone-icon.amber { background: rgba(245,166,35,0.12); }
+    .zone-icon.teal  { background: rgba(0,201,184,0.12); }
+    .zone-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 600; color: var(--white);
+      margin-bottom: 4px;
+    }
+    .zone-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── STATS ── */
+    #stats { padding: 80px 0; }
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+      margin-top: 40px;
+    }
+    @media(max-width:580px){ .stats-row{ grid-template-columns:1fr; } }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(245,166,35,0.1);
+      border-radius: 16px; padding: 32px 24px;
+      text-align: center; backdrop-filter: blur(8px);
+      position: relative; overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .stat-card:nth-child(1)::before { background: var(--amber); }
+    .stat-card:nth-child(2)::before { background: var(--teal); }
+    .stat-card:nth-child(3)::before { background: #8B7CF6; }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(245,166,35,0.25);
+    }
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3rem; font-weight: 700;
+      line-height: 1; color: var(--white);
+    }
+    .stat-number.amber { color: var(--amber); }
+    .stat-number.teal  { color: var(--teal); }
+    .stat-number.purple{ color: #8B7CF6; }
+    .stat-label {
+      font-size: 0.88rem; color: var(--muted); margin-top: 8px; font-weight: 500;
+    }
+
+    /* ── MAP SECTION ── */
+    #maps { padding: 100px 0; }
+    .map-frame {
+      margin-top: 40px;
+      border-radius: 18px; overflow: hidden;
+      border: 1px solid rgba(245,166,35,0.18);
+      position: relative;
+      box-shadow: 0 0 60px rgba(245,166,35,0.06), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .map-frame a { display: block; }
+    .map-frame img {
+      width: 100%; height: 420px; object-fit: cover; display: block;
+      transition: transform 0.5s ease;
+    }
+    .map-frame:hover img { transform: scale(1.02); }
+    .map-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,15,30,0.7) 0%, transparent 50%);
+      display: flex; align-items: flex-end; padding: 28px;
+      pointer-events: none;
+    }
+    .map-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(10,15,30,0.85);
+      border: 1px solid rgba(245,166,35,0.3);
+      border-radius: 8px; padding: 8px 16px;
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--amber); backdrop-filter: blur(8px);
+    }
+    .live-dot {
+      width: 7px; height: 7px; background: var(--teal);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--teal);
+      animation: pinBlink 1.8s ease-in-out infinite;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #how-it-works { padding: 100px 0; }
+    .steps-container { margin-top: 48px; position: relative; }
+    .steps-track {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    @media(max-width:760px){
+      .steps-track{ grid-template-columns: 1fr 1fr; }
+    }
+    @media(max-width:480px){
+      .steps-track{ grid-template-columns: 1fr; }
+    }
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 28px 22px;
+      position: relative; overflow: hidden;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .step-card:hover {
+      border-color: rgba(245,166,35,0.25);
+      transform: translateY(-3px);
+    }
+    .step-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--amber); margin-bottom: 18px;
+    }
+    .step-icon {
+      font-size: 1.8rem; margin-bottom: 14px;
+    }
+    .step-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 600;
+      color: var(--white); margin-bottom: 8px;
+    }
+    .step-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+    .step-connector {
+      position: absolute; top: 38px; right: -8px;
+      width: 16px; height: 2px; background: rgba(245,166,35,0.25);
+      z-index: 1;
+    }
+
+    /* ── TEAM ── */
+    #team { padding: 100px 0 80px; }
+    .team-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 20px; margin-top: 48px;
+    }
+    @media(max-width:680px){ .team-grid{ grid-template-columns:1fr; } }
+
+    .team-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px; padding: 36px 24px 28px;
+      text-align: center; backdrop-filter: blur(8px);
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      position: relative; overflow: hidden;
+    }
+    .team-card:hover {
+      border-color: rgba(245,166,35,0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+    .team-card::before {
+      content: '';
+      position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .team-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%; object-fit: cover;
+      border: 3px solid rgba(245,166,35,0.4);
+      box-shadow: 0 0 20px rgba(245,166,35,0.15);
+      margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .team-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--white); margin-bottom: 4px;
+    }
+    .team-role {
+      font-size: 0.83rem; color: var(--teal); font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 32px 24px; text-align: center;
+    }
+    footer p {
+      font-size: 0.88rem; color: var(--muted);
+    }
+    footer span { color: var(--amber); }
+
+    /* ── SCROLL FADE-IN ── */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
 </head>
-<body class="header-gradient font-outfit">
-    <div id="home"></div> <header class="sticky top-0 z-50 w-full bg-gradient-to-r from-black via-orange-600 to-[#FF780A] bg-opacity-95 backdrop-blur-md shadow-md">
-        <nav class="max-w-10xl mx-auto px-4 sm:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="#hero" class="logo-shine text-black text-3xl font-extrabold tracking-tight">
-                    Manipal UniNav
-                </a>
-                <button id="menu-toggle" class="sm:hidden text-white text-3xl focus:outline-none">☰</button>
-                <div id="nav-links" class="hidden sm:flex space-x-4 sm:space-x-8 flex-col sm:flex-row sm:items-center absolute sm:static top-20 right-0 sm:top-auto sm:right-auto bg-transparent p-4 sm:p-0 rounded-lg sm:rounded-none shadow-lg sm:shadow-none">
-                    <a href="#home" class="text-xl toggle-button text-white hover:text-yellow-300 transition">Home</a>
-                    <a href="#about" class="text-xl toggle-button text-white hover:text-yellow-300 transition">About</a>
-                    <a href="#stats" class="text-xl toggle-button text-white hover:text-yellow-300 transition">Stats</a>
-                    <a href="#maps" class="text-xl toggle-button text-white hover:text-yellow-300 transition">Maps</a>
-                    <a href="#how-it-works" class="text-xl toggle-button text-white hover:text-yellow-300 transition">Guide</a>
-                    <a href="#team" class="text-xl toggle-button text-white hover:text-yellow-300 transition">Team</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <main class="min-h-screen flex flex-col items-center p-4 sm:p-8">
-        <section id="hero" class="w-full max-w-5xl text-center my-20">
-            <h2 class="text-4xl sm:text-6xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
-                Welcome To
-            </h2>
-            <h1 class="fade-in text-4xl sm:text-8xl font-extrabold text-[#F4E452] tracking-tight leading-relaxed">
-                Manipal UniNav
-            </h1>
-            <p class="mt-4 text-lg text-[#FF780A] max-w-3xl mx-auto">
-                <br><span id="typewriter"></span>
-            </p>
-        </section>
-        <section id="about" class="relative w-full max-w-5xl mx-auto my-20 px-4">
-            <div class="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-40 bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500"></div>
-            <div class="bg-[#F4E452] p-10 rounded-3xl shadow-xl">
-                <h2 class="text-4xl font-extrabold text-[#963646] mb-4 text-center">About Manipal UniNav</h2>
-                <p class="text-black leading-relaxed text-center font-semibold">
-                    Finding your way around a large university campus can be confusing, especially for new students or visitors.
-                    <b>Manipal UniNav</b> is our interactive navigation platform designed to make this easier. Manipal UniNav is built with a simple vision:
-                    to help everyone on campus find their way without hassle—whether it's a new student figuring out where their next class is,
-                    or a visitor locating the auditorium. With open-source tools and thoughtful design, we’ve created a solution that’s light, fast, and scalable.
-                    The project is split into two core parts, each maintained in separate repositories and deployed individually:
-                    <br><br>
-                    <b>The Interactive Map Module</b> – This is the heart of the navigation experience. It uses maps sourced from OpenStreetMap and other
-                    open-source map providers, ensuring free and reliable access to detailed, customizable mapping data. For real-time routing and pathfinding,
-                    we’ve integrated the OpenRouteService (ORS) API, which provides accurate walking directions and seamless navigation.
-                    <br><br>
-                    We've divided the university into two distinct zones:
-                    <br><br>
-                    <b>The College Campus</b> – housing academic blocks, libraries, labs, and administrative buildings.
-                    <b>The Hostel Campus</b> – including student housing, mess areas, and nearby recreational spots.
-                    This separation helps in organizing routes more efficiently and ensures users can easily toggle between academic and residential navigation.
-                </p>
-            </div>
-        </section>
-        <section id="stats" class="w-full max-w-5xl text-center my-20 px-4">
-            <h2 class="text-5xl font-extrabold text-[#F4E452] mb-6">UNINAV'S PROSPECTIVE IMPACT</h2>
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-8">
-                <div class="stat-card glow">
-                    <h3 class="counter text-5xl font-extrabold text-white" data-target="6000">0</h3>
-                    <p class="text-[#F4E452] font-semibold">Students Will Be Helped</p>
-                </div>
-                <div class="stat-card glow">
-                    <h3 class="counter text-5xl font-extrabold text-white" data-target="30">0</h3>
-                    <p class="text-[#F4E452] font-semibold">Buildings Covered</p>
-                </div>
-                <div class="stat-card glow">
-                    <h3 class="counter text-5xl font-extrabold text-white" data-target="10">0</h3>
-                    <p class="text-[#F4E452] font-semibold">Guides Available</p>
-                </div>
-            </div>
-        </section>
-        <div class="flex justify-center my-6">
-            <a href="https://manipalmaplive.vercel.app/" target="_blank"
-               class="glow-btn px-10 py-5 text-2xl text-black flex items-center justify-center rounded-full shadow-lg font-bold">
-                Open Campus Map
-            </a>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <nav>
+    <a href="#hero" class="logo">
+      <div class="logo-pin"></div>
+      Manipal UniNav
+    </a>
+    <button id="menu-toggle" aria-label="Toggle menu">☰</button>
+    <div class="nav-links" id="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#stats">Stats</a>
+      <a href="#maps">Map</a>
+      <a href="#how-it-works">Guide</a>
+      <a href="#team">Team</a>
+      <a href="https://manipalmaplive.vercel.app/" target="_blank" class="btn-nav">Open Map ↗</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ── HERO ── -->
+<main>
+<div id="home"></div>
+<section id="hero">
+  <div class="hero-inner">
+    <div class="crosshair">
+      <div class="crosshair-ring"></div>
+      <div class="crosshair-ring"></div>
+      <div class="crosshair-dot">
+        <div class="pin-center"></div>
+      </div>
+    </div>
+    <div class="hero-tag">MUJ Campus Navigator</div>
+    <h1 class="hero-title">
+      Find your way<br>around <span class="accent">Manipal Jaipur</span>
+    </h1>
+    <p class="hero-sub">
+      <span id="typewriter"></span><span class="cursor"></span>
+    </p>
+    <div class="hero-cta">
+      <a href="https://manipalmaplive.vercel.app/" target="_blank" class="btn-primary">
+        🗺 Open Campus Map
+      </a>
+      <a href="#how-it-works" class="btn-secondary">How it works →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">What is UniNav</div>
+      <h2 class="section-title">Navigation built<br>for campus life</h2>
+    </div>
+    <div class="about-grid" style="margin-top:40px;">
+      <div class="about-text reveal">
+        <p>Finding your way around a large university campus can be overwhelming — especially for new students or visitors. <strong>Manipal UniNav</strong> is an interactive navigation platform designed to make this effortless.</p>
+        <p>Built on <strong>OpenStreetMap</strong> and powered by the <strong>OpenRouteService API</strong>, UniNav provides real-time walking directions and accurate pathfinding across the entire MUJ campus — free, fast, and open-source.</p>
+        <p>We split the campus into two navigation zones so routes stay organized and easy to follow, whether you're heading to a lecture or the mess hall.</p>
+      </div>
+      <div class="zone-cards reveal">
+        <div class="zone-card">
+          <div class="zone-icon amber">🏛</div>
+          <div>
+            <h4>College Campus</h4>
+            <p>Academic blocks, libraries, labs, admin buildings, and all academic facilities across the main campus.</p>
+          </div>
         </div>
-        <section id="maps" class="w-full max-w-5xl bg-[#F4E452] p-10 rounded-3xl shadow-xl my-20 text-center px-4">
-            <h2 class="text-4xl font-extrabold text-[#963646] mb-6">Campus Map</h2>
-            <a href="https://manipalmaplive.vercel.app/" target="_blank" class="block rounded-2xl overflow-hidden shadow-lg transform transition duration-300 hover:scale-105">
-                <img src="image/mapintro.png" alt="MUJ Campus Map Preview" class="w-full h-96 object-cover" />
-            </a>
-            <p class="mt-4 text-black font-semibold">
-                Click the map above to explore the full interactive MUJ Navigator.
-            </p>
-        </section>
-        <section id="how-it-works" class="w-full max-w-5xl mx-auto text-center my-20 px-4">
-            <h1 class="text-6xl font-extrabold text-[#F4E452] mb-10 drop-shadow-lg">HOW UNINAV WORKS?</h1>
-            <div class="relative overflow-hidden">
-                <div id="slider" class="flex transition-transform duration-700 ease-in-out">
-                    <div class="w-full flex-shrink-0 text-center p-6">
-                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-                            <img src="./image/1.png" alt="Step 1" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-                            <h3 class="text-2xl font-extrabold text-[#963646] mb-2">Step 1: Open the Website</h3>
-                            <p class="text-gray-800 text-base font-semibold">Go to https://manipalmap.vercel.app/ on your browser. The homepage will load with the interactive MUJ campus map.</p>
-                        </div>
-                    </div>
-                    <div class="w-full flex-shrink-0 text-center p-6">
-                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-                            <img src="./image/2.png" alt="Step 2" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-                            <h3 class="text-2xl font-extrabold text-[#963646] mb-2">Step 2: Search for a Location</h3>
-                            <p class="text-gray-800 text-base font-semibold">Use the search bar at the top to type in the name of a building, block, or facility (e.g., "Library", "Hostel", "Mess").</p>
-                        </div>
-                    </div>
-                    <div class="w-full flex-shrink-0 text-center p-6">
-                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-                            <img src="./image/phonemockup.png" alt="Step 3" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-                            <h3 class="text-2xl font-extrabold text-[#963646] mb-2">Step 3: Get Directions</h3>
-                            <p class="text-gray-800 text-base font-semibold">Click on the location to view details and select the option to get directions. The map will highlight the route for you.</p>
-                        </div>
-                    </div>
-                    <div class="w-full flex-shrink-0 text-center p-6">
-                        <div class="bg-yellow-300 rounded-2xl shadow-xl p-6 animate-glow">
-                            <img src="./image/4.png" alt="Step 4" class="mx-auto mb-4 rounded-xl shadow-md transform transition duration-500 hover:scale-105 w-5/6">
-                            <h3 class="text-2xl font-extrabold text-[#963646] mb-2">Step 4: Navigate the Campus</h3>
-                            <p class="text-gray-800 text-base font-semibold">Follow the highlighted path on the map to easily reach your destination within the MUJ campus.</p>
-                        </div>
-                    </div>
-                </div>
-                <button id="prev" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">‹</button>
-                <button id="next" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#963646] text-white px-3 py-2 rounded-full shadow-md hover:bg-[#b54756] transition">›</button>
-            </div>
-        </section>
-        <section id="team" class="w-full max-w-5xl text-center my-20 px-4">
-            <h1 class="text-6xl font-extrabold text-[#F4E452] mb-12 drop-shadow-lg">Meet The Team</h1>
-            <div class="flex flex-col sm:flex-row justify-center sm:justify-between items-center w-full gap-12">
-                <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50 w-full sm:w-1/3">
-                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                    <img src="./image/bhargavi.jpeg"
-                         class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Bhargavi">
-                    <h3 class="text-2xl font-extrabold text-[#963646] mt-4">Bhargavi Chaudhary</h3>
-                    <p class="text-gray-600 font-semibold">UI/UX Designer</p>
-                </div>
-                <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50 w-full sm:w-1/3">
-                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                    <img src="./image/anmol.jpeg"
-                         class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Anmol">
-                    <h3 class="text-2xl font-extrabold text-[#963646] mt-4">Anmol Srivastava</h3>
-                    <p class="text-gray-600 font-semibold">Lead Developer</p>
-                </div>
-                <div class="relative group bg-white rounded-3xl shadow-2xl p-8 hover:scale-105 transition-transform duration-500 hover:shadow-[#F4E452]/50 w-full sm:w-1/3">
-                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full bg-gradient-to-r from-[#F4E452] via-[#FF780A] to-pink-500 blur-3xl opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                    <img src="./image/tavishi.jpeg"
-                         class="w-32 h-32 mx-auto rounded-full relative z-10 border-4 border-[#F4E452] shadow-lg" alt="Tavishi">
-                    <h3 class="text-2xl font-extrabold text-[#963646] mt-4">Tavishi Singh</h3>
-                    <p class="text-gray-600 font-semibold">Content & Maps</p>
-                </div>
-            </div>
-        </section>
-        <footer class="w-full text-center text-[#F4E452] py-6 mt-12 border-t border-gray-200">
-            © 2025 Manipal UniNav. Made with ❤️ by Team CCG(Campus Compass Guide). All rights reserved.
-        </footer>
-    </main>
-    <script src="script.js"></script>
+        <div class="zone-card">
+          <div class="zone-icon teal">🏠</div>
+          <div>
+            <h4>Hostel Campus</h4>
+            <p>Student hostels, mess areas, recreational spots, and all residential zone destinations.</p>
+          </div>
+        </div>
+        <div class="zone-card">
+          <div class="zone-icon amber">🔗</div>
+          <div>
+            <h4>Open Source</h4>
+            <p>Both map modules are open source — lightweight, scalable, and free to access for everyone on campus.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<section id="stats">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">Impact at a glance</div>
+      <h2 class="section-title">UniNav by the numbers</h2>
+    </div>
+    <div class="stats-row reveal">
+      <div class="stat-card">
+        <div class="stat-number amber counter" data-target="6000">0</div>
+        <div class="stat-label">Students Served</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number teal counter" data-target="30">0</div>
+        <div class="stat-label">Buildings Mapped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple counter" data-target="10">0</div>
+        <div class="stat-label">Guides Available</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAP ── -->
+<section id="maps">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Explore the map</div>
+      <h2 class="section-title">Interactive Campus Map</h2>
+      <p style="color:var(--muted);margin-top:12px;font-size:1rem;">Click anywhere on the map to launch the full interactive navigator.</p>
+    </div>
+    <div class="map-frame reveal">
+      <a href="https://manipalmaplive.vercel.app/" target="_blank">
+        <img src="image/mapintro.png" alt="MUJ Campus Map Preview" />
+        <div class="map-overlay">
+          <div class="map-badge">
+            <div class="live-dot"></div>
+            Live Interactive Map — Click to explore
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">Getting started</div>
+      <h2 class="section-title">How UniNav works</h2>
+    </div>
+    <div class="steps-track" style="margin-top:48px;">
+      <div class="step-card reveal">
+        <div class="step-num">Step 01</div>
+        <div class="step-icon">🌐</div>
+        <h4>Open the Website</h4>
+        <p>Visit manipalmap.vercel.app in any browser. The interactive MUJ campus map loads instantly.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">Step 02</div>
+        <div class="step-icon">🔍</div>
+        <h4>Search a Location</h4>
+        <p>Type a building, block, or facility name — like "Library", "Hostel B", or "Mess" — in the search bar.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">Step 03</div>
+        <div class="step-icon">📍</div>
+        <h4>Get Directions</h4>
+        <p>Tap the location pin to view details and request walking directions. The route lights up on the map.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">Step 04</div>
+        <div class="step-icon">🚶</div>
+        <h4>Navigate</h4>
+        <p>Follow the highlighted path to reach your destination anywhere across the MUJ campus.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TEAM ── -->
+<section id="team">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">The people behind it</div>
+      <h2 class="section-title">Meet the team</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <img src="./image/bhargavi.jpeg" class="team-avatar" alt="Bhargavi Chaudhary" />
+        <div class="team-name">Bhargavi Chaudhary</div>
+        <div class="team-role">UI / UX Designer</div>
+      </div>
+      <div class="team-card reveal">
+        <img src="./image/anmol.jpeg" class="team-avatar" alt="Anmol Srivastava" />
+        <div class="team-name">Anmol Srivastava</div>
+        <div class="team-role">Lead Developer</div>
+      </div>
+      <div class="team-card reveal">
+        <img src="./image/tavishi.jpeg" class="team-avatar" alt="Tavishi Singh" />
+        <div class="team-name">Tavishi Singh</div>
+        <div class="team-role">Content & Maps</div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p>© 2025 Manipal UniNav · Made with <span>♥</span> by Team CCG — Campus Compass Guide · All rights reserved.</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Mobile menu
+  const toggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
+  toggle.addEventListener("click", () => navLinks.classList.toggle("open"));
+  navLinks.querySelectorAll("a").forEach(a => a.addEventListener("click", () => navLinks.classList.remove("open")));
+
+  // Typewriter
+  const el = document.getElementById("typewriter");
+  const text = "Explore academic blocks, hostels, labs, and everything in between — with real-time walking directions across MUJ Jaipur.";
+  let i = 0;
+  const type = setInterval(() => {
+    el.textContent += text.charAt(i++);
+    if (i === text.length) clearInterval(type);
+  }, 38);
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll(".reveal");
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, idx) => {
+      if (e.isIntersecting) {
+        // stagger siblings
+        const siblings = e.target.parentElement.querySelectorAll(".reveal");
+        let delay = 0;
+        siblings.forEach((s, si) => { if(s === e.target) delay = si * 80; });
+        setTimeout(() => e.target.classList.add("visible"), delay);
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => revealObs.observe(r));
+
+  // Counter animation
+  const counters = document.querySelectorAll(".counter");
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = +el.getAttribute("data-target");
+      const dur = 1600;
+      const start = performance.now();
+      const update = (now) => {
+        const t = Math.min((now - start) / dur, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(ease * target).toLocaleString();
+        if (t < 1) requestAnimationFrame(update);
+        else el.textContent = target.toLocaleString();
+      };
+      requestAnimationFrame(update);
+      counterObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => counterObs.observe(c));
+
+});
+</script>
 </body>
 </html>
