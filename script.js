@@ -1,29 +1,37 @@
-// This script runs after the entire HTML document is fully loaded and parsed.
 document.addEventListener("DOMContentLoaded", () => {
   // Mobile Menu Toggle
   const menuToggle = document.getElementById("menu-toggle");
   const navLinks = document.getElementById("nav-links");
   const navItems = navLinks.querySelectorAll("a");
 
-  // Toggle mobile menu on click
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
       navLinks.classList.toggle("hidden");
     });
   }
 
-  // Hide mobile menu when a navigation link is clicked
   navItems.forEach((item) => {
     item.addEventListener("click", () => {
       navLinks.classList.add("hidden");
     });
   });
 
-  // Typewriter effect for the hero section
+  // Smooth Header Background on Scroll
+  const header = document.querySelector('header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('shadow-lg', 'bg-black/80');
+      header.classList.remove('bg-black/60');
+    } else {
+      header.classList.remove('shadow-lg', 'bg-black/80');
+      header.classList.add('bg-black/60');
+    }
+  });
+
+  // Typewriter effect logic
   const typewriterElement = document.getElementById("typewriter");
   if (typewriterElement) {
-    const text =
-      "Explore the vibrant life and architecture of Manipal University and its hostels with our one-stop map navigator.";
+    const text = "Explore the life and architecture of Manipal University with a high-performance map navigator.";
     let index = 0;
 
     const typing = setInterval(() => {
@@ -32,12 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (index === text.length) {
         clearInterval(typing);
       }
-    }, 50); // Adjust typing speed here
+    }, 40); // Slightly faster for a snappier feel
   }
 
-  // Counter animation using Intersection Observer
+  // Counter animation logic
   const counters = document.querySelectorAll(".counter");
-  const speed = 200; // The total number of steps to reach the target
+  const speed = 150; 
 
   const observer = new IntersectionObserver(
     (entries, observer) => {
@@ -45,24 +53,25 @@ document.addEventListener("DOMContentLoaded", () => {
         if (entry.isIntersecting) {
           const counter = entry.target;
           const target = +counter.getAttribute("data-target");
+          
           const updateCount = () => {
             const count = +counter.innerText;
             const increment = target / speed;
 
             if (count < target) {
               counter.innerText = Math.ceil(count + increment);
-              setTimeout(updateCount, 1);
+              setTimeout(updateCount, 10);
             } else {
               counter.innerText = target;
             }
           };
           updateCount();
-          observer.unobserve(counter); // Stop observing after animation
+          observer.unobserve(counter);
         }
       });
     },
     { threshold: 0.5 }
-  ); // Trigger when 50% of the element is visible
+  );
 
   counters.forEach((counter) => {
     observer.observe(counter);
@@ -71,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Service Worker Registration
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('Service Worker registered:', reg))
+      .then(reg => console.log('Service Worker registered successfully'))
       .catch(err => console.log('Service Worker failed:', err));
   }
 });
