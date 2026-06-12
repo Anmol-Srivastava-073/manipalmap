@@ -25,7 +25,7 @@
             transition: background-color 0.5s ease;
         }
         .dark-mode #map { background: #2f3640; }
-        
+
         input:focus-visible, button:focus-visible {
             outline: 3px solid #2980b9;
             outline-offset: 2px;
@@ -58,7 +58,7 @@
             color: #333;
         }
         .input-box input::placeholder { color: #666; font-style: italic; }
-        
+
         .btn {
             background: rgba(255, 255, 255, 0.9);
             border: none;
@@ -72,31 +72,144 @@
             font-size: 13px;
         }
         .btn:hover { background-color: #fff4f1; }
-        
-        #suggestions {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: 800px;
-            width: 90vw;
+
+        /* ── DRAWER ── */
+        #places-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2000;
             background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            max-height: 180px;
-            overflow-y: auto;
-            display: none;
-            z-index: 1600;
-            font-size: 15px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -6px 30px rgba(0,0,0,0.18);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
         }
-        #suggestions div {
-            padding: 12px 15px;
+        #places-drawer.open { transform: translateY(0); }
+        .dark-mode #places-drawer { background: #2f3640; color: white; }
+
+        .drawer-handle {
+            width: 40px;
+            height: 4px;
+            background: #ccc;
+            border-radius: 4px;
+            margin: 12px auto 4px;
+            flex-shrink: 0;
+        }
+        .drawer-header {
+            padding: 8px 16px 10px;
+            flex-shrink: 0;
+        }
+        .drawer-header h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .drawer-search {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #eee;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .drawer-search:focus { border-color: var(--primary); }
+        .dark-mode .drawer-search { background: #3d4451; color: white; border-color: #555; }
+
+        .drawer-categories {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 10px;
+            overflow-x: auto;
+            flex-shrink: 0;
+            scrollbar-width: none;
+        }
+        .drawer-categories::-webkit-scrollbar { display: none; }
+        .cat-chip {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            color: #555;
+            transition: background 0.2s, color 0.2s;
+        }
+        .cat-chip.active, .cat-chip:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .dark-mode .cat-chip { background: #3d4451; color: #ccc; }
+        .dark-mode .cat-chip.active { background: var(--primary); color: white; }
+
+        .drawer-list {
+            overflow-y: auto;
+            flex: 1;
+            padding: 0 10px 20px;
+        }
+        .drawer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .drawer-item:hover { background: #fff4f1; }
+        .dark-mode .drawer-item:hover { background: #3d4451; }
+        .dark-mode .drawer-item { border-bottom-color: #3d4451; }
+        .place-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-hover), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .place-name {
+            font-size: 14px;
+            font-weight: 600;
             color: #333;
         }
-        #suggestions div:hover { background: #f7d7ca; color: var(--primary); }
-        
+        .dark-mode .place-name { color: #eee; }
+        .place-category {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        .dark-mode .place-category { color: #aaa; }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1999;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+        .drawer-overlay.visible { display: block; }
+
+        /* active input which triggered drawer */
+        input.drawer-active {
+            outline: 2px solid white;
+        }
+
+        /* ── rest of original styles ── */
         .travel-info-box {
             position: absolute;
             bottom: 70px;
@@ -115,7 +228,7 @@
             display: none;
         }
         .dark-mode .travel-info-box { background: rgba(47, 54, 64, 0.95); color: white; }
-        
+
         .live-toggle, .cancel-trip {
             position: absolute;
             bottom: 18px;
@@ -143,7 +256,7 @@
             display: none;
         }
         .cancel-trip:hover { background: #ff7675; }
-        
+
         @media (max-width: 600px) {
             .mobile-button-container {
                 position: fixed;
@@ -195,7 +308,7 @@
         }
         #downloadOfflinebtn { background: #4caf50; }
         #darkModeBtn { background: var(--primary); }
-        
+
         #offline-popup {
             position: fixed;
             bottom: 20px;
@@ -218,7 +331,7 @@
 </head>
 <body>
     <div id="map" aria-label="Campus Map"></div>
-    
+
     <div class="top-controls">
         <button class="control-btn" id="darkModeBtn" title="Toggle Dark Mode">🌙</button>
         <button class="control-btn" id="downloadOfflinebtn">📥 Offline</button>
@@ -230,20 +343,32 @@
         <input id="to" type="text" placeholder="To" autocomplete="off" />
         <button class="btn" id="goBtn">Go ➜</button>
     </div>
-    
-    <div id="suggestions" role="listbox"></div>
-    
+
     <div class="travel-info-box" id="travelInfo" aria-live="polite"></div>
-    
+
     <div class="mobile-button-container">
         <button class="live-toggle" id="liveToggle" aria-pressed="false">Start Live Location</button>
         <button class="cancel-trip" id="cancelTripBtn">Cancel Trip</button>
     </div>
-    
+
     <div id="offline-popup">
         <div class="title">Downloading area…</div>
         <div class="progress-bar"><div id="offline-progress"></div></div>
         <div id="offline-status">0%</div>
+    </div>
+
+    <!-- DRAWER OVERLAY -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- PLACES DRAWER -->
+    <div id="places-drawer" role="dialog" aria-label="All places">
+        <div class="drawer-handle"></div>
+        <div class="drawer-header">
+            <h3>📍 All Places</h3>
+            <input class="drawer-search" id="drawerSearch" type="text" placeholder="Search places…" autocomplete="off" />
+        </div>
+        <div class="drawer-categories" id="drawerCategories"></div>
+        <div class="drawer-list" id="drawerList"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -269,7 +394,7 @@
         const map = L.map('map').setView([26.8436, 75.565], 16);
         const lightUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         const darkUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-        
+
         const lightLayer = L.tileLayer(lightUrl, { maxZoom: 19, crossOrigin: true }).addTo(map);
         const darkLayer = L.tileLayer(darkUrl, { maxZoom: 19, crossOrigin: true });
 
@@ -290,37 +415,145 @@
 
         const SUBWAY_COORDS = [26.842031, 75.563313];
 
-        const LANDMARKS = {
-            "AB1 Block": [26.842586, 75.564249], "AB2 Block": [26.843117, 75.5661],
-            "AB3 Block": [26.84407, 75.564072], "BlueDove Mess": [26.840432, 75.561798],
-            "BluSpring(INDYA) Mess": [26.841255, 75.561567], "Laundry": [26.840202, 75.561454],
-            "Old Mess": [26.843112, 75.565209], "Central Library": [26.841648, 75.565944],
-            "Lecture Hall Complex/ AB4 Block": [26.844338, 75.564705], "Main Gate": [26.840729, 75.566325],
-            "Gate 2": [26.841524, 75.563868], "Grand Stairs": [26.842507, 75.565467],
-            "Block G1": [26.840815, 75.563450], "Block G2": [26.840642, 75.562629],
-            "Block G3": [26.840518, 75.562956], "Block G4": [26.840587, 75.562146],
-            "G4 Badminton Court": [26.840350, 75.562369], "Gym": [26.841210, 75.561594],
-            "Block B1": [26.841782, 75.562967], "Block B3": [26.841413, 75.562431],
-            "Block B5": [26.841729, 75.561921], "Block B2": [26.842045, 75.562189],
-            "Block B6": [26.842165, 75.561690], "Block B7": [26.841859, 75.560896],
-            "Transformer": [26.841538, 75.560730], "Chiller Panel Room": [26.841275, 75.560800],
-            "GHS Library": [26.840317, 75.561444], "Jogger's Park": [26.840092, 75.563310],
-            "Subway Entrance": [26.842031, 75.563313], "Saras Juice Corner": [26.840758, 75.563485],
-            "Subway Wraps": [26.841445, 75.563090], "Taste Of India": [26.841445, 75.563090],
-            "Chatkara": [26.841445, 75.563090], "Waffle Shop": [26.841399, 75.562809],
-            "Cook House": [26.840952, 75.563493], "Administrative Block": [26.841672, 75.565992],
-            "AWS Building": [26.843797, 75.566947]
+        // LANDMARKS with category and emoji
+        const LANDMARKS_DATA = {
+            "AB1 Block":                      { coords: [26.842586, 75.564249], category: "Academic",     icon: "🏫" },
+            "AB2 Block":                      { coords: [26.843117, 75.5661],   category: "Academic",     icon: "🏫" },
+            "AB3 Block":                      { coords: [26.84407,  75.564072], category: "Academic",     icon: "🏫" },
+            "Lecture Hall Complex/ AB4 Block":{ coords: [26.844338, 75.564705], category: "Academic",     icon: "🏫" },
+            "Central Library":                { coords: [26.841648, 75.565944], category: "Academic",     icon: "📚" },
+            "GHS Library":                    { coords: [26.840317, 75.561444], category: "Academic",     icon: "📚" },
+            "Administrative Block":           { coords: [26.841672, 75.565992], category: "Academic",     icon: "🏢" },
+            "AWS Building":                   { coords: [26.843797, 75.566947], category: "Academic",     icon: "🏢" },
+            "BlueDove Mess":                  { coords: [26.840432, 75.561798], category: "Food",         icon: "🍽️" },
+            "BluSpring(INDYA) Mess":          { coords: [26.841255, 75.561567], category: "Food",         icon: "🍽️" },
+            "Old Mess":                       { coords: [26.843112, 75.565209], category: "Food",         icon: "🍽️" },
+            "Saras Juice Corner":             { coords: [26.840758, 75.563485], category: "Food",         icon: "🥤" },
+            "Subway Wraps":                   { coords: [26.841445, 75.563090], category: "Food",         icon: "🥪" },
+            "Taste Of India":                 { coords: [26.841445, 75.563090], category: "Food",         icon: "🍛" },
+            "Chatkara":                       { coords: [26.841445, 75.563090], category: "Food",         icon: "🌮" },
+            "Waffle Shop":                    { coords: [26.841399, 75.562809], category: "Food",         icon: "🧇" },
+            "Cook House":                     { coords: [26.840952, 75.563493], category: "Food",         icon: "🍳" },
+            "Block G1":                       { coords: [26.840815, 75.563450], category: "Hostel",       icon: "🏠" },
+            "Block G2":                       { coords: [26.840642, 75.562629], category: "Hostel",       icon: "🏠" },
+            "Block G3":                       { coords: [26.840518, 75.562956], category: "Hostel",       icon: "🏠" },
+            "Block G4":                       { coords: [26.840587, 75.562146], category: "Hostel",       icon: "🏠" },
+            "Block B1":                       { coords: [26.841782, 75.562967], category: "Hostel",       icon: "🏠" },
+            "Block B2":                       { coords: [26.842045, 75.562189], category: "Hostel",       icon: "🏠" },
+            "Block B3":                       { coords: [26.841413, 75.562431], category: "Hostel",       icon: "🏠" },
+            "Block B5":                       { coords: [26.841729, 75.561921], category: "Hostel",       icon: "🏠" },
+            "Block B6":                       { coords: [26.842165, 75.561690], category: "Hostel",       icon: "🏠" },
+            "Block B7":                       { coords: [26.841859, 75.560896], category: "Hostel",       icon: "🏠" },
+            "Main Gate":                      { coords: [26.840729, 75.566325], category: "Gates",        icon: "🚪" },
+            "Gate 2":                         { coords: [26.841524, 75.563868], category: "Gates",        icon: "🚪" },
+            "Subway Entrance":                { coords: [26.842031, 75.563313], category: "Gates",        icon: "🚇" },
+            "Grand Stairs":                   { coords: [26.842507, 75.565467], category: "Landmarks",    icon: "🪜" },
+            "Jogger's Park":                  { coords: [26.840092, 75.563310], category: "Landmarks",    icon: "🌳" },
+            "G4 Badminton Court":             { coords: [26.840350, 75.562369], category: "Sports",       icon: "🏸" },
+            "Gym":                            { coords: [26.841210, 75.561594], category: "Sports",       icon: "💪" },
+            "Laundry":                        { coords: [26.840202, 75.561454], category: "Facilities",   icon: "👕" },
+            "Transformer":                    { coords: [26.841538, 75.560730], category: "Facilities",   icon: "⚡" },
+            "Chiller Panel Room":             { coords: [26.841275, 75.560800], category: "Facilities",   icon: "❄️" },
         };
-        
+
+        // Build flat LANDMARKS object for routing compatibility
+        const LANDMARKS = {};
+        Object.entries(LANDMARKS_DATA).forEach(([name, data]) => {
+            LANDMARKS[name] = data.coords;
+        });
+
+        // ── DRAWER LOGIC ──
+        const drawer = document.getElementById('places-drawer');
+        const overlay = document.getElementById('drawerOverlay');
+        const drawerList = document.getElementById('drawerList');
+        const drawerSearch = document.getElementById('drawerSearch');
+        const drawerCategories = document.getElementById('drawerCategories');
+
+        let activeInputId = null;
+        let activeCategory = 'All';
+
+        const categories = ['All', ...new Set(Object.values(LANDMARKS_DATA).map(d => d.category))];
+
+        // Build category chips
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'cat-chip' + (cat === 'All' ? ' active' : '');
+            btn.textContent = cat;
+            btn.addEventListener('click', () => {
+                activeCategory = cat;
+                document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                renderDrawerList(drawerSearch.value);
+            });
+            drawerCategories.appendChild(btn);
+        });
+
+        function renderDrawerList(query = '') {
+            drawerList.innerHTML = '';
+            const q = query.trim().toLowerCase();
+            Object.entries(LANDMARKS_DATA).forEach(([name, data]) => {
+                if (activeCategory !== 'All' && data.category !== activeCategory) return;
+                if (q && !name.toLowerCase().includes(q)) return;
+
+                const item = document.createElement('div');
+                item.className = 'drawer-item';
+                item.innerHTML = `
+                    <div class="place-icon">${data.icon}</div>
+                    <div>
+                        <div class="place-name">${name}</div>
+                        <div class="place-category">${data.category}</div>
+                    </div>`;
+                item.addEventListener('click', () => {
+                    if (activeInputId) {
+                        document.getElementById(activeInputId).value = name;
+                    }
+                    closeDrawer();
+                    // Pan map to location
+                    map.setView(data.coords, 18);
+                });
+                drawerList.appendChild(item);
+            });
+
+            if (!drawerList.children.length) {
+                drawerList.innerHTML = '<div style="text-align:center;padding:30px;color:#aaa;">No places found</div>';
+            }
+        }
+
+        function openDrawer(inputId) {
+            activeInputId = inputId;
+            drawerSearch.value = document.getElementById(inputId).value;
+            renderDrawerList(drawerSearch.value);
+            drawer.classList.add('open');
+            overlay.classList.add('visible');
+            drawerSearch.focus();
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            overlay.classList.remove('visible');
+            activeInputId = null;
+        }
+
+        drawerSearch.addEventListener('input', () => renderDrawerList(drawerSearch.value));
+        overlay.addEventListener('click', closeDrawer);
+
+        // Open drawer on focus of from/to inputs
+        ['from', 'to'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('focus', () => openDrawer(id));
+            el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { closeDrawer(); navigate(); } });
+        });
+
+        // ── ROUTING ──
         const HOSTEL_POLYGON = [[26.84337, 75.56231], [26.83925, 75.56459], [26.83862, 75.56178], [26.84262, 75.56036], [26.84337, 75.56231]];
         const COLLEGE_POLYGON = [[26.84622, 75.56238], [26.83902, 75.56532], [26.84450, 75.56806], [26.84647, 75.56523], [26.84622, 75.56238]];
-        
+
         let routeLayer = null, fromMarker = null, toMarker = null, subwayMarker = null;
         let watchId = null, liveMarker = null, liveAccuracyCircle = null;
 
         function turfPoint(coords){ return { type: 'Feature', geometry: { type: 'Point', coordinates: coords } }; }
         function turfPolygon(coords){ return { type: 'Feature', geometry: { type: 'Polygon', coordinates: coords } }; }
-        
+
         function turfBooleanPointInPolygon(pt, poly) {
             const x = pt.geometry.coordinates[0], y = pt.geometry.coordinates[1];
             const vs = poly.geometry.coordinates[0];
@@ -362,19 +595,17 @@
             const coords = [[start[1], start[0]]];
             if (useSubway) coords.push([SUBWAY_COORDS[1], SUBWAY_COORDS[0]]);
             coords.push([end[1], end[0]]);
-            
+
             const res = await fetch('/api/directions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ coordinates: coords }),
             });
 
-            // Surface the real error message from the API response
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
                 throw new Error(errData.error || res.statusText);
             }
-
             return res.json();
         }
 
@@ -383,29 +614,29 @@
             const fromInput = document.getElementById('from').value;
             const toInput = document.getElementById('to').value;
             if (!fromInput || !toInput) return alert('Please enter both locations.');
-            
+
             const fromCoords = parseCoords(fromInput);
             const toCoords = parseCoords(toInput);
-            if (!fromCoords || !toCoords) return alert('Invalid locations. Please select from suggestions or enter as "lat, lon".');
-            
+            if (!fromCoords || !toCoords) return alert('Invalid locations. Please select from the list or enter as "lat, lon".');
+
             const mustUseSubway = campusOf(fromCoords) && campusOf(toCoords) && campusOf(fromCoords) !== campusOf(toCoords);
-            
+
             try {
                 const routeGeojson = await fetchRoute(fromCoords, toCoords, mustUseSubway);
                 routeLayer = L.geoJSON(routeGeojson, { style: { color: '#ff7e5f', weight: 6, opacity: 0.85 } }).addTo(map);
-                
+
                 const bounds = routeLayer.getBounds();
                 if (bounds.isValid()) map.fitBounds(bounds.pad(0.15));
-                
+
                 const summary = routeGeojson.features[0].properties.summary;
                 const travelInfoEl = document.getElementById('travelInfo');
                 travelInfoEl.innerHTML = `<b>Trip Info</b><br>Distance: ${(summary.distance / 1000).toFixed(2)} km<br>Est. time: ${Math.round(summary.duration / 60)} mins`;
                 travelInfoEl.style.display = 'block';
                 document.getElementById('cancelTripBtn').style.display = 'block';
-                
-                fromMarker = L.marker(fromCoords, { icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
-                toMarker = L.marker(toCoords, { icon: L.divIcon({ className: 'end-marker', html: '<div style="background:#ff7e5f; border-radius:50%; width:24px; height:24px; color:#fff; font-weight:700; display:flex; justify-content:center; align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
-                
+
+                fromMarker = L.marker(fromCoords, { icon: L.divIcon({ className: 'start-marker', html: '<div style="background:#ff7e5f;border-radius:50%;width:24px;height:24px;color:#fff;font-weight:700;display:flex;justify-content:center;align-items:center;">A</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+                toMarker   = L.marker(toCoords,   { icon: L.divIcon({ className: 'end-marker',   html: '<div style="background:#ff7e5f;border-radius:50%;width:24px;height:24px;color:#fff;font-weight:700;display:flex;justify-content:center;align-items:center;">B</div>', iconSize: [24,24], iconAnchor: [12,12] }) }).addTo(map);
+
                 if (mustUseSubway) {
                     subwayMarker = L.circleMarker(SUBWAY_COORDS, { radius: 8, color: '#2d3436', fillColor: '#fff', weight: 2 }).bindPopup('Subway (required transfer)').addTo(map);
                     travelInfoEl.innerHTML += `<br><small style="font-weight:600;">Transfer via Subway required.</small>`;
@@ -414,37 +645,6 @@
                 alert('Routing failed: ' + e.message);
             }
         }
-
-        function showSuggestions(input) {
-            const val = input.value.trim().toLowerCase();
-            const suggestBox = document.getElementById('suggestions');
-            suggestBox.innerHTML = '';
-            if (!val) return suggestBox.style.display = 'none';
-            
-            const matches = Object.keys(LANDMARKS).filter(n => n.toLowerCase().includes(val));
-            if (!matches.length) return suggestBox.style.display = 'none';
-            
-            suggestBox.style.display = 'block';
-            matches.forEach(name => {
-                const div = document.createElement('div');
-                div.textContent = name;
-                div.onclick = () => { input.value = name; suggestBox.style.display = 'none'; };
-                suggestBox.appendChild(div);
-            });
-        }
-
-        ['from', 'to'].forEach(id => {
-            const el = document.getElementById(id);
-            el.addEventListener('input', () => showSuggestions(el));
-            el.addEventListener('focus', () => showSuggestions(el));
-            el.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigate(); });
-        });
-        
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.input-box') && !e.target.closest('#suggestions')) {
-                document.getElementById('suggestions').style.display = 'none';
-            }
-        });
 
         function useCurrentLocationAsFrom() {
             if (!navigator.geolocation) return alert('Geolocation not supported.');
@@ -481,7 +681,7 @@
                         map.setView([latitude, longitude], 17);
                         btn.textContent = 'Stop Tracking';
                     },
-                    (err) => { alert("Tracking error."); toggleLive(); },
+                    () => { alert("Tracking error."); toggleLive(); },
                     { enableHighAccuracy: true, timeout: 15000 }
                 );
             }
@@ -490,15 +690,15 @@
         function prefetchTiles() {
             if (!navigator.serviceWorker?.controller) return alert('Service Worker inactive. Refresh page.');
             const activeTemplate = isDark ? darkUrl : lightUrl;
-            navigator.serviceWorker.controller.postMessage({ 
-                type: 'PREFETCH_TILES', 
-                bbox: [75.5595, 26.8385, 75.5715, 26.8485], 
+            navigator.serviceWorker.controller.postMessage({
+                type: 'PREFETCH_TILES',
+                bbox: [75.5595, 26.8385, 75.5715, 26.8485],
                 zooms: [15, 16, 17, 18],
-                tileUrlTemplate: activeTemplate 
+                tileUrlTemplate: activeTemplate
             });
         }
 
-        document.getElementById('goBtn').addEventListener('click', navigate);
+        document.getElementById('goBtn').addEventListener('click', () => { closeDrawer(); navigate(); });
         document.getElementById('useCurrentBtn').addEventListener('click', useCurrentLocationAsFrom);
         document.getElementById('liveToggle').addEventListener('click', toggleLive);
         document.getElementById('cancelTripBtn').addEventListener('click', cancelTrip);
