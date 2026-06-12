@@ -1,86 +1,96 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Mobile Menu Toggle
+
+  // ---- Navbar scroll state ----
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    navbar.classList.toggle("scrolled", window.scrollY > 40);
+  });
+
+  // ---- Mobile menu toggle ----
   const menuToggle = document.getElementById("menu-toggle");
   const navLinks = document.getElementById("nav-links");
-  const navItems = navLinks.querySelectorAll("a");
 
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("hidden");
+      navLinks.classList.toggle("open");
     });
   }
 
-  navItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      navLinks.classList.add("hidden");
+  // Close mobile menu on link click
+  navLinks.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      navLinks.classList.remove("open");
     });
   });
 
-  // Smooth Header Background on Scroll
-  const header = document.querySelector('header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      header.classList.add('shadow-lg', 'bg-black/80');
-      header.classList.remove('bg-black/60');
-    } else {
-      header.classList.remove('shadow-lg', 'bg-black/80');
-      header.classList.add('bg-black/60');
-    }
-  });
+  // ---- Active nav link on scroll ----
+  const sections = document.querySelectorAll("section[id], div[id='hero']");
+  const navAnchors = document.querySelectorAll(".nav-links a");
 
-  // Typewriter effect logic
-  const typewriterElement = document.getElementById("typewriter");
-  if (typewriterElement) {
-    const text = "Explore the life and architecture of Manipal University with a high-performance map navigator.";
-    let index = 0;
-
-    const typing = setInterval(() => {
-      typewriterElement.textContent += text.charAt(index);
-      index++;
-      if (index === text.length) {
-        clearInterval(typing);
-      }
-    }, 40); // Slightly faster for a snappier feel
-  }
-
-  // Counter animation logic
-  const counters = document.querySelectorAll(".counter");
-  const speed = 150; 
-
-  const observer = new IntersectionObserver(
-    (entries, observer) => {
-      entries.forEach((entry) => {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
-          const counter = entry.target;
-          const target = +counter.getAttribute("data-target");
-          
-          const updateCount = () => {
-            const count = +counter.innerText;
-            const increment = target / speed;
+          const id = entry.target.id;
+          navAnchors.forEach(a => {
+            a.classList.toggle("active", a.getAttribute("href") === `#${id}`);
+          });
+        }
+      });
+    },
+    { threshold: 0.35 }
+  );
 
-            if (count < target) {
-              counter.innerText = Math.ceil(count + increment);
-              setTimeout(updateCount, 10);
-            } else {
-              counter.innerText = target;
-            }
+  document.querySelectorAll("section[id]").forEach(s => sectionObserver.observe(s));
+
+  // ---- Reveal on scroll ----
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15 }
+  );
+
+  document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
+
+  // ---- Counter animation ----
+  const counters = document.querySelectorAll(".counter");
+
+  const counterObserver = new IntersectionObserver(
+    (entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = +el.getAttribute("data-target");
+          const duration = 1400;
+          const step = Math.ceil(target / (duration / 16));
+          let current = 0;
+
+          const tick = () => {
+            current = Math.min(current + step, target);
+            el.textContent = current.toLocaleString();
+            if (current < target) requestAnimationFrame(tick);
           };
-          updateCount();
-          observer.unobserve(counter);
+
+          requestAnimationFrame(tick);
+          obs.unobserve(el);
         }
       });
     },
     { threshold: 0.5 }
   );
 
-  counters.forEach((counter) => {
-    observer.observe(counter);
-  });
+  counters.forEach(c => counterObserver.observe(c));
 
-  // Service Worker Registration
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('Service Worker registered successfully'))
-      .catch(err => console.log('Service Worker failed:', err));
+  // ---- Service Worker ----
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js")
+      .then(reg => console.log("SW registered:", reg))
+      .catch(err => console.log("SW failed:", err));
   }
 });
