@@ -1,96 +1,77 @@
+// This script runs after the entire HTML document is fully loaded and parsed.
 document.addEventListener("DOMContentLoaded", () => {
-
-  // ---- Navbar scroll state ----
-  const navbar = document.getElementById("navbar");
-  window.addEventListener("scroll", () => {
-    navbar.classList.toggle("scrolled", window.scrollY > 40);
-  });
-
-  // ---- Mobile menu toggle ----
+  // Mobile Menu Toggle
   const menuToggle = document.getElementById("menu-toggle");
   const navLinks = document.getElementById("nav-links");
+  const navItems = navLinks.querySelectorAll("a");
 
+  // Toggle mobile menu on click
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("open");
+      navLinks.classList.toggle("hidden");
     });
   }
 
-  // Close mobile menu on link click
-  navLinks.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-      navLinks.classList.remove("open");
+  // Hide mobile menu when a navigation link is clicked
+  navItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      navLinks.classList.add("hidden");
     });
   });
 
-  // ---- Active nav link on scroll ----
-  const sections = document.querySelectorAll("section[id], div[id='hero']");
-  const navAnchors = document.querySelectorAll(".nav-links a");
+  // Typewriter effect for the hero section
+  const typewriterElement = document.getElementById("typewriter");
+  if (typewriterElement) {
+    const text =
+      "Explore the vibrant life and architecture of Manipal University and its hostels with our one-stop map navigator.";
+    let index = 0;
 
-  const sectionObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          navAnchors.forEach(a => {
-            a.classList.toggle("active", a.getAttribute("href") === `#${id}`);
-          });
-        }
-      });
-    },
-    { threshold: 0.35 }
-  );
+    const typing = setInterval(() => {
+      typewriterElement.textContent += text.charAt(index);
+      index++;
+      if (index === text.length) {
+        clearInterval(typing);
+      }
+    }, 50); // Adjust typing speed here
+  }
 
-  document.querySelectorAll("section[id]").forEach(s => sectionObserver.observe(s));
-
-  // ---- Reveal on scroll ----
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.15 }
-  );
-
-  document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
-
-  // ---- Counter animation ----
+  // Counter animation using Intersection Observer
   const counters = document.querySelectorAll(".counter");
+  const speed = 200; // The total number of steps to reach the target
 
-  const counterObserver = new IntersectionObserver(
-    (entries, obs) => {
-      entries.forEach(entry => {
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const el = entry.target;
-          const target = +el.getAttribute("data-target");
-          const duration = 1400;
-          const step = Math.ceil(target / (duration / 16));
-          let current = 0;
+          const counter = entry.target;
+          const target = +counter.getAttribute("data-target");
+          const updateCount = () => {
+            const count = +counter.innerText;
+            const increment = target / speed;
 
-          const tick = () => {
-            current = Math.min(current + step, target);
-            el.textContent = current.toLocaleString();
-            if (current < target) requestAnimationFrame(tick);
+            if (count < target) {
+              counter.innerText = Math.ceil(count + increment);
+              setTimeout(updateCount, 1);
+            } else {
+              counter.innerText = target;
+            }
           };
-
-          requestAnimationFrame(tick);
-          obs.unobserve(el);
+          updateCount();
+          observer.unobserve(counter); // Stop observing after animation
         }
       });
     },
     { threshold: 0.5 }
-  );
+  ); // Trigger when 50% of the element is visible
 
-  counters.forEach(c => counterObserver.observe(c));
+  counters.forEach((counter) => {
+    observer.observe(counter);
+  });
 
-  // ---- Service Worker ----
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js")
-      .then(reg => console.log("SW registered:", reg))
-      .catch(err => console.log("SW failed:", err));
+  // Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registered:', reg))
+      .catch(err => console.log('Service Worker failed:', err));
   }
 });
