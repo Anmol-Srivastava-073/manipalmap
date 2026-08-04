@@ -1,0 +1,27 @@
+//BACKUP FOR TEAM DETAILS
+
+<section id="team">
+  <div class="container">
+    <div class="reveal">
+      <div class="eyebrow">The people behind it</div>
+      <h2 class="section-title">Meet the team</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <img src="./image/bhargavi.jpeg" class="team-avatar" alt="Bhargavi Chaudhary" />
+        <div class="team-name">Bhargavi Chaudhary</div>
+        <div class="team-role">UI / UX Design</div>
+      </div>
+      <div class="team-card reveal">
+        <img src="./image/anmol.jpeg" class="team-avatar" alt="Anmol Srivastava" />
+        <div class="team-name">Anmol Srivastava</div>
+        <div class="team-role">Lead Developer</div>
+      </div>
+      <div class="team-card reveal">
+        <img src="./image/tavishi.jpeg" class="team-avatar" alt="Tavishi Singh" />
+        <div class="team-name">Tavishi Singh</div>
+        <div class="team-role">Content & Maps</div>
+      </div>
+    </div>
+  </div>
+</section>
